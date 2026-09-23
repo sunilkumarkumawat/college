@@ -267,13 +267,13 @@ $classType = Helper::classType();
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group mb-1">
-                                                    <label class="mb-0" style="font-size:10.5px; font-weight:700;">Default Amount (₹)*</label>
+                                                    <label class="mb-0" style="font-size:10.5px; font-weight:700;">Default Amount (₹)</label>
                                                     <input type="text" class="form-control form-control-sm font-weight-bold text-success" id="batch_common_amount" placeholder="e.g. 15000" value="15000" oninput="syncCommonAmount(this.value)" onkeypress="javascript:return isNumber(event)">
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group mb-1">
-                                                    <label class="mb-0" style="font-size:10.5px; font-weight:700;">Default Due Date</label>
+                                                    <label class="mb-0" style="font-size:10.5px; font-weight:700;">Default Due Date (Optional)</label>
                                                     <input type="date" class="form-control form-control-sm" id="batch_common_due_date" onchange="syncCommonDueDate(this.value)">
                                                 </div>
                                             </div>
@@ -787,10 +787,10 @@ function updateSemPreview() {
         html += '<table class="table table-sm table-bordered table-striped mb-0 text-dark" style="font-size: 11px; background: #ffffff;">';
         html += '<thead style="background: #002c54; color: #ffffff; position: sticky; top: 0; z-index: 2;">';
         html += '<tr>';
-        html += '<th style="padding: 4px 6px; width: 28%; background: #002c54; color: #ffffff;">Class / Sem</th>';
-        html += '<th style="padding: 4px 6px; width: 32%; background: #002c54; color: #ffffff;">Fee Head Name</th>';
-        html += '<th style="padding: 4px 6px; width: 22%; background: #002c54; color: #ffffff;">Amount (₹)*</th>';
-        html += '<th style="padding: 4px 6px; width: 18%; background: #002c54; color: #ffffff;">Due Date</th>';
+        html += '<th style="padding: 4px 6px; width: 25%; background: #002c54; color: #ffffff;">Class / Sem</th>';
+        html += '<th style="padding: 4px 6px; width: 31%; background: #002c54; color: #ffffff;">Fee Head Name</th>';
+        html += '<th style="padding: 4px 6px; width: 22%; background: #002c54; color: #ffffff;">Amount (₹)</th>';
+        html += '<th style="padding: 4px 6px; width: 22%; background: #002c54; color: #ffffff;">Due Date</th>';
         html += '</tr>';
         html += '</thead>';
         html += '<tbody>';
@@ -821,16 +821,17 @@ function updateSemPreview() {
         document.getElementById('submit_btn').innerHTML = '<i class="fa fa-check-circle"></i> Save ' + loopCount + ' Semester Fee Structure (Fees Master)';
     } else {
         html += '<div class="alert alert-info py-1 px-2 mb-2" style="font-size: 10.5px; border-radius: 4px; background: #e8f4fd; border: 1px solid #b8daff; color: #004085;">';
-        html += '<i class="fa fa-info-circle"></i> <strong>Tip:</strong> Select a course from the dropdown above to automatically link to classes. You can also customize individual amounts below:';
+        html += '<i class="fa fa-info-circle"></i> <strong>Tip:</strong> Select a course from the dropdown above to automatically link to classes. You can also customize individual amounts & due dates below:';
         html += '</div>';
 
         html += '<div class="table-responsive" style="max-height: 200px; overflow-y: auto; border: 1px solid #c2d4ea; border-radius: 4px;">';
         html += '<table class="table table-sm table-bordered table-striped mb-0 text-dark" style="font-size: 11px; background: #ffffff;">';
         html += '<thead style="background: #002c54; color: #ffffff; position: sticky; top: 0; z-index: 2;">';
         html += '<tr>';
-        html += '<th style="padding: 4px 6px; width: 28%; background: #002c54; color: #ffffff;">Semester</th>';
-        html += '<th style="padding: 4px 6px; width: 44%; background: #002c54; color: #ffffff;">Fee Head Name</th>';
-        html += '<th style="padding: 4px 6px; width: 28%; background: #002c54; color: #ffffff;">Amount (₹)*</th>';
+        html += '<th style="padding: 4px 6px; width: 22%; background: #002c54; color: #ffffff;">Semester</th>';
+        html += '<th style="padding: 4px 6px; width: 34%; background: #002c54; color: #ffffff;">Fee Head Name</th>';
+        html += '<th style="padding: 4px 6px; width: 22%; background: #002c54; color: #ffffff;">Amount (₹)</th>';
+        html += '<th style="padding: 4px 6px; width: 22%; background: #002c54; color: #ffffff;">Due Date</th>';
         html += '</tr>';
         html += '</thead>';
         html += '<tbody>';
@@ -841,6 +842,7 @@ function updateSemPreview() {
             html += '<td style="vertical-align: middle; padding: 4px 6px;"><strong class="text-primary">Semester ' + i + '</strong></td>';
             html += '<td style="vertical-align: middle; padding: 4px 6px;"><input type="text" name="names[]" class="form-control form-control-sm p-1 font-weight-bold text-dark" value="' + headName + '" style="font-size: 11px; height: 26px; border: 1px solid #ced4da;"></td>';
             html += '<td style="vertical-align: middle; padding: 4px 6px;"><input type="number" class="form-control form-control-sm p-1 font-weight-bold text-success text-right sem-row-amount" value="' + commonAmount + '" min="0" style="font-size: 11px; height: 26px; border: 1px solid #28a745; background: #f8fff9;"></td>';
+            html += '<td style="vertical-align: middle; padding: 4px 6px;"><input type="date" class="form-control form-control-sm p-1 sem-row-due" value="' + commonDueDate + '" style="font-size: 10px; height: 26px; border: 1px solid #ced4da;"></td>';
             html += '</tr>';
         }
 

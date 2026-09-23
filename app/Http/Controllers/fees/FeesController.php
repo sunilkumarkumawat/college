@@ -276,30 +276,28 @@ class FeesController extends Controller
                                 }
 
                                 // 2. Create or update FeesMaster for this class
-                                if ($amt > 0 || !empty($dueDate)) {
-                                    $fm = \App\Models\FeesMaster::where('session_id', $session_id)
-                                        ->where('branch_id', $branch_id)
-                                        ->where('class_type_id', $cTypeId)
-                                        ->where('fees_group_id', $fg->id)
-                                        ->whereNull('deleted_at')
-                                        ->first();
-                                    if (!$fm) {
-                                        $fm = new \App\Models\FeesMaster;
-                                        $fm->user_id = $user_id;
-                                        $fm->session_id = $session_id;
-                                        $fm->branch_id = $branch_id;
-                                        $fm->class_type_id = $cTypeId;
-                                        $fm->fees_group_id = $fg->id;
-                                    }
-                                    $fm->amount = $amt;
-                                    $fm->nri = $amt;
-                                    $fm->management = $amt;
-                                    $fm->govt = $amt;
-                                    $fm->installment_due_date = $dueDate;
-                                    $fm->editable = 0;
-                                    $fm->save();
-                                    $assignedCount++;
+                                $fm = \App\Models\FeesMaster::where('session_id', $session_id)
+                                    ->where('branch_id', $branch_id)
+                                    ->where('class_type_id', $cTypeId)
+                                    ->where('fees_group_id', $fg->id)
+                                    ->whereNull('deleted_at')
+                                    ->first();
+                                if (!$fm) {
+                                    $fm = new \App\Models\FeesMaster;
+                                    $fm->user_id = $user_id;
+                                    $fm->session_id = $session_id;
+                                    $fm->branch_id = $branch_id;
+                                    $fm->class_type_id = $cTypeId;
+                                    $fm->fees_group_id = $fg->id;
                                 }
+                                $fm->amount = $amt;
+                                $fm->nri = $amt;
+                                $fm->management = $amt;
+                                $fm->govt = $amt;
+                                $fm->installment_due_date = $dueDate;
+                                $fm->editable = 0;
+                                $fm->save();
+                                $assignedCount++;
                             }
                         }
                         return redirect::to('feesGroup')->with('message', 'Fees Structure & Heads Saved Successfully for ' . $assignedCount . ' Classes/Semesters !');
