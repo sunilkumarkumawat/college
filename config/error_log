@@ -1,0 +1,12 @@
+[20-May-2024 19:03:19 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/eplanetacademy/public_html/erp/config/database.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/eplanetacademy/public_html/erp/config/database.php on line 18
+[27-Jun-2024 12:14:31 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/rusoft/public_html/demo3/config/database.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/rusoft/public_html/demo3/config/database.php on line 18
+[16-Aug-2024 09:03:09 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/rusoft/public_html/talent/config/database.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/rusoft/public_html/talent/config/database.php on line 18
