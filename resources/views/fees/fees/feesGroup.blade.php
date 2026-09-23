@@ -257,26 +257,13 @@ $classType = Helper::classType();
                                         </div>
                                     </div>
 
-                                    <!-- Fees Master Assignment Settings (Amount & Due Date) -->
+                                    <!-- Fees Master Assignment Settings (Default Amount) -->
                                     <div class="fee-master-amount-box">
-                                        <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <label class="font-weight-bold text-dark mb-0" style="font-size:11.5px;">
-                                                <i class="fa fa-check-square-o text-success"></i> Default Amount & Due Date (Applied to all semesters):
+                                        <div class="form-group mb-0">
+                                            <label class="font-weight-bold text-dark mb-1" style="font-size:11.5px;">
+                                                <i class="fa fa-check-square-o text-success"></i> Default Amount (Applied to all semesters):
                                             </label>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-group mb-1">
-                                                    <label class="mb-0" style="font-size:10.5px; font-weight:700;">Default Amount (₹)</label>
-                                                    <input type="text" class="form-control form-control-sm font-weight-bold text-success" id="batch_common_amount" placeholder="e.g. 15000" value="15000" oninput="syncCommonAmount(this.value)" onkeypress="javascript:return isNumber(event)">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group mb-1">
-                                                    <label class="mb-0" style="font-size:10.5px; font-weight:700;">Default Due Date (Optional)</label>
-                                                    <input type="date" class="form-control form-control-sm" id="batch_common_due_date" onchange="syncCommonDueDate(this.value)">
-                                                </div>
-                                            </div>
+                                            <input type="text" class="form-control form-control-sm font-weight-bold text-success" id="batch_common_amount" placeholder="e.g. 15000" value="15000" oninput="syncCommonAmount(this.value)" onkeypress="javascript:return isNumber(event)">
                                         </div>
                                     </div>
                                 </div>
@@ -769,15 +756,10 @@ function syncCommonAmount(val) {
     $('.sem-row-amount').val(val);
 }
 
-function syncCommonDueDate(val) {
-    $('.sem-row-due').val(val);
-}
-
 function updateSemPreview() {
     var baseName = document.getElementById('sem_base_name').value.trim() || 'Tuition Fee';
     var count = parseInt(document.getElementById('sem_count').value) || 6;
     var commonAmount = document.getElementById('batch_common_amount').value || '15000';
-    var commonDueDate = document.getElementById('batch_common_due_date').value || '';
 
     var html = '';
 
@@ -811,7 +793,7 @@ function updateSemPreview() {
             html += '<input type="number" name="amount[]" class="form-control form-control-sm p-1 font-weight-bold text-success text-right sem-row-amount" value="' + commonAmount + '" min="0" style="font-size: 11px; height: 26px; border: 1px solid #28a745; background: #f8fff9;">';
             html += '</td>';
             html += '<td style="vertical-align: middle; padding: 4px 6px;">';
-            html += '<input type="date" name="due_date[]" class="form-control form-control-sm p-1 sem-row-due" value="' + commonDueDate + '" style="font-size: 10px; height: 26px; border: 1px solid #ced4da;">';
+            html += '<input type="date" name="due_date[]" class="form-control form-control-sm p-1 sem-row-due" value="" style="font-size: 10px; height: 26px; border: 1px solid #ced4da;">';
             html += '</td>';
             html += '</tr>';
         }
@@ -842,7 +824,7 @@ function updateSemPreview() {
             html += '<td style="vertical-align: middle; padding: 4px 6px;"><strong class="text-primary">Semester ' + i + '</strong></td>';
             html += '<td style="vertical-align: middle; padding: 4px 6px;"><input type="text" name="names[]" class="form-control form-control-sm p-1 font-weight-bold text-dark" value="' + headName + '" style="font-size: 11px; height: 26px; border: 1px solid #ced4da;"></td>';
             html += '<td style="vertical-align: middle; padding: 4px 6px;"><input type="number" class="form-control form-control-sm p-1 font-weight-bold text-success text-right sem-row-amount" value="' + commonAmount + '" min="0" style="font-size: 11px; height: 26px; border: 1px solid #28a745; background: #f8fff9;"></td>';
-            html += '<td style="vertical-align: middle; padding: 4px 6px;"><input type="date" class="form-control form-control-sm p-1 sem-row-due" value="' + commonDueDate + '" style="font-size: 10px; height: 26px; border: 1px solid #ced4da;"></td>';
+            html += '<td style="vertical-align: middle; padding: 4px 6px;"><input type="date" class="form-control form-control-sm p-1 sem-row-due" value="" style="font-size: 10px; height: 26px; border: 1px solid #ced4da;"></td>';
             html += '</tr>';
         }
 
