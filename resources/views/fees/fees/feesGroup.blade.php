@@ -145,6 +145,14 @@ $classType = Helper::classType();
     border: 1px solid #c2d4ea;
     border-radius: 5px;
     padding: 8px;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+}
+.fees-unified-page #preview_box {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
 }
 .fees-unified-page .preview-header {
     background: #e8f2fc;
@@ -2056,7 +2064,7 @@ function updateSemPreview() {
 
     if (currentCourseClasses.length > 0) {
         var loopCount = Math.min(count, currentCourseClasses.length);
-        html += '<div class="table-responsive" style="max-height: 220px; overflow-y: auto; border: 1px solid #c2d4ea; border-radius: 4px;">';
+        html += '<div class="table-responsive" style="height: auto; border: 1px solid #c2d4ea; border-radius: 4px;">';
         html += '<table class="table table-sm table-bordered table-striped mb-0 text-dark" style="font-size: 11px; background: #ffffff;">';
         html += '<thead style="background: #002c54; color: #ffffff; position: sticky; top: 0; z-index: 2;">';
         html += '<tr>';
