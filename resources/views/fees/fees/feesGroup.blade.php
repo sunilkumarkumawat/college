@@ -270,13 +270,78 @@ $classType = Helper::classType();
                                         </div>
 
                                         <!-- Fees Master Assignment Settings (Default Amount) -->
-                                        <div class="fee-master-amount-box">
+                                        <div class="fee-master-amount-box mb-2">
                                             <div class="form-group mb-0">
                                                 <label class="font-weight-bold text-dark mb-1" style="font-size:11.5px;">
-                                                    <i class="fa fa-check-square-o text-success"></i> Default Amount (Applied to all semesters):
+                                                    <i class="fa fa-inr text-success"></i> Default Amount (Applied to all semesters):
                                                 </label>
                                                 <input type="text" class="form-control form-control-sm font-weight-bold text-success" id="batch_common_amount" placeholder="e.g. 15000" value="15000" oninput="syncCommonAmount(this.value)" onkeypress="javascript:return isNumber(event)">
                                             </div>
+                                        </div>
+
+                                        <!-- Due Date Schedule Generator Box -->
+                                        <div class="card p-2 mb-2" style="background: #f0f7ff; border: 1px solid #b8daff; border-radius: 4px;">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <span class="font-weight-bold text-primary" style="font-size: 11px;">
+                                                    <i class="fa fa-calendar-check-o text-primary"></i> Auto Due Date Schedule
+                                                </span>
+                                                <button type="button" class="btn btn-xs btn-outline-primary py-0 px-2 font-weight-bold" style="font-size: 10px;" onclick="applyDueDateSchedule()">
+                                                    <i class="fa fa-magic"></i> Auto-Fill Dates
+                                                </button>
+                                            </div>
+                                            
+                                            <div class="row">
+                                                <div class="col-6 pr-1">
+                                                    <div class="form-group mb-1">
+                                                        <label class="mb-0 text-muted" style="font-size: 10px; font-weight: 600;">Start Date (Sem 1)</label>
+                                                        <input type="date" class="form-control form-control-sm" id="schedule_start_date" value="{{ date('Y-m-10') }}" onchange="applyDueDateSchedule()" style="font-size: 11px; height: 26px; padding: 2px 4px;">
+                                                    </div>
+                                                </div>
+                                                <div class="col-6 pl-1">
+                                                    <div class="form-group mb-1">
+                                                        <label class="mb-0 text-muted" style="font-size: 10px; font-weight: 600;">Interval / Gap</label>
+                                                        <select class="form-control form-control-sm" id="schedule_interval" onchange="applyDueDateSchedule()" style="font-size: 10.5px; height: 26px; padding: 2px 4px;">
+                                                            <option value="6" selected>Every 6 Months (Semester)</option>
+                                                            <option value="1">Every 1 Month (Monthly)</option>
+                                                            <option value="2">Every 2 Months (Bi-Monthly)</option>
+                                                            <option value="3">Every 3 Months (Quarterly)</option>
+                                                            <option value="4">Every 4 Months (Tri-Annual)</option>
+                                                            <option value="12">Every 12 Months (Yearly)</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6 pr-1">
+                                                    <div class="form-group mb-0">
+                                                        <label class="mb-0 text-muted" style="font-size: 10px; font-weight: 600;">Due Day of Month</label>
+                                                        <select class="form-control form-control-sm" id="schedule_due_day" onchange="applyDueDateSchedule()" style="font-size: 10.5px; height: 26px; padding: 2px 4px;">
+                                                            <option value="same" selected>Same Day as Start Date</option>
+                                                            <option value="1">1st of Month</option>
+                                                            <option value="5">5th of Month</option>
+                                                            <option value="10">10th of Month</option>
+                                                            <option value="15">15th of Month</option>
+                                                            <option value="20">20th of Month</option>
+                                                            <option value="25">25th of Month</option>
+                                                            <option value="last">Last Day of Month</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6 pl-1">
+                                                    <div class="form-group mb-0">
+                                                        <label class="mb-0 text-muted" style="font-size: 10px; font-weight: 600;">Quick Actions</label>
+                                                        <div class="btn-group btn-group-sm d-flex" role="group">
+                                                            <button type="button" class="btn btn-outline-secondary btn-xs w-50" style="font-size:9.5px; height: 26px; padding: 1px 3px;" onclick="clearDueDates()" title="Clear all due dates">
+                                                                <i class="fa fa-times text-danger"></i> Clear
+                                                            </button>
+                                                            <button type="button" class="btn btn-primary btn-xs w-50" style="font-size:9.5px; height: 26px; padding: 1px 3px;" onclick="applyDueDateSchedule()" title="Calculate & Fill">
+                                                                <i class="fa fa-refresh"></i> Apply
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <small class="text-muted mt-1" style="font-size: 9px; line-height: 1.1;">
+                                                <i class="fa fa-info-circle text-info"></i> Auto-generates due dates across semesters based on selected interval.
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
@@ -844,6 +909,54 @@ function syncCommonAmount(val) {
     $('.sem-row-amount').val(val);
 }
 
+function applyDueDateSchedule() {
+    var startDateInput = document.getElementById('schedule_start_date');
+    if (!startDateInput) return;
+    var startDateVal = startDateInput.value;
+    if (!startDateVal) return;
+    
+    var intervalMonths = parseInt(document.getElementById('schedule_interval').value) || 6;
+    var dueDayRule = document.getElementById('schedule_due_day').value;
+    
+    var startParts = startDateVal.split('-');
+    if (startParts.length < 3) return;
+    
+    var baseYear = parseInt(startParts[0]);
+    var baseMonth = parseInt(startParts[1]) - 1; // 0-indexed month
+    var baseDay = parseInt(startParts[2]);
+
+    var dueInputs = document.querySelectorAll('.sem-row-due');
+    dueInputs.forEach(function(input, idx) {
+        var targetMonthTotal = baseMonth + (idx * intervalMonths);
+        var targetYear = baseYear + Math.floor(targetMonthTotal / 12);
+        var targetMonth = targetMonthTotal % 12;
+        
+        var targetDay = baseDay;
+        if (dueDayRule === 'last') {
+            targetDay = new Date(targetYear, targetMonth + 1, 0).getDate();
+        } else if (dueDayRule !== 'same') {
+            targetDay = parseInt(dueDayRule);
+        }
+        
+        // Ensure day doesn't exceed total days in that month (e.g. Feb 28/29)
+        var maxDaysInMonth = new Date(targetYear, targetMonth + 1, 0).getDate();
+        if (targetDay > maxDaysInMonth) {
+            targetDay = maxDaysInMonth;
+        }
+        
+        var formattedMonth = String(targetMonth + 1).padStart(2, '0');
+        var formattedDay = String(targetDay).padStart(2, '0');
+        input.value = targetYear + '-' + formattedMonth + '-' + formattedDay;
+    });
+}
+
+function clearDueDates() {
+    var dueInputs = document.querySelectorAll('.sem-row-due');
+    dueInputs.forEach(function(input) {
+        input.value = '';
+    });
+}
+
 function updateSemPreview() {
     var baseName = document.getElementById('sem_base_name').value.trim() || 'Tuition Fee';
     var count = parseInt(document.getElementById('sem_count').value) || 6;
@@ -894,6 +1007,9 @@ function updateSemPreview() {
     document.getElementById('preview_title').innerText = 'Semester-wise Fees & Amount Setup:';
     document.getElementById('preview_box').innerHTML = html;
     document.getElementById('preview_count_badge').innerText = (currentCourseClasses.length > 0 ? Math.min(count, currentCourseClasses.length) : count) + ' Semesters';
+
+    // Auto-apply schedule if start date is set
+    applyDueDateSchedule();
 }
 
 function updateSingleClassPreview() {
