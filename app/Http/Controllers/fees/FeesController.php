@@ -413,8 +413,9 @@ class FeesController extends Controller
                 $fees_group_list = $query->orderBy('id', 'ASC')->get();
 
                 // Query for Fees Master
-                $feesMasterQuery = \App\Models\FeesMaster::with('feesGroup')->with('ClassTypes')
-                    ->where('branch_id', Session::get('branch_id'));
+                $feesMasterQuery = \App\Models\FeesMaster::with(['feesGroup', 'ClassTypes.course'])
+                    ->where('branch_id', Session::get('branch_id'))
+                    ->whereNull('deleted_at');
                 if (!empty($search['session_id']) && $search['session_id'] !== 'all') {
                     $feesMasterQuery->where('session_id', $search['session_id']);
                 } else {
@@ -429,7 +430,9 @@ class FeesController extends Controller
                 if (!empty($search['class_type_id'])) {
                     $feesMasterQuery->where('class_type_id', $search['class_type_id']);
                 }
-                $fees_master_list = $feesMasterQuery->groupBy('class_type_id')->get();
+
+                $allFeesMasterRows = (clone $feesMasterQuery)->orderBy('class_type_id')->orderBy('id')->get();
+                $fees_master_list = (clone $feesMasterQuery)->groupBy('class_type_id')->get();
 
                 $courses = Helper::getCourses();
                 $classType = Helper::classType();
@@ -440,6 +443,7 @@ class FeesController extends Controller
                 return view('fees.fees.feesGroup', [
                     'dataview' => $fees_group_list,
                     'feesMasterList' => $fees_master_list,
+                    'allFeesMasterRows' => $allFeesMasterRows,
                     'courses' => $courses,
                     'classType' => $classType,
                     'allClassType' => $allClassType,
