@@ -254,8 +254,10 @@ class FeesController extends Controller
                             $fName = trim($request->fee_name[$k] ?? '');
                             $amt = floatval($request->amount[$k] ?? 0);
                             $dueDate = !empty($request->due_date[$k]) ? $request->due_date[$k] : null;
+                            $grpType = !empty($request->group_type[$k]) ? $request->group_type[$k] : (!empty($request->group_type) && is_string($request->group_type) ? $request->group_type : 'academic');
+                            $isRefund = !empty($request->fees_refund[$k]) ? $request->fees_refund[$k] : (!empty($request->fees_refund) && is_string($request->fees_refund) ? $request->fees_refund : 'no');
 
-                            if (!empty($cTypeId) && !empty($fName)) {
+                            if (!empty($cTypeId) && !empty($fName) && $amt > 0) {
                                 // 1. Find or create FeesGroup
                                 $fg = FeesGroup::where('branch_id', $branch_id)
                                     ->where('session_id', $session_id)
@@ -268,11 +270,17 @@ class FeesController extends Controller
                                     $fg->session_id = $session_id;
                                     $fg->branch_id = $branch_id;
                                     $fg->name = $fName;
-                                    $fg->fees_refund = $request->fees_refund ?? 'no';
+                                    $fg->fees_refund = $isRefund;
                                     $fg->fees_partial = $request->fees_partial ?? 0;
-                                    $fg->group_type = $request->group_type ?? null;
+                                    $fg->group_type = $grpType;
                                     $fg->fees_type = 'full';
                                     $fg->save();
+                                } else {
+                                    // Update group_type if it was not set
+                                    if (empty($fg->group_type) && !empty($grpType)) {
+                                        $fg->group_type = $grpType;
+                                        $fg->save();
+                                    }
                                 }
 
                                 // 2. Create or update FeesMaster for this class
@@ -300,7 +308,7 @@ class FeesController extends Controller
                                 $assignedCount++;
                             }
                         }
-                        return redirect::to('feesGroup')->with('message', 'Fees Structure & Heads Saved Successfully for ' . $assignedCount . ' Classes/Semesters !');
+                        return redirect::to('feesGroup')->with('message', 'Course Fee Structure & Fees Master successfully saved for ' . $assignedCount . ' Fee Heads / Installments !');
                     }
 
                     // Case 2: Single Class Assignment
