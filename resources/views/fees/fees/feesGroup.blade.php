@@ -261,9 +261,26 @@ table.dataTable thead .sorting_desc:after {
 }
 
 /* Executive Course Cards, KPI Chips & Quick Filters */
+.bg-light {
+    background-color: #f8fafc !important;
+    color: #1e293b !important;
+}
+.badge-light {
+    background-color: #f1f5f9 !important;
+    color: #1e293b !important;
+    border: 1px solid #cbd5e1 !important;
+}
+.card-header.bg-primary .badge-light,
+.course-card-header .badge-light {
+    background-color: #ffffff !important;
+    color: var(--brand-dark) !important;
+    font-weight: 700 !important;
+    border: none !important;
+}
+
 .kpi-chip-card {
-    background: #ffffff;
-    border: 1px solid var(--brand-border);
+    background: #ffffff !important;
+    border: 1px solid var(--brand-border) !important;
     border-radius: 6px;
     padding: 6px 10px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.03);
@@ -277,14 +294,30 @@ table.dataTable thead .sorting_desc:after {
     box-shadow: 0 3px 6px rgba(0,0,0,0.08);
 }
 .kpi-chip-icon {
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
     border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
+    font-size: 15px;
     flex-shrink: 0;
+}
+.kpi-chip-icon.icon-courses {
+    background: #e0f2fe !important;
+    color: #0284c7 !important;
+}
+.kpi-chip-icon.icon-classes {
+    background: #e0e7ff !important;
+    color: #4338ca !important;
+}
+.kpi-chip-icon.icon-pool {
+    background: #dcfce7 !important;
+    color: #15803d !important;
+}
+.kpi-chip-icon.icon-heads {
+    background: #fef3c7 !important;
+    color: #b45309 !important;
 }
 .kpi-chip-val {
     font-size: 13.5px;
@@ -298,6 +331,84 @@ table.dataTable thead .sorting_desc:after {
     color: #64748b;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+}
+
+/* Quick Filters Box Container */
+.quick-filters-box {
+    background: #f1f5f9 !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin-bottom: 10px;
+}
+.quick-filters-box label {
+    color: var(--brand-dark) !important;
+    font-weight: 700 !important;
+    font-size: 11.5px !important;
+}
+.quick-filters-box label i {
+    color: var(--brand-dark-hover) !important;
+}
+.quick-filters-box .text-muted,
+.quick-filters-box small {
+    color: #475569 !important;
+    font-weight: 600 !important;
+    font-size: 10px !important;
+}
+
+/* Empty Course State */
+.empty-course-box {
+    background: #f8fafc !important;
+    border: 1.5px dashed #cbd5e1 !important;
+    border-radius: 6px;
+    padding: 16px 12px;
+    text-align: center;
+}
+.empty-course-box .empty-msg {
+    color: #334155 !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    margin-bottom: 8px;
+}
+.empty-course-box .empty-msg i {
+    color: #0284c7 !important;
+    margin-right: 4px;
+}
+.empty-course-box .empty-msg strong {
+    color: var(--brand-dark) !important;
+}
+.btn-configure-course {
+    background: var(--brand-dark) !important;
+    color: #ffffff !important;
+    border: 1px solid var(--brand-dark) !important;
+    font-weight: 700 !important;
+    font-size: 11px !important;
+    padding: 4px 12px !important;
+    border-radius: 4px;
+    transition: all 0.15s ease-in-out;
+}
+.btn-configure-course:hover {
+    background: var(--brand-dark-hover) !important;
+    color: #ffffff !important;
+    border-color: var(--brand-dark-hover) !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.18) !important;
+}
+.btn-configure-course i {
+    color: #ffffff !important;
+}
+
+/* Modal Table Headers */
+.modal table thead th,
+.modal table thead tr th {
+    background: #f1f5f9 !important;
+    color: #0f172a !important;
+    font-weight: 700 !important;
+    border-bottom: 2px solid #cbd5e1 !important;
+    font-size: 11.5px !important;
+}
+.modal table tbody td {
+    color: #1e293b !important;
+    font-size: 11.5px !important;
 }
 
 /* Course Filter Pills */
@@ -933,7 +1044,7 @@ table.dataTable thead .sorting_desc:after {
                                     <div class="row mb-2">
                                         <div class="col-6 col-md-3 mb-1">
                                             <div class="kpi-chip-card">
-                                                <div class="kpi-chip-icon bg-light text-primary">
+                                                <div class="kpi-chip-icon icon-courses">
                                                     <i class="fa fa-graduation-cap"></i>
                                                 </div>
                                                 <div>
@@ -944,7 +1055,7 @@ table.dataTable thead .sorting_desc:after {
                                         </div>
                                         <div class="col-6 col-md-3 mb-1">
                                             <div class="kpi-chip-card">
-                                                <div class="kpi-chip-icon bg-light text-info">
+                                                <div class="kpi-chip-icon icon-classes">
                                                     <i class="fa fa-book"></i>
                                                 </div>
                                                 <div>
@@ -955,7 +1066,7 @@ table.dataTable thead .sorting_desc:after {
                                         </div>
                                         <div class="col-6 col-md-3 mb-1">
                                             <div class="kpi-chip-card">
-                                                <div class="kpi-chip-icon bg-light text-success">
+                                                <div class="kpi-chip-icon icon-pool">
                                                     <i class="fa fa-inr"></i>
                                                 </div>
                                                 <div>
@@ -966,7 +1077,7 @@ table.dataTable thead .sorting_desc:after {
                                         </div>
                                         <div class="col-6 col-md-3 mb-1">
                                             <div class="kpi-chip-card">
-                                                <div class="kpi-chip-icon bg-light text-warning">
+                                                <div class="kpi-chip-icon icon-heads">
                                                     <i class="fa fa-tags"></i>
                                                 </div>
                                                 <div>
@@ -978,12 +1089,12 @@ table.dataTable thead .sorting_desc:after {
                                     </div>
 
                                     <!-- Quick Course Filter Pills Bar -->
-                                    <div class="p-2 mb-2 bg-light border rounded">
+                                    <div class="quick-filters-box">
                                         <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <label class="font-weight-bold text-dark mb-0" style="font-size:11px;">
-                                                <i class="fa fa-filter text-primary"></i> Quick Course Filters:
+                                            <label class="font-weight-bold mb-0">
+                                                <i class="fa fa-filter"></i> Quick Course Filters:
                                             </label>
-                                            <small class="text-muted" style="font-size:10px;">Click course to filter instantly</small>
+                                            <small>Click course to filter instantly</small>
                                         </div>
                                         <div class="course-filter-scroll" id="course_pill_list">
                                             <button type="button" class="course-pill-btn active" data-course-id="all" onclick="filterByCourse('all', this)">
@@ -1183,11 +1294,11 @@ table.dataTable thead .sorting_desc:after {
                                                                 </table>
                                                             </div>
                                                         @else
-                                                            <div class="p-3 text-center border rounded bg-light" style="border: 1.5px dashed #cbd5e1 !important;">
-                                                                <p class="text-muted mb-2" style="font-size: 11.5px;">
-                                                                    <i class="fa fa-info-circle text-info"></i> No fee structure configured for <strong>{{ $c->name }}</strong> in this session.
-                                                                </p>
-                                                                <button type="button" class="btn btn-outline-primary btn-xs font-weight-bold" onclick="selectCourseForSetup('{{ $c->id }}')">
+                                                            <div class="empty-course-box">
+                                                                <div class="empty-msg">
+                                                                    <i class="fa fa-info-circle"></i> No fee structure configured for <strong>{{ $c->name }}</strong> in this session.
+                                                                </div>
+                                                                <button type="button" class="btn btn-configure-course shadow-sm" onclick="selectCourseForSetup('{{ $c->id }}')">
                                                                     <i class="fa fa-plus-circle"></i> Click Here to Configure {{ $c->name }}
                                                                 </button>
                                                             </div>
