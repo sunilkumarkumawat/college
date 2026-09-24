@@ -8,7 +8,54 @@ $classType = Helper::classType();
 @section('content')
 
 <style>
-/* Clean & High-Contrast Compact Styles */
+/* Clean, High-Contrast & Accessible Styles */
+:root {
+    --brand-dark: #002c54;
+    --brand-dark-hover: #004b8d;
+    --brand-darker: #001a33;
+    --brand-light: #f8fafc;
+    --brand-border: #cbd5e1;
+}
+
+/* Base Buttons & Dark Background High-Contrast Rules */
+.btn-primary {
+    background-color: var(--brand-dark) !important;
+    border-color: var(--brand-dark) !important;
+    color: #ffffff !important;
+}
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+    background-color: var(--brand-dark-hover) !important;
+    border-color: var(--brand-dark-hover) !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2) !important;
+}
+.btn-primary i {
+    color: inherit !important;
+}
+
+/* Card Headers with Dark Background */
+.card-header.bg-primary {
+    background: var(--brand-dark) !important;
+    color: #ffffff !important;
+    border-bottom: 1px solid var(--brand-darker) !important;
+}
+.card-header.bg-primary .card-title,
+.card-header.bg-primary h3,
+.card-header.bg-primary h5 {
+    color: #ffffff !important;
+    margin-bottom: 0;
+}
+.card-header.bg-primary .card-title i,
+.card-header.bg-primary h3 i {
+    color: #ffffff !important;
+}
+.card-header.bg-primary .badge-light {
+    background: #ffffff !important;
+    color: var(--brand-dark) !important;
+    font-weight: 700;
+}
+
+/* Course Selector Container */
 .course-selector-box {
     background: #f0f7ff !important;
     border: 1px solid #b8daff !important;
@@ -16,23 +63,37 @@ $classType = Helper::classType();
     padding: 8px 10px;
     margin-bottom: 10px;
 }
+
+/* Structure Mode Toggle Buttons */
 .mode-toggle-btn {
     flex: 1;
     padding: 6px 8px;
     font-size: 11px;
     font-weight: 600;
     text-align: center;
-    border: 1px solid #ced4da;
+    border: 1px solid var(--brand-border);
     background: #ffffff;
-    color: #333333;
+    color: #1e293b;
     cursor: pointer;
     transition: all 0.2s ease;
 }
+.mode-toggle-btn:hover {
+    background: #e2e8f0;
+    color: var(--brand-dark);
+    border-color: #94a3b8;
+}
 .mode-toggle-btn.active {
-    background: #002c54 !important;
+    background: var(--brand-dark) !important;
     color: #ffffff !important;
-    border-color: #002c54 !important;
+    border-color: var(--brand-dark) !important;
     box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+.mode-toggle-btn.active:hover {
+    background: var(--brand-dark-hover) !important;
+    color: #ffffff !important;
+}
+.mode-toggle-btn.active small {
+    color: #e2e8f0 !important;
 }
 .mode-toggle-btn:first-child {
     border-top-left-radius: 4px;
@@ -42,9 +103,11 @@ $classType = Helper::classType();
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
 }
+
+/* Quick Preset Pills */
 .quick-preset-btn {
     display: inline-block;
-    padding: 2px 7px;
+    padding: 2px 8px;
     margin: 2px 1px;
     font-size: 10.5px;
     font-weight: 600;
@@ -56,10 +119,13 @@ $classType = Helper::classType();
     transition: all 0.15s ease-in-out;
 }
 .quick-preset-btn:hover {
-    background: #002c54;
-    color: #ffffff;
-    border-color: #002c54;
+    background: var(--brand-dark) !important;
+    color: #ffffff !important;
+    border-color: var(--brand-dark) !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.12);
 }
+
+/* Preview Box */
 .preview-badge {
     display: inline-block;
     padding: 3px 7px;
@@ -80,7 +146,7 @@ $classType = Helper::classType();
 }
 .preview-header {
     background: #e8f2fc;
-    color: #002c54;
+    color: var(--brand-dark);
     font-weight: 700;
     font-size: 11.5px;
     padding: 4px 8px;
@@ -95,39 +161,55 @@ $classType = Helper::classType();
     margin-top: 8px;
     margin-bottom: 8px;
 }
-.badge-academic { background-color: #007bff; color: #fff; }
-.badge-examination { background-color: #fd7e14; color: #fff; }
-.badge-practical { background-color: #17a2b8; color: #fff; }
-.badge-admission { background-color: #6f42c1; color: #fff; }
-.badge-facility { background-color: #20c997; color: #fff; }
-.badge-refundable { background-color: #28a745; color: #fff; }
-.badge-hostel_transport { background-color: #e83e8c; color: #fff; }
-.badge-other { background-color: #6c757d; color: #fff; }
 
-.padding_table thead tr th {
-    background: #002c54 !important;
+/* Category Badges (Clean, Vivid & Light Text) */
+.badge-academic { background-color: #007bff !important; color: #ffffff !important; }
+.badge-examination { background-color: #e65100 !important; color: #ffffff !important; }
+.badge-practical { background-color: #00838f !important; color: #ffffff !important; }
+.badge-admission { background-color: #512da8 !important; color: #ffffff !important; }
+.badge-facility { background-color: #00796b !important; color: #ffffff !important; }
+.badge-refundable { background-color: #2e7d32 !important; color: #ffffff !important; }
+.badge-hostel_transport { background-color: #c2185b !important; color: #ffffff !important; }
+.badge-other { background-color: #455a64 !important; color: #ffffff !important; }
+
+/* Table Headers (High-Contrast White on Dark) */
+.padding_table thead tr th,
+#example1 thead tr th,
+#example2 thead tr th {
+    background: var(--brand-dark) !important;
     color: #ffffff !important;
     font-size: 11.5px !important;
-    padding: 6px 8px !important;
+    padding: 7px 9px !important;
     font-weight: 600 !important;
+    border-color: var(--brand-darker) !important;
+    vertical-align: middle !important;
+}
+.padding_table thead tr th a,
+.padding_table thead tr th i,
+#example1 thead tr th a,
+#example1 thead tr th i,
+#example2 thead tr th a,
+#example2 thead tr th i {
+    color: #ffffff !important;
 }
 .padding_table td {
     padding: 5px 8px !important;
     font-size: 11.5px !important;
     vertical-align: middle !important;
-    color: #212529 !important;
-}
-.filter-box-custom {
-    background: #f8fafc !important;
-    border: 1px solid #e2e8f0 !important;
-    border-radius: 6px;
-    padding: 8px 10px;
-}
-.filter-label-custom {
-    font-size: 11px !important;
-    font-weight: 700 !important;
     color: #1e293b !important;
 }
+
+/* DataTables Sorting Arrows in Dark Header */
+table.dataTable thead .sorting:before, 
+table.dataTable thead .sorting_asc:before, 
+table.dataTable thead .sorting_desc:before,
+table.dataTable thead .sorting:after, 
+table.dataTable thead .sorting_asc:after, 
+table.dataTable thead .sorting_desc:after {
+    color: #ffffff !important;
+    opacity: 0.8 !important;
+}
+
 /* Header & Tab alignment */
 .card-header::after {
     display: none !important;
@@ -145,21 +227,54 @@ $classType = Helper::classType();
 .card-header .nav-pills .nav-link {
     margin: 0 !important;
 }
+
+/* Top Tab Link Hover & Active States */
+#feesTab a.nav-link {
+    background: rgba(255, 255, 255, 0.15) !important;
+    color: #ffffff !important;
+    border-radius: 4px;
+    font-size: 11.5px;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+}
+#feesTab a.nav-link i {
+    color: #ffffff !important;
+}
+#feesTab a.nav-link:hover:not(.active) {
+    background: #ffffff !important;
+    color: var(--brand-dark) !important;
+    border-color: #ffffff !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+#feesTab a.nav-link:hover:not(.active) i {
+    color: var(--brand-dark) !important;
+}
+#feesTab a.nav-link.active {
+    background: #ffffff !important;
+    color: var(--brand-dark) !important;
+    border-color: #ffffff !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.18) !important;
+}
+#feesTab a.nav-link.active i {
+    color: var(--brand-dark) !important;
+}
+
 /* Executive Course Cards, KPI Chips & Quick Filters */
 .kpi-chip-card {
     background: #ffffff;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--brand-border);
     border-radius: 6px;
     padding: 6px 10px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.03);
     display: flex;
     align-items: center;
     gap: 8px;
-    transition: transform 0.15s ease;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 .kpi-chip-card:hover {
     transform: translateY(-1px);
-    box-shadow: 0 3px 6px rgba(0,0,0,0.06);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.08);
 }
 .kpi-chip-icon {
     width: 32px;
@@ -184,6 +299,8 @@ $classType = Helper::classType();
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
+
+/* Course Filter Pills */
 .course-filter-scroll {
     display: flex;
     overflow-x: auto;
@@ -199,26 +316,41 @@ $classType = Helper::classType();
     font-size: 11px;
     font-weight: 600;
     border-radius: 20px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--brand-border);
     background: #ffffff;
-    color: #334155;
+    color: #1e293b;
     cursor: pointer;
     white-space: nowrap;
     transition: all 0.2s ease;
 }
 .course-pill-btn:hover {
-    background: #f1f5f9;
-    color: #0f172a;
-    border-color: #94a3b8;
+    background: var(--brand-dark) !important;
+    color: #ffffff !important;
+    border-color: var(--brand-dark) !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+.course-pill-btn:hover i {
+    color: #ffffff !important;
+}
+.course-pill-btn:hover .badge-counter {
+    background: rgba(255,255,255,0.25) !important;
+    color: #ffffff !important;
 }
 .course-pill-btn.active {
-    background: #002c54 !important;
+    background: var(--brand-dark) !important;
     color: #ffffff !important;
-    border-color: #002c54 !important;
+    border-color: var(--brand-dark) !important;
     box-shadow: 0 2px 4px rgba(0,44,84,0.25);
 }
+.course-pill-btn.active:hover {
+    background: var(--brand-dark-hover) !important;
+    color: #ffffff !important;
+}
+.course-pill-btn.active i {
+    color: #ffffff !important;
+}
 .course-pill-btn .badge-counter {
-    background: rgba(0,0,0,0.07);
+    background: rgba(0,0,0,0.08);
     color: inherit;
     border-radius: 10px;
     padding: 1px 6px;
@@ -226,12 +358,14 @@ $classType = Helper::classType();
     font-weight: 700;
 }
 .course-pill-btn.active .badge-counter {
-    background: rgba(255,255,255,0.25);
-    color: #ffffff;
+    background: rgba(255,255,255,0.25) !important;
+    color: #ffffff !important;
 }
+
+/* Course Cards */
 .course-card {
     background: #ffffff;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--brand-border);
     border-radius: 8px;
     margin-bottom: 12px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.03);
@@ -243,8 +377,8 @@ $classType = Helper::classType();
     border-color: #94a3b8;
 }
 .course-card-header {
-    background: linear-gradient(135deg, #002c54 0%, #034b8c 100%);
-    color: #ffffff;
+    background: linear-gradient(135deg, var(--brand-dark) 0%, var(--brand-dark-hover) 100%) !important;
+    color: #ffffff !important;
     padding: 8px 12px;
     display: flex;
     justify-content: space-between;
@@ -256,39 +390,57 @@ $classType = Helper::classType();
     font-size: 13px;
     font-weight: 700;
     margin: 0;
-    color: #ffffff;
+    color: #ffffff !important;
     display: flex;
     align-items: center;
     gap: 6px;
 }
-.semester-sub-card {
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    margin-bottom: 8px;
-    background: #ffffff;
+.course-card-title i {
+    color: #ffffff !important;
 }
-.semester-sub-header {
-    background: #f8fafc;
-    border-bottom: 1px solid #e2e8f0;
-    padding: 6px 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+
+/* Setup Button Inside Course Card */
+.course-card-header .btn-setup-course {
+    background: #ffffff !important;
+    color: var(--brand-dark) !important;
+    border: 1px solid #ffffff !important;
+    font-weight: 700 !important;
+    transition: all 0.15s ease-in-out;
 }
+.course-card-header .btn-setup-course:hover {
+    background: var(--brand-darker) !important;
+    color: #ffffff !important;
+    border-color: var(--brand-darker) !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2) !important;
+}
+.course-card-header .btn-setup-course:hover i {
+    color: #ffffff !important;
+}
+
+/* Dual View Switch Buttons */
 .view-switch-btn {
     font-size: 11px;
     font-weight: 600;
     padding: 3px 10px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--brand-border);
     background: #ffffff;
     color: #334155;
     cursor: pointer;
-    transition: all 0.15s;
+    transition: all 0.15s ease;
+}
+.view-switch-btn:hover {
+    background: #e2e8f0;
+    color: var(--brand-dark);
+    border-color: #94a3b8;
 }
 .view-switch-btn.active {
-    background: #002c54;
-    color: #ffffff;
-    border-color: #002c54;
+    background: var(--brand-dark) !important;
+    color: #ffffff !important;
+    border-color: var(--brand-dark) !important;
+}
+.view-switch-btn.active:hover {
+    background: var(--brand-dark-hover) !important;
+    color: #ffffff !important;
 }
 .view-switch-btn:first-child {
     border-top-left-radius: 4px;
@@ -298,21 +450,76 @@ $classType = Helper::classType();
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
 }
+
+/* Quick Export Toolbar Buttons */
 .quick-export-btn {
     font-size: 10.5px;
     font-weight: 600;
     padding: 3px 8px;
     border-radius: 4px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--brand-border);
     background: #ffffff;
     color: #334155;
     cursor: pointer;
-    transition: all 0.15s;
+    transition: all 0.15s ease;
 }
 .quick-export-btn:hover {
-    background: #002c54;
-    color: #ffffff;
-    border-color: #002c54;
+    background: var(--brand-dark) !important;
+    color: #ffffff !important;
+    border-color: var(--brand-dark) !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+}
+.quick-export-btn:hover i {
+    color: #ffffff !important;
+}
+
+/* DataTables Buttons (Excel, CSV, PDF, Print) */
+.dt-buttons .btn {
+    background: #ffffff !important;
+    color: #1e293b !important;
+    border: 1px solid var(--brand-border) !important;
+    font-weight: 600 !important;
+    font-size: 11px !important;
+    padding: 3px 8px !important;
+    transition: all 0.15s ease !important;
+}
+.dt-buttons .btn:hover {
+    background: var(--brand-dark) !important;
+    color: #ffffff !important;
+    border-color: var(--brand-dark) !important;
+}
+
+/* Modal Headers */
+.modal-header.bg-primary {
+    background: var(--brand-dark) !important;
+    color: #ffffff !important;
+    border-bottom: 1px solid var(--brand-darker) !important;
+}
+.modal-header.bg-primary .modal-title {
+    color: #ffffff !important;
+}
+.modal-header.bg-primary .close {
+    color: #ffffff !important;
+    text-shadow: none;
+    opacity: 0.9;
+    transition: opacity 0.15s ease, color 0.15s ease;
+}
+.modal-header.bg-primary .close:hover {
+    color: #ffdd57 !important;
+    opacity: 1;
+}
+
+/* Back Button in Card Header */
+.card-header .btn-back-header {
+    background: #ffffff !important;
+    color: var(--brand-dark) !important;
+    font-weight: 700 !important;
+    border: 1px solid #ffffff !important;
+    transition: all 0.15s ease;
+}
+.card-header .btn-back-header:hover {
+    background: #e2e8f0 !important;
+    color: var(--brand-darker) !important;
 }
 </style>
 
@@ -667,18 +874,18 @@ $classType = Helper::classType();
                         <div class="card-header bg-primary px-2 py-1 d-flex align-items-center justify-content-between flex-nowrap" style="min-height: 40px !important;">
                             <ul class="nav nav-pills d-inline-flex m-0 p-0 align-items-center flex-nowrap" id="feesTab" role="tablist" style="gap: 6px;">
                                 <li class="nav-item m-0">
-                                    <a class="nav-link active font-weight-bold py-1 px-3 shadow-none text-nowrap" id="fees-master-tab" data-toggle="pill" href="#tab_fees_master" role="tab" style="background:#ffffff; color:#002c54 !important; border-radius:4px; font-size:11.5px; border:1px solid #ffffff; cursor:pointer;">
+                                    <a class="nav-link active font-weight-bold py-1 px-3 shadow-none text-nowrap" id="fees-master-tab" data-toggle="pill" href="#tab_fees_master" role="tab">
                                         <i class="fa fa-table"></i> Class-wise Fees Master
                                     </a>
                                 </li>
                                 <li class="nav-item m-0">
-                                    <a class="nav-link font-weight-bold py-1 px-3 shadow-none text-nowrap" id="fees-group-tab" data-toggle="pill" href="#tab_fees_group" role="tab" style="background:rgba(255,255,255,0.2); color:#ffffff !important; border-radius:4px; font-size:11.5px; border:1px solid rgba(255,255,255,0.4); cursor:pointer;">
+                                    <a class="nav-link font-weight-bold py-1 px-3 shadow-none text-nowrap" id="fees-group-tab" data-toggle="pill" href="#tab_fees_group" role="tab">
                                         <i class="fa fa-list"></i> All Fee Heads
                                     </a>
                                 </li>
                             </ul>
                             <div class="m-0 p-0 ml-auto" style="flex-shrink: 0;">
-                                <a href="{{url('fee_dashboard')}}" class="btn btn-light btn-xs font-weight-bold py-1 px-2 shadow-none text-nowrap" style="font-size:11px; color:#002c54;"><i class="fa fa-arrow-left"></i> {{ __('messages.Back') }}</a>
+                                <a href="{{url('fee_dashboard')}}" class="btn btn-back-header btn-xs font-weight-bold py-1 px-2 shadow-none text-nowrap" style="font-size:11px;"><i class="fa fa-arrow-left"></i> {{ __('messages.Back') }}</a>
                             </div>
                         </div>  
                         
@@ -896,8 +1103,8 @@ $classType = Helper::classType();
                                                             <span class="badge badge-success px-2 py-1 font-weight-bold" style="font-size:11.5px;">
                                                                 ₹{{ number_format($cTotalFee) }} Total Course Fee
                                                             </span>
-                                                            <button type="button" class="btn btn-xs btn-light font-weight-bold shadow-sm" onclick="selectCourseForSetup('{{ $c->id }}')" style="font-size:10.5px; color:#002c54;">
-                                                                <i class="fa fa-plus-circle text-primary"></i> Setup in Form
+                                                            <button type="button" class="btn btn-xs btn-setup-course font-weight-bold shadow-sm" onclick="selectCourseForSetup('{{ $c->id }}')" style="font-size:10.5px;">
+                                                                <i class="fa fa-plus-circle"></i> Setup in Form
                                                             </button>
                                                         </div>
                                                     </div>
@@ -1154,9 +1361,9 @@ $classType = Helper::classType();
 <div class="modal fade" id="Modal_id" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">{{ __('common.Delete Confirmation') }}</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+            <div class="modal-header bg-danger py-2 text-white">
+                <h5 class="modal-title text-white font-weight-bold" id="exampleModalLabel" style="font-size: 14px;"><i class="fa fa-trash"></i> {{ __('common.Delete Confirmation') }}</h5>
+                <button type="button" class="close text-white" data-bs-dismiss="modal" aria-label="Close" style="opacity: 0.9;">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
