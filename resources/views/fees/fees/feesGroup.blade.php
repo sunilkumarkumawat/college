@@ -225,163 +225,57 @@ $classType = Helper::classType();
 
                                     <!-- Controls shown when a course is selected -->
                                     <div id="section_semester_controls" style="display: none;">
-                                        
-                                        <!-- Course Fee Components / Heads Configurator -->
-                                        <div class="card p-2 mb-2" style="background: #ffffff; border: 1px solid #c2d4ea; border-radius: 4px;">
-                                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                                <label class="font-weight-bold text-dark mb-0" style="font-size:11.5px;">
-                                                    <i class="fa fa-list-ul text-primary"></i> Course Fee Components & Amounts:
+                                        <div class="form-group mb-2">
+                                            <label class="font-weight-bold text-dark mb-1" style="font-size:11.5px;">Fee Head Base Name*</label>
+                                            <div class="mb-1">
+                                                <span class="quick-preset-btn" onclick="setSemBase('Tuition Fee', 'academic')">Tuition Fee</span>
+                                                <span class="quick-preset-btn" onclick="setSemBase('Semester Exam Fee', 'examination')">Exam Fee</span>
+                                                <span class="quick-preset-btn" onclick="setSemBase('Practical / Lab Fee', 'practical')">Practical Fee</span>
+                                                <span class="quick-preset-btn" onclick="setSemBase('Development Fee', 'academic')">Development Fee</span>
+                                            </div>
+                                            <input type="text" class="form-control form-control-sm font-weight-bold" id="sem_base_name" value="Tuition Fee" placeholder="e.g. Tuition Fee, Exam Fee" oninput="updateSemPreview()">
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group mb-2">
+                                                    <label class="font-weight-bold mb-1" style="font-size:11px;">Total Semesters / Years*</label>
+                                                    <select class="form-control form-control-sm font-weight-bold" id="sem_count" onchange="updateSemPreview()">
+                                                        <option value="1">1 Semester</option>
+                                                        <option value="2">2 Semesters (1 Year)</option>
+                                                        <option value="3">3 Semesters</option>
+                                                        <option value="4">4 Semesters (2 Years)</option>
+                                                        <option value="5">5 Semesters</option>
+                                                        <option value="6" selected>6 Semesters (3 Years)</option>
+                                                        <option value="7">7 Semesters</option>
+                                                        <option value="8">8 Semesters (4 Years)</option>
+                                                        <option value="9">9 Semesters</option>
+                                                        <option value="10">10 Semesters (5 Years)</option>
+                                                        <option value="12">12 Semesters (6 Years)</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group mb-2">
+                                                    <label class="font-weight-bold mb-1" style="font-size:11px;">Category</label>
+                                                    <select class="form-control form-control-sm" name="group_type" id="sem_group_type">
+                                                        <option value="academic" selected>Academic (Tuition / University)</option>
+                                                        <option value="examination">Examination</option>
+                                                        <option value="practical">Laboratory & Practical</option>
+                                                        <option value="facility">Campus Facility & Library</option>
+                                                        <option value="other">Other</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Fees Master Assignment Settings (Default Amount) -->
+                                        <div class="fee-master-amount-box mb-2">
+                                            <div class="form-group mb-0">
+                                                <label class="font-weight-bold text-dark mb-1" style="font-size:11.5px;">
+                                                    <i class="fa fa-inr text-success"></i> Default Amount (Applied to all semesters):
                                                 </label>
-                                                <button type="button" class="btn btn-xs btn-outline-primary py-0 px-2 font-weight-bold" style="font-size: 10px;" onclick="addCustomFeeHeadRow()">
-                                                    <i class="fa fa-plus-circle"></i> Add Fee Head
-                                                </button>
-                                            </div>
-                                            
-                                            <div id="fee_components_list">
-                                                <!-- Component 1: Tuition Fee -->
-                                                <div class="fee-component-row p-1 mb-1 border rounded bg-light" data-id="1">
-                                                    <div class="d-flex align-items-center justify-content-between">
-                                                        <div class="custom-control custom-checkbox mr-1">
-                                                            <input type="checkbox" class="custom-control-input comp-active" id="comp_active_1" checked onchange="updateSemPreview()">
-                                                            <label class="custom-control-label font-weight-bold text-dark" for="comp_active_1" style="font-size:11px; cursor:pointer;">Tuition Fee</label>
-                                                        </div>
-                                                        <span class="badge badge-academic" style="font-size: 9.5px;">Academic</span>
-                                                    </div>
-                                                    <div class="row mt-1 no-gutters" style="gap: 4px;">
-                                                        <div class="col">
-                                                            <input type="text" class="form-control form-control-sm comp-name" value="Tuition Fee" placeholder="Head Name" oninput="updateSemPreview()" style="font-size:11px; height:24px; padding: 2px 4px;">
-                                                        </div>
-                                                        <div class="col" style="max-width: 85px;">
-                                                            <input type="number" class="form-control form-control-sm font-weight-bold text-success text-right comp-amount" value="15000" placeholder="₹ Amount" oninput="updateSemPreview()" style="font-size:11px; height:24px; padding: 2px 4px;">
-                                                        </div>
-                                                        <div class="col" style="max-width: 95px;">
-                                                            <select class="form-control form-control-sm comp-apply" onchange="updateSemPreview()" style="font-size:10px; height:24px; padding: 1px 2px;">
-                                                                <option value="all" selected>All Semesters</option>
-                                                                <option value="sem1">Sem 1 Only</option>
-                                                            </select>
-                                                        </div>
-                                                        <input type="hidden" class="comp-type" value="academic">
-                                                        <input type="hidden" class="comp-refund" value="no">
-                                                    </div>
-                                                </div>
-
-                                                <!-- Component 2: Practical / Lab Fee -->
-                                                <div class="fee-component-row p-1 mb-1 border rounded bg-light" data-id="2">
-                                                    <div class="d-flex align-items-center justify-content-between">
-                                                        <div class="custom-control custom-checkbox mr-1">
-                                                            <input type="checkbox" class="custom-control-input comp-active" id="comp_active_2" checked onchange="updateSemPreview()">
-                                                            <label class="custom-control-label font-weight-bold text-dark" for="comp_active_2" style="font-size:11px; cursor:pointer;">Practical / Lab Fee</label>
-                                                        </div>
-                                                        <span class="badge badge-practical" style="font-size: 9.5px;">Practical</span>
-                                                    </div>
-                                                    <div class="row mt-1 no-gutters" style="gap: 4px;">
-                                                        <div class="col">
-                                                            <input type="text" class="form-control form-control-sm comp-name" value="Practical / Lab Fee" placeholder="Head Name" oninput="updateSemPreview()" style="font-size:11px; height:24px; padding: 2px 4px;">
-                                                        </div>
-                                                        <div class="col" style="max-width: 85px;">
-                                                            <input type="number" class="form-control form-control-sm font-weight-bold text-success text-right comp-amount" value="2500" placeholder="₹ Amount" oninput="updateSemPreview()" style="font-size:11px; height:24px; padding: 2px 4px;">
-                                                        </div>
-                                                        <div class="col" style="max-width: 95px;">
-                                                            <select class="form-control form-control-sm comp-apply" onchange="updateSemPreview()" style="font-size:10px; height:24px; padding: 1px 2px;">
-                                                                <option value="all" selected>All Semesters</option>
-                                                                <option value="sem1">Sem 1 Only</option>
-                                                            </select>
-                                                        </div>
-                                                        <input type="hidden" class="comp-type" value="practical">
-                                                        <input type="hidden" class="comp-refund" value="no">
-                                                    </div>
-                                                </div>
-
-                                                <!-- Component 3: Semester Exam Fee -->
-                                                <div class="fee-component-row p-1 mb-1 border rounded bg-light" data-id="3">
-                                                    <div class="d-flex align-items-center justify-content-between">
-                                                        <div class="custom-control custom-checkbox mr-1">
-                                                            <input type="checkbox" class="custom-control-input comp-active" id="comp_active_3" checked onchange="updateSemPreview()">
-                                                            <label class="custom-control-label font-weight-bold text-dark" for="comp_active_3" style="font-size:11px; cursor:pointer;">Semester Exam Fee</label>
-                                                        </div>
-                                                        <span class="badge badge-examination" style="font-size: 9.5px;">Examination</span>
-                                                    </div>
-                                                    <div class="row mt-1 no-gutters" style="gap: 4px;">
-                                                        <div class="col">
-                                                            <input type="text" class="form-control form-control-sm comp-name" value="Semester Exam Fee" placeholder="Head Name" oninput="updateSemPreview()" style="font-size:11px; height:24px; padding: 2px 4px;">
-                                                        </div>
-                                                        <div class="col" style="max-width: 85px;">
-                                                            <input type="number" class="form-control form-control-sm font-weight-bold text-success text-right comp-amount" value="1500" placeholder="₹ Amount" oninput="updateSemPreview()" style="font-size:11px; height:24px; padding: 2px 4px;">
-                                                        </div>
-                                                        <div class="col" style="max-width: 95px;">
-                                                            <select class="form-control form-control-sm comp-apply" onchange="updateSemPreview()" style="font-size:10px; height:24px; padding: 1px 2px;">
-                                                                <option value="all" selected>All Semesters</option>
-                                                                <option value="sem1">Sem 1 Only</option>
-                                                            </select>
-                                                        </div>
-                                                        <input type="hidden" class="comp-type" value="examination">
-                                                        <input type="hidden" class="comp-refund" value="no">
-                                                    </div>
-                                                </div>
-
-                                                <!-- Component 4: Admission Fee (Sem 1 Only default) -->
-                                                <div class="fee-component-row p-1 mb-1 border rounded bg-light" data-id="4">
-                                                    <div class="d-flex align-items-center justify-content-between">
-                                                        <div class="custom-control custom-checkbox mr-1">
-                                                            <input type="checkbox" class="custom-control-input comp-active" id="comp_active_4" onchange="updateSemPreview()">
-                                                            <label class="custom-control-label font-weight-bold text-dark" for="comp_active_4" style="font-size:11px; cursor:pointer;">Admission / Registration Fee</label>
-                                                        </div>
-                                                        <span class="badge badge-admission" style="font-size: 9.5px;">Admission</span>
-                                                    </div>
-                                                    <div class="row mt-1 no-gutters" style="gap: 4px;">
-                                                        <div class="col">
-                                                            <input type="text" class="form-control form-control-sm comp-name" value="Admission Fee" placeholder="Head Name" oninput="updateSemPreview()" style="font-size:11px; height:24px; padding: 2px 4px;">
-                                                        </div>
-                                                        <div class="col" style="max-width: 85px;">
-                                                            <input type="number" class="form-control form-control-sm font-weight-bold text-success text-right comp-amount" value="1000" placeholder="₹ Amount" oninput="updateSemPreview()" style="font-size:11px; height:24px; padding: 2px 4px;">
-                                                        </div>
-                                                        <div class="col" style="max-width: 95px;">
-                                                            <select class="form-control form-control-sm comp-apply" onchange="updateSemPreview()" style="font-size:10px; height:24px; padding: 1px 2px;">
-                                                                <option value="sem1" selected>Sem 1 Only</option>
-                                                                <option value="all">All Semesters</option>
-                                                            </select>
-                                                        </div>
-                                                        <input type="hidden" class="comp-type" value="admission">
-                                                        <input type="hidden" class="comp-refund" value="no">
-                                                    </div>
-                                                </div>
-
-                                                <!-- Component 5: Caution Money (Refundable, Sem 1 Only default) -->
-                                                <div class="fee-component-row p-1 mb-1 border rounded bg-light" data-id="5">
-                                                    <div class="d-flex align-items-center justify-content-between">
-                                                        <div class="custom-control custom-checkbox mr-1">
-                                                            <input type="checkbox" class="custom-control-input comp-active" id="comp_active_5" onchange="updateSemPreview()">
-                                                            <label class="custom-control-label font-weight-bold text-dark" for="comp_active_5" style="font-size:11px; cursor:pointer;">Caution Money (Refundable)</label>
-                                                        </div>
-                                                        <span class="badge badge-refundable" style="font-size: 9.5px;">Refundable</span>
-                                                    </div>
-                                                    <div class="row mt-1 no-gutters" style="gap: 4px;">
-                                                        <div class="col">
-                                                            <input type="text" class="form-control form-control-sm comp-name" value="Caution Money (Refundable)" placeholder="Head Name" oninput="updateSemPreview()" style="font-size:11px; height:24px; padding: 2px 4px;">
-                                                        </div>
-                                                        <div class="col" style="max-width: 85px;">
-                                                            <input type="number" class="form-control form-control-sm font-weight-bold text-success text-right comp-amount" value="2000" placeholder="₹ Amount" oninput="updateSemPreview()" style="font-size:11px; height:24px; padding: 2px 4px;">
-                                                        </div>
-                                                        <div class="col" style="max-width: 95px;">
-                                                            <select class="form-control form-control-sm comp-apply" onchange="updateSemPreview()" style="font-size:10px; height:24px; padding: 1px 2px;">
-                                                                <option value="sem1" selected>Sem 1 Only</option>
-                                                                <option value="all">All Semesters</option>
-                                                            </select>
-                                                        </div>
-                                                        <input type="hidden" class="comp-type" value="refundable">
-                                                        <input type="hidden" class="comp-refund" value="yes">
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="d-flex justify-content-between align-items-center mt-1 pt-1 border-top">
-                                                <div class="custom-control custom-checkbox">
-                                                    <input type="checkbox" class="custom-control-input" id="sem_suffix_option" checked onchange="updateSemPreview()">
-                                                    <label class="custom-control-label text-muted" for="sem_suffix_option" style="font-size:10px; cursor:pointer;">
-                                                        Append Semester suffix (e.g. <em>Tuition Fee - Sem 1</em>)
-                                                    </label>
-                                                </div>
-                                                <input type="hidden" id="sem_count" value="6">
+                                                <input type="text" class="form-control form-control-sm font-weight-bold text-success" id="batch_common_amount" placeholder="e.g. 15000" value="15000" oninput="syncCommonAmount(this.value)" onkeypress="javascript:return isNumber(event)">
                                             </div>
                                         </div>
 
@@ -669,43 +563,22 @@ $classType = Helper::classType();
                                                                     $rowSessionId = $item->session_id ?? Session::get('session_id');
                                                                     $allData = DB::table('fees_master')
                                                                         ->leftjoin('fees_group', 'fees_group.id', '=', 'fees_master.fees_group_id')
-                                                                        ->select('fees_master.amount', 'fees_group.name as fees_group_name', 'fees_group.group_type', 'fees_master.id', 'fees_master.fees_group_id', 'fees_master.installment_due_date')
+                                                                        ->select('fees_master.amount', 'fees_group.name as fees_group_name', 'fees_master.id', 'fees_master.fees_group_id', 'fees_master.installment_due_date')
                                                                         ->where('class_type_id', $item->class_type_id)
                                                                         ->where('fees_master.session_id', $rowSessionId)
                                                                         ->whereNull('fees_master.deleted_at')
                                                                         ->get();
-                                                                    $classTotal = $allData->sum('amount');
                                                                 @endphp
                                                                 <table width="100%" class="table table-sm table-borderless mb-0">
                                                                     @foreach ($allData as $mydata)
-                                                                        @php
-                                                                            $gtClass = 'badge-other';
-                                                                            $gt = $mydata->group_type ?? '';
-                                                                            if ($gt === 'academic') { $gtClass = 'badge-academic'; }
-                                                                            elseif ($gt === 'examination') { $gtClass = 'badge-examination'; }
-                                                                            elseif ($gt === 'practical') { $gtClass = 'badge-practical'; }
-                                                                            elseif ($gt === 'admission' || $gt === 'registration') { $gtClass = 'badge-admission'; }
-                                                                            elseif ($gt === 'facility') { $gtClass = 'badge-facility'; }
-                                                                            elseif ($gt === 'refundable') { $gtClass = 'badge-refundable'; }
-                                                                        @endphp
                                                                         <tr style="border-bottom: 1px dashed #dee2e6;">
-                                                                            <td style="padding: 2px 4px;">
-                                                                                <span class="font-weight-bold text-dark">{{ $mydata->fees_group_name ?? '' }}</span>
-                                                                                @if(!empty($gt))
-                                                                                    <span class="badge {{ $gtClass }} ml-1" style="font-size:9px;">{{ ucfirst($gt) }}</span>
-                                                                                @endif
-                                                                            </td>
-                                                                            <td style="padding: 2px 4px; font-weight: 700; color: #28a745; text-align: right; width: 75px;">₹{{ number_format($mydata->amount ?? 0) }}</td>
-                                                                            <td style="padding: 2px 4px; font-size: 10px; color: #6c757d; text-align: right; width: 90px;">
-                                                                                {{ !empty($mydata->installment_due_date) ? date('d-M-Y', strtotime($mydata->installment_due_date)) : '<span class="text-muted">No Due</span>' }}
+                                                                            <td style="padding: 2px 4px; font-weight:600;">{{ $mydata->fees_group_name ?? '' }}</td>
+                                                                            <td style="padding: 2px 4px; font-weight: 700; color: #28a745;">₹{{ number_format($mydata->amount ?? 0) }}</td>
+                                                                            <td style="padding: 2px 4px; font-size: 10.5px; color: #6c757d;">
+                                                                                {{ !empty($mydata->installment_due_date) ? date('d-M-Y', strtotime($mydata->installment_due_date)) : 'No Due Date' }}
                                                                             </td>
                                                                         </tr>
                                                                     @endforeach
-                                                                    <tr style="background: #f8f9fa;">
-                                                                        <td style="padding: 2px 4px; font-weight: 700; font-size: 10.5px; color: #002c54;">Total Fee:</td>
-                                                                        <td style="padding: 2px 4px; font-weight: 800; font-size: 11px; color: #002c54; text-align: right;">₹{{ number_format($classTotal) }}</td>
-                                                                        <td></td>
-                                                                    </tr>
                                                                 </table>
                                                             </td>
                                                             @if($getPermission->edit == 1)
@@ -998,49 +871,9 @@ function switchMode(mode) {
     }
 }
 
-var customCompCounter = 10;
-function addCustomFeeHeadRow() {
-    customCompCounter++;
-    var html = `
-        <div class="fee-component-row p-1 mb-1 border rounded bg-white shadow-sm" data-id="${customCompCounter}">
-            <div class="d-flex align-items-center justify-content-between mb-1">
-                <div class="custom-control custom-checkbox mr-1">
-                    <input type="checkbox" class="custom-control-input comp-active" id="comp_active_${customCompCounter}" checked onchange="updateSemPreview()">
-                    <label class="custom-control-label font-weight-bold text-dark" for="comp_active_${customCompCounter}" style="font-size:11px; cursor:pointer;">Custom Fee Head</label>
-                </div>
-                <div class="d-flex align-items-center" style="gap: 4px;">
-                    <select class="form-control form-control-sm comp-type" onchange="updateSemPreview()" style="font-size:9.5px; height:20px; padding:0 2px;">
-                        <option value="academic">Academic</option>
-                        <option value="practical">Practical</option>
-                        <option value="examination">Examination</option>
-                        <option value="admission">Admission</option>
-                        <option value="facility">Facility / Campus</option>
-                        <option value="refundable">Refundable</option>
-                        <option value="other">Other</option>
-                    </select>
-                    <button type="button" class="btn btn-danger btn-xs py-0 px-1" onclick="$(this).closest('.fee-component-row').remove(); updateSemPreview();" title="Remove" style="font-size:9px; height:18px;">
-                        <i class="fa fa-times"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="row no-gutters" style="gap: 4px;">
-                <div class="col">
-                    <input type="text" class="form-control form-control-sm comp-name" value="Other Fee" placeholder="Fee Name" oninput="updateSemPreview()" style="font-size:11px; height:24px; padding: 2px 4px;">
-                </div>
-                <div class="col" style="max-width: 85px;">
-                    <input type="number" class="form-control form-control-sm font-weight-bold text-success text-right comp-amount" value="1000" placeholder="₹ Amount" oninput="updateSemPreview()" style="font-size:11px; height:24px; padding: 2px 4px;">
-                </div>
-                <div class="col" style="max-width: 95px;">
-                    <select class="form-control form-control-sm comp-apply" onchange="updateSemPreview()" style="font-size:10px; height:24px; padding: 1px 2px;">
-                        <option value="all" selected>All Semesters</option>
-                        <option value="sem1">Sem 1 Only</option>
-                    </select>
-                </div>
-                <input type="hidden" class="comp-refund" value="no">
-            </div>
-        </div>
-    `;
-    $('#fee_components_list').append(html);
+function setSemBase(name, cat) {
+    document.getElementById('sem_base_name').value = name;
+    if (cat) document.getElementById('sem_group_type').value = cat;
     updateSemPreview();
 }
 
@@ -1072,8 +905,8 @@ function updateHeadOnlyPartial(checkbox) {
     document.getElementById('fees_partial').value = checkbox.checked ? 1 : 0;
 }
 
-function syncSemDueDate(semIdx, dateVal) {
-    $('.sem-' + semIdx + '-due').val(dateVal);
+function syncCommonAmount(val) {
+    $('.sem-row-amount').val(val);
 }
 
 function applyDueDateSchedule() {
@@ -1092,9 +925,8 @@ function applyDueDateSchedule() {
     var baseMonth = parseInt(startParts[1]) - 1; // 0-indexed month
     var baseDay = parseInt(startParts[2]);
 
-    var semDueInputs = document.querySelectorAll('.sem-due-input');
-    semDueInputs.forEach(function(input) {
-        var idx = parseInt(input.getAttribute('data-sem-idx')) || 0;
+    var dueInputs = document.querySelectorAll('.sem-row-due');
+    dueInputs.forEach(function(input, idx) {
         var targetMonthTotal = baseMonth + (idx * intervalMonths);
         var targetYear = baseYear + Math.floor(targetMonthTotal / 12);
         var targetMonth = targetMonthTotal % 12;
@@ -1106,6 +938,7 @@ function applyDueDateSchedule() {
             targetDay = parseInt(dueDayRule);
         }
         
+        // Ensure day doesn't exceed total days in that month (e.g. Feb 28/29)
         var maxDaysInMonth = new Date(targetYear, targetMonth + 1, 0).getDate();
         if (targetDay > maxDaysInMonth) {
             targetDay = maxDaysInMonth;
@@ -1113,152 +946,69 @@ function applyDueDateSchedule() {
         
         var formattedMonth = String(targetMonth + 1).padStart(2, '0');
         var formattedDay = String(targetDay).padStart(2, '0');
-        var fullDateStr = targetYear + '-' + formattedMonth + '-' + formattedDay;
-        input.value = fullDateStr;
-        syncSemDueDate(idx, fullDateStr);
+        input.value = targetYear + '-' + formattedMonth + '-' + formattedDay;
     });
 }
 
 function clearDueDates() {
-    var semDueInputs = document.querySelectorAll('.sem-due-input');
-    semDueInputs.forEach(function(input) {
-        var idx = parseInt(input.getAttribute('data-sem-idx')) || 0;
+    var dueInputs = document.querySelectorAll('.sem-row-due');
+    dueInputs.forEach(function(input) {
         input.value = '';
-        syncSemDueDate(idx, '');
     });
-}
-
-function recalcTotals() {
-    var grandTotal = 0;
-    var count = parseInt(document.getElementById('sem_count').value) || 6;
-    var loopCount = currentCourseClasses ? Math.min(count, currentCourseClasses.length) : 0;
-
-    for (var i = 0; i < loopCount; i++) {
-        var semSum = 0;
-        $('.sem-' + i + '-amount').each(function() {
-            semSum += parseFloat($(this).val()) || 0;
-        });
-        $('#sem_total_badge_' + i).text('₹' + semSum.toLocaleString('en-IN'));
-        grandTotal += semSum;
-    }
-
-    var totalHeads = $('input[name="fee_name[]"]').length;
-    var badgeElem = document.getElementById('preview_count_badge');
-    if (badgeElem) {
-        badgeElem.innerText = loopCount + ' Semesters | ₹' + grandTotal.toLocaleString('en-IN');
-    }
-    var submitElem = document.getElementById('submit_btn');
-    if (submitElem && currentMode === 'semester') {
-        submitElem.innerHTML = '<i class="fa fa-check-circle"></i> Save Course Fee Structure (' + loopCount + ' Semesters, ' + totalHeads + ' Heads - ₹' + grandTotal.toLocaleString('en-IN') + ')';
-    }
 }
 
 function updateSemPreview() {
-    var components = [];
-    $('#fee_components_list .fee-component-row').each(function() {
-        var row = $(this);
-        var isActive = row.find('.comp-active').is(':checked');
-        if (isActive) {
-            var name = row.find('.comp-name').val().trim() || 'Fee';
-            var amt = parseFloat(row.find('.comp-amount').val()) || 0;
-            var apply = row.find('.comp-apply').val() || 'all';
-            var type = row.find('.comp-type').val() || 'academic';
-            var refund = row.find('.comp-refund').val() || (type === 'refundable' ? 'yes' : 'no');
-            components.push({
-                name: name,
-                amount: amt,
-                apply: apply,
-                type: type,
-                refund: refund
-            });
-        }
-    });
-
-    var useSuffix = document.getElementById('sem_suffix_option') ? document.getElementById('sem_suffix_option').checked : true;
+    var baseName = document.getElementById('sem_base_name').value.trim() || 'Tuition Fee';
     var count = parseInt(document.getElementById('sem_count').value) || 6;
+    var commonAmount = document.getElementById('batch_common_amount').value || '15000';
+
     var html = '';
 
-    if (currentCourseClasses && currentCourseClasses.length > 0) {
+    if (currentCourseClasses.length > 0) {
         var loopCount = Math.min(count, currentCourseClasses.length);
-        var totalHeadEntries = 0;
+        html += '<div class="table-responsive" style="max-height: 220px; overflow-y: auto; border: 1px solid #c2d4ea; border-radius: 4px;">';
+        html += '<table class="table table-sm table-bordered table-striped mb-0 text-dark" style="font-size: 11px; background: #ffffff;">';
+        html += '<thead style="background: #002c54; color: #ffffff; position: sticky; top: 0; z-index: 2;">';
+        html += '<tr>';
+        html += '<th style="padding: 4px 6px; width: 25%; background: #002c54; color: #ffffff;">Class / Sem</th>';
+        html += '<th style="padding: 4px 6px; width: 31%; background: #002c54; color: #ffffff;">Fee Head Name</th>';
+        html += '<th style="padding: 4px 6px; width: 22%; background: #002c54; color: #ffffff;">Amount (₹)</th>';
+        html += '<th style="padding: 4px 6px; width: 22%; background: #002c54; color: #ffffff;">Due Date</th>';
+        html += '</tr>';
+        html += '</thead>';
+        html += '<tbody>';
 
-        html += '<div class="table-responsive" style="max-height: 320px; overflow-y: auto; border: 1px solid #c2d4ea; border-radius: 4px; background: #f8f9fa;">';
-        
         for (var i = 0; i < loopCount; i++) {
             var cl = currentCourseClasses[i];
-            var semApplicableComps = [];
-            for (var c = 0; c < components.length; c++) {
-                if (components[c].apply === 'sem1' && i > 0) continue;
-                semApplicableComps.push(components[c]);
-            }
+            var headName = baseName + ' - Sem ' + (i + 1);
 
-            html += '<div class="card mb-2 mx-1 mt-1 border shadow-sm" style="border-radius: 4px;">';
-            html += '<div class="card-header py-1 px-2 d-flex justify-content-between align-items-center" style="background: #002c54; color: #fff;">';
-            html += '<span class="font-weight-bold" style="font-size: 11px;"><i class="fa fa-graduation-cap text-warning"></i> ' + cl.name + '</span>';
-            html += '<div class="d-flex align-items-center" style="gap: 6px;">';
-            html += '<label class="mb-0 text-white-50" style="font-size: 10px;">Due Date:</label>';
-            html += '<input type="date" class="form-control form-control-sm sem-due-input" data-sem-idx="' + i + '" onchange="syncSemDueDate(' + i + ', this.value)" style="font-size: 10px; height: 22px; width: 120px; padding: 1px 3px; background: #fff;">';
-            html += '<span class="badge badge-success font-weight-bold px-2 sem-total-badge" id="sem_total_badge_' + i + '" style="font-size: 10.5px;">₹0</span>';
-            html += '</div>';
-            html += '</div>';
-
-            html += '<div class="card-body p-0">';
-            html += '<table class="table table-sm table-bordered mb-0" style="font-size: 10.5px; background: #ffffff;">';
-            html += '<thead class="bg-light text-muted" style="font-size: 10px;">';
             html += '<tr>';
-            html += '<th style="padding: 2px 4px; width: 50%;">Fee Head Name</th>';
-            html += '<th style="padding: 2px 4px; width: 25%;">Category</th>';
-            html += '<th style="padding: 2px 4px; width: 25%; text-align: right;">Amount (₹)</th>';
+            html += '<td style="vertical-align: middle; padding: 4px 6px;">';
+            html += '<strong class="text-primary">' + cl.name + '</strong>';
+            html += '<input type="hidden" name="class_type_id[]" value="' + cl.id + '">';
+            html += '</td>';
+            html += '<td style="vertical-align: middle; padding: 4px 6px;">';
+            html += '<input type="text" name="fee_name[]" class="form-control form-control-sm p-1 font-weight-bold text-dark sem-head-name" value="' + headName + '" style="font-size: 11px; height: 26px; border: 1px solid #ced4da;">';
+            html += '</td>';
+            html += '<td style="vertical-align: middle; padding: 4px 6px;">';
+            html += '<input type="number" name="amount[]" class="form-control form-control-sm p-1 font-weight-bold text-success text-right sem-row-amount" value="' + commonAmount + '" min="0" style="font-size: 11px; height: 26px; border: 1px solid #28a745; background: #f8fff9;">';
+            html += '</td>';
+            html += '<td style="vertical-align: middle; padding: 4px 6px;">';
+            html += '<input type="date" name="due_date[]" class="form-control form-control-sm p-1 sem-row-due" value="" style="font-size: 10px; height: 26px; border: 1px solid #ced4da;">';
+            html += '</td>';
             html += '</tr>';
-            html += '</thead>';
-            html += '<tbody>';
-
-            if (semApplicableComps.length === 0) {
-                html += '<tr><td colspan="3" class="text-center text-danger py-1" style="font-size: 10px;">No active fee components for this semester.</td></tr>';
-            } else {
-                for (var j = 0; j < semApplicableComps.length; j++) {
-                    var comp = semApplicableComps[j];
-                    var headName = useSuffix ? (comp.name + ' - Sem ' + (i + 1)) : comp.name;
-                    var badgeClass = 'badge-other';
-                    if (comp.type === 'academic') badgeClass = 'badge-academic';
-                    else if (comp.type === 'examination') badgeClass = 'badge-examination';
-                    else if (comp.type === 'practical') badgeClass = 'badge-practical';
-                    else if (comp.type === 'admission') badgeClass = 'badge-admission';
-                    else if (comp.type === 'facility') badgeClass = 'badge-facility';
-                    else if (comp.type === 'refundable') badgeClass = 'badge-refundable';
-
-                    html += '<tr>';
-                    html += '<td style="padding: 2px 4px; vertical-align: middle;">';
-                    html += '<input type="text" name="fee_name[]" class="form-control form-control-sm p-1 font-weight-bold text-dark" value="' + headName + '" style="font-size: 10.5px; height: 24px;">';
-                    html += '<input type="hidden" name="class_type_id[]" value="' + cl.id + '">';
-                    html += '<input type="hidden" name="group_type[]" value="' + comp.type + '">';
-                    html += '<input type="hidden" name="fees_refund[]" value="' + comp.refund + '">';
-                    html += '<input type="hidden" name="due_date[]" class="sem-' + i + '-due" value="">';
-                    html += '</td>';
-                    html += '<td style="padding: 2px 4px; vertical-align: middle;">';
-                    html += '<span class="badge ' + badgeClass + '" style="font-size: 9.5px;">' + comp.type + '</span>';
-                    html += '</td>';
-                    html += '<td style="padding: 2px 4px; vertical-align: middle;">';
-                    html += '<input type="number" name="amount[]" class="form-control form-control-sm p-1 font-weight-bold text-success text-right sem-row-amount sem-' + i + '-amount" value="' + comp.amount + '" min="0" oninput="recalcTotals()" style="font-size: 11px; height: 24px; border: 1px solid #28a745; background: #f8fff9;">';
-                    html += '</td>';
-                    html += '</tr>';
-                    totalHeadEntries++;
-                }
-            }
-
-            html += '</tbody></table>';
-            html += '</div></div>';
         }
 
-        html += '</div>';
+        html += '</tbody></table></div>';
         document.getElementById('batch_inputs_container').innerHTML = '';
+        document.getElementById('submit_btn').innerHTML = '<i class="fa fa-check-circle"></i> Save ' + loopCount + ' Semester Fee Structure (Fees Master)';
     }
 
-    document.getElementById('preview_title').innerText = 'Course Semester Breakdown & Fee Master:';
+    document.getElementById('preview_title').innerText = 'Semester-wise Fees & Amount Setup:';
     document.getElementById('preview_box').innerHTML = html;
-    
-    // Auto-calculate initial sums and apply schedule
-    recalcTotals();
+    document.getElementById('preview_count_badge').innerText = (currentCourseClasses.length > 0 ? Math.min(count, currentCourseClasses.length) : count) + ' Semesters';
+
+    // Auto-apply schedule if start date is set
     applyDueDateSchedule();
 }
 
