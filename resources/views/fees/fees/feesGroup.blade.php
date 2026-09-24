@@ -165,9 +165,10 @@ $classType = Helper::classType();
                         
                         <div class="card-body p-2">
                             <!-- Course Auto-Detect Box -->
-                            <div class="course-selector-box">
-                                <label class="font-weight-bold text-primary mb-1" style="font-size:11.5px;">
-                                    <i class="fa fa-graduation-cap"></i> Select Course (Auto-Detects Semesters / Years):
+                            <div class="course-selector-box" id="course_selector_box">
+                                <label class="font-weight-bold text-primary mb-1 d-flex justify-content-between align-items-center" style="font-size:11.5px;">
+                                    <span><i class="fa fa-graduation-cap"></i> Select Course (Auto-Detects Semesters / Years): <span class="text-danger" id="course_req_star">*</span></span>
+                                    <span class="badge badge-primary px-2" id="course_mode_badge" style="font-size: 10px;">Required</span>
                                 </label>
                                 <select class="form-control form-control-sm select2 font-weight-bold" id="course_selector" onchange="onCourseSelected(this)">
                                     <option value="">-- Select Course (e.g. BA, BSc, B.Ed) --</option>
@@ -213,57 +214,69 @@ $classType = Helper::classType();
 
                                 <!-- MODE 1: ALL SEMESTERS (BATCH) -->
                                 <div id="section_semester">
-                                    <div class="form-group mb-2">
-                                        <label class="font-weight-bold text-dark mb-1" style="font-size:11.5px;">Fee Head Base Name*</label>
-                                        <div class="mb-1">
-                                            <span class="quick-preset-btn" onclick="setSemBase('Tuition Fee', 'academic')">Tuition Fee</span>
-                                            <span class="quick-preset-btn" onclick="setSemBase('Semester Exam Fee', 'examination')">Exam Fee</span>
-                                            <span class="quick-preset-btn" onclick="setSemBase('Practical / Lab Fee', 'practical')">Practical Fee</span>
-                                            <span class="quick-preset-btn" onclick="setSemBase('Development Fee', 'academic')">Development Fee</span>
-                                        </div>
-                                        <input type="text" class="form-control form-control-sm font-weight-bold" id="sem_base_name" value="Tuition Fee" placeholder="e.g. Tuition Fee, Exam Fee" oninput="updateSemPreview()">
+                                    <!-- Notice shown when NO course is selected -->
+                                    <div id="course_required_notice" class="p-3 text-center border rounded bg-white my-2" style="border: 1.5px dashed #007bff !important; border-radius: 6px;">
+                                        <i class="fa fa-graduation-cap text-primary" style="font-size: 28px;"></i>
+                                        <h6 class="font-weight-bold text-dark mt-2 mb-1" style="font-size: 13px;">Please Select a Course Above</h6>
+                                        <p class="text-muted mb-0" style="font-size: 11px;">
+                                            Select a Course from the dropdown above (e.g. <strong>BA, BSc, B.Ed</strong>) to auto-detect semesters and generate class-wise fee structure.
+                                        </p>
                                     </div>
 
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group mb-2">
-                                                <label class="font-weight-bold mb-1" style="font-size:11px;">Total Semesters / Years*</label>
-                                                <select class="form-control form-control-sm font-weight-bold" id="sem_count" onchange="updateSemPreview()">
-                                                    <option value="1">1 Semester</option>
-                                                    <option value="2">2 Semesters (1 Year)</option>
-                                                    <option value="3">3 Semesters</option>
-                                                    <option value="4">4 Semesters (2 Years)</option>
-                                                    <option value="5">5 Semesters</option>
-                                                    <option value="6" selected>6 Semesters (3 Years)</option>
-                                                    <option value="7">7 Semesters</option>
-                                                    <option value="8">8 Semesters (4 Years)</option>
-                                                    <option value="9">9 Semesters</option>
-                                                    <option value="10">10 Semesters (5 Years)</option>
-                                                    <option value="12">12 Semesters (6 Years)</option>
-                                                </select>
+                                    <!-- Controls shown when a course is selected -->
+                                    <div id="section_semester_controls" style="display: none;">
+                                        <div class="form-group mb-2">
+                                            <label class="font-weight-bold text-dark mb-1" style="font-size:11.5px;">Fee Head Base Name*</label>
+                                            <div class="mb-1">
+                                                <span class="quick-preset-btn" onclick="setSemBase('Tuition Fee', 'academic')">Tuition Fee</span>
+                                                <span class="quick-preset-btn" onclick="setSemBase('Semester Exam Fee', 'examination')">Exam Fee</span>
+                                                <span class="quick-preset-btn" onclick="setSemBase('Practical / Lab Fee', 'practical')">Practical Fee</span>
+                                                <span class="quick-preset-btn" onclick="setSemBase('Development Fee', 'academic')">Development Fee</span>
                                             </div>
+                                            <input type="text" class="form-control form-control-sm font-weight-bold" id="sem_base_name" value="Tuition Fee" placeholder="e.g. Tuition Fee, Exam Fee" oninput="updateSemPreview()">
                                         </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group mb-2">
-                                                <label class="font-weight-bold mb-1" style="font-size:11px;">Category</label>
-                                                <select class="form-control form-control-sm" name="group_type" id="sem_group_type">
-                                                    <option value="academic" selected>Academic (Tuition / University)</option>
-                                                    <option value="examination">Examination</option>
-                                                    <option value="practical">Laboratory & Practical</option>
-                                                    <option value="facility">Campus Facility & Library</option>
-                                                    <option value="other">Other</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
 
-                                    <!-- Fees Master Assignment Settings (Default Amount) -->
-                                    <div class="fee-master-amount-box">
-                                        <div class="form-group mb-0">
-                                            <label class="font-weight-bold text-dark mb-1" style="font-size:11.5px;">
-                                                <i class="fa fa-check-square-o text-success"></i> Default Amount (Applied to all semesters):
-                                            </label>
-                                            <input type="text" class="form-control form-control-sm font-weight-bold text-success" id="batch_common_amount" placeholder="e.g. 15000" value="15000" oninput="syncCommonAmount(this.value)" onkeypress="javascript:return isNumber(event)">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group mb-2">
+                                                    <label class="font-weight-bold mb-1" style="font-size:11px;">Total Semesters / Years*</label>
+                                                    <select class="form-control form-control-sm font-weight-bold" id="sem_count" onchange="updateSemPreview()">
+                                                        <option value="1">1 Semester</option>
+                                                        <option value="2">2 Semesters (1 Year)</option>
+                                                        <option value="3">3 Semesters</option>
+                                                        <option value="4">4 Semesters (2 Years)</option>
+                                                        <option value="5">5 Semesters</option>
+                                                        <option value="6" selected>6 Semesters (3 Years)</option>
+                                                        <option value="7">7 Semesters</option>
+                                                        <option value="8">8 Semesters (4 Years)</option>
+                                                        <option value="9">9 Semesters</option>
+                                                        <option value="10">10 Semesters (5 Years)</option>
+                                                        <option value="12">12 Semesters (6 Years)</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group mb-2">
+                                                    <label class="font-weight-bold mb-1" style="font-size:11px;">Category</label>
+                                                    <select class="form-control form-control-sm" name="group_type" id="sem_group_type">
+                                                        <option value="academic" selected>Academic (Tuition / University)</option>
+                                                        <option value="examination">Examination</option>
+                                                        <option value="practical">Laboratory & Practical</option>
+                                                        <option value="facility">Campus Facility & Library</option>
+                                                        <option value="other">Other</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Fees Master Assignment Settings (Default Amount) -->
+                                        <div class="fee-master-amount-box">
+                                            <div class="form-group mb-0">
+                                                <label class="font-weight-bold text-dark mb-1" style="font-size:11.5px;">
+                                                    <i class="fa fa-check-square-o text-success"></i> Default Amount (Applied to all semesters):
+                                                </label>
+                                                <input type="text" class="form-control form-control-sm font-weight-bold text-success" id="batch_common_amount" placeholder="e.g. 15000" value="15000" oninput="syncCommonAmount(this.value)" onkeypress="javascript:return isNumber(event)">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -373,7 +386,7 @@ $classType = Helper::classType();
                                 <div id="batch_inputs_container"></div>
 
                                 <!-- Live Clean Preview Box (High Contrast & Editable) -->
-                                <div class="preview-box-container mt-2 mb-2">
+                                <div class="preview-box-container mt-2 mb-2" id="preview_box_container" style="display: none;">
                                     <div class="d-flex justify-content-between align-items-center preview-header">
                                         <span><i class="fa fa-pencil-square-o text-primary"></i> <span id="preview_title">Fee Heads & Structure Preview:</span></span>
                                         <span class="badge badge-primary px-2" id="preview_count_badge">6 Semesters</span>
@@ -639,11 +652,31 @@ function onCourseSelected(selectElem) {
     var opt = selectElem.options[selectElem.selectedIndex];
     var infoDiv = document.getElementById('course_detected_info');
     var infoText = document.getElementById('course_detected_text');
+    var noticeDiv = document.getElementById('course_required_notice');
+    var controlsDiv = document.getElementById('section_semester_controls');
+    var previewContainer = document.getElementById('preview_box_container');
+    var submitBtn = document.getElementById('submit_btn');
 
     if (!opt || !opt.value) {
         infoDiv.style.display = 'none';
         currentCourseClasses = [];
-        updateSemPreview();
+        
+        if (currentMode === 'semester') {
+            if (noticeDiv) noticeDiv.style.display = 'block';
+            if (controlsDiv) controlsDiv.style.display = 'none';
+            if (previewContainer) previewContainer.style.display = 'none';
+            submitBtn.disabled = true;
+            submitBtn.className = 'btn btn-secondary btn-sm btn-block font-weight-bold py-2 disabled';
+            submitBtn.innerHTML = '<i class="fa fa-hand-o-up"></i> Please Select a Course to Continue';
+        }
+        
+        var singleClassSelect = $('#single_class_type_id');
+        singleClassSelect.empty().append('<option value="">-- Select Class / Semester --</option>');
+        @if(!empty($classType))
+            @foreach($classType as $cl)
+                singleClassSelect.append('<option value="{{ $cl->id }}" data-course-id="{{ $cl->course_id }}">{{ $cl->name }}</option>');
+            @endforeach
+        @endif
         return;
     }
 
@@ -675,18 +708,34 @@ function onCourseSelected(selectElem) {
         success: function(res) {
             currentCourseClasses = res || [];
             
-            // Populate single class dropdown if in single class mode
+            // Populate single class dropdown with only classes of this course
             var singleClassSelect = $('#single_class_type_id');
             singleClassSelect.empty().append('<option value="">-- Select Class / Semester --</option>');
             $.each(currentCourseClasses, function(idx, item) {
                 singleClassSelect.append('<option value="' + item.id + '">' + item.name + '</option>');
             });
 
-            updateSemPreview();
+            if (currentMode === 'semester') {
+                if (noticeDiv) noticeDiv.style.display = 'none';
+                if (controlsDiv) controlsDiv.style.display = 'block';
+                if (previewContainer) previewContainer.style.display = 'block';
+                submitBtn.disabled = false;
+                submitBtn.className = 'btn btn-primary btn-sm btn-block font-weight-bold py-2 shadow-sm';
+                updateSemPreview();
+            } else if (currentMode === 'single_class') {
+                updateSingleClassPreview();
+            }
         },
         error: function() {
             currentCourseClasses = [];
-            updateSemPreview();
+            if (currentMode === 'semester') {
+                if (noticeDiv) noticeDiv.style.display = 'block';
+                if (controlsDiv) controlsDiv.style.display = 'none';
+                if (previewContainer) previewContainer.style.display = 'none';
+                submitBtn.disabled = true;
+                submitBtn.className = 'btn btn-secondary btn-sm btn-block font-weight-bold py-2 disabled';
+                submitBtn.innerHTML = '<i class="fa fa-hand-o-up"></i> Please Select a Course to Continue';
+            }
         }
     });
 }
@@ -703,17 +752,56 @@ function switchMode(mode) {
     document.getElementById('section_single_class').style.display = 'none';
     document.getElementById('section_single_head').style.display = 'none';
 
+    var courseBox = document.getElementById('course_selector_box');
+    var courseBadge = document.getElementById('course_mode_badge');
+    var courseReqStar = document.getElementById('course_req_star');
+    var noticeDiv = document.getElementById('course_required_notice');
+    var controlsDiv = document.getElementById('section_semester_controls');
+    var previewContainer = document.getElementById('preview_box_container');
+    var submitBtn = document.getElementById('submit_btn');
+    var courseSelected = document.getElementById('course_selector').value !== '';
+
     if (mode === 'semester') {
         document.getElementById('btn_mode_semester').classList.add('active');
         document.getElementById('section_semester').style.display = 'block';
-        updateSemPreview();
+        courseBox.style.display = 'block';
+        courseBadge.innerText = 'Required';
+        courseBadge.className = 'badge badge-primary px-2';
+        courseReqStar.style.display = 'inline';
+
+        if (courseSelected && currentCourseClasses.length > 0) {
+            if (noticeDiv) noticeDiv.style.display = 'none';
+            if (controlsDiv) controlsDiv.style.display = 'block';
+            if (previewContainer) previewContainer.style.display = 'block';
+            submitBtn.disabled = false;
+            submitBtn.className = 'btn btn-primary btn-sm btn-block font-weight-bold py-2 shadow-sm';
+            updateSemPreview();
+        } else {
+            if (noticeDiv) noticeDiv.style.display = 'block';
+            if (controlsDiv) controlsDiv.style.display = 'none';
+            if (previewContainer) previewContainer.style.display = 'none';
+            submitBtn.disabled = true;
+            submitBtn.className = 'btn btn-secondary btn-sm btn-block font-weight-bold py-2 disabled';
+            submitBtn.innerHTML = '<i class="fa fa-hand-o-up"></i> Please Select a Course to Continue';
+        }
     } else if (mode === 'single_class') {
         document.getElementById('btn_mode_single_class').classList.add('active');
         document.getElementById('section_single_class').style.display = 'block';
+        courseBox.style.display = 'block';
+        courseBadge.innerText = 'Filter Course';
+        courseBadge.className = 'badge badge-info px-2';
+        courseReqStar.style.display = 'none';
+        if (previewContainer) previewContainer.style.display = 'block';
+        submitBtn.disabled = false;
+        submitBtn.className = 'btn btn-primary btn-sm btn-block font-weight-bold py-2 shadow-sm';
         updateSingleClassPreview();
     } else {
         document.getElementById('btn_mode_single_head').classList.add('active');
         document.getElementById('section_single_head').style.display = 'block';
+        courseBox.style.display = 'none';
+        if (previewContainer) previewContainer.style.display = 'block';
+        submitBtn.disabled = false;
+        submitBtn.className = 'btn btn-primary btn-sm btn-block font-weight-bold py-2 shadow-sm';
         updateHeadOnlyPreview();
     }
 }
@@ -801,41 +889,11 @@ function updateSemPreview() {
         html += '</tbody></table></div>';
         document.getElementById('batch_inputs_container').innerHTML = '';
         document.getElementById('submit_btn').innerHTML = '<i class="fa fa-check-circle"></i> Save ' + loopCount + ' Semester Fee Structure (Fees Master)';
-    } else {
-        html += '<div class="alert alert-info py-1 px-2 mb-2" style="font-size: 10.5px; border-radius: 4px; background: #e8f4fd; border: 1px solid #b8daff; color: #004085;">';
-        html += '<i class="fa fa-info-circle"></i> <strong>Tip:</strong> Select a course from the dropdown above to automatically link to classes. You can also customize individual amounts & due dates below:';
-        html += '</div>';
-
-        html += '<div class="table-responsive" style="max-height: 200px; overflow-y: auto; border: 1px solid #c2d4ea; border-radius: 4px;">';
-        html += '<table class="table table-sm table-bordered table-striped mb-0 text-dark" style="font-size: 11px; background: #ffffff;">';
-        html += '<thead style="background: #002c54; color: #ffffff; position: sticky; top: 0; z-index: 2;">';
-        html += '<tr>';
-        html += '<th style="padding: 4px 6px; width: 22%; background: #002c54; color: #ffffff;">Semester</th>';
-        html += '<th style="padding: 4px 6px; width: 34%; background: #002c54; color: #ffffff;">Fee Head Name</th>';
-        html += '<th style="padding: 4px 6px; width: 22%; background: #002c54; color: #ffffff;">Amount (₹)</th>';
-        html += '<th style="padding: 4px 6px; width: 22%; background: #002c54; color: #ffffff;">Due Date</th>';
-        html += '</tr>';
-        html += '</thead>';
-        html += '<tbody>';
-
-        for (var i = 1; i <= count; i++) {
-            var headName = baseName + ' - Sem ' + i;
-            html += '<tr>';
-            html += '<td style="vertical-align: middle; padding: 4px 6px;"><strong class="text-primary">Semester ' + i + '</strong></td>';
-            html += '<td style="vertical-align: middle; padding: 4px 6px;"><input type="text" name="names[]" class="form-control form-control-sm p-1 font-weight-bold text-dark" value="' + headName + '" style="font-size: 11px; height: 26px; border: 1px solid #ced4da;"></td>';
-            html += '<td style="vertical-align: middle; padding: 4px 6px;"><input type="number" class="form-control form-control-sm p-1 font-weight-bold text-success text-right sem-row-amount" value="' + commonAmount + '" min="0" style="font-size: 11px; height: 26px; border: 1px solid #28a745; background: #f8fff9;"></td>';
-            html += '<td style="vertical-align: middle; padding: 4px 6px;"><input type="date" class="form-control form-control-sm p-1 sem-row-due" value="" style="font-size: 10px; height: 26px; border: 1px solid #ced4da;"></td>';
-            html += '</tr>';
-        }
-
-        html += '</tbody></table></div>';
-        document.getElementById('batch_inputs_container').innerHTML = '';
-        document.getElementById('submit_btn').innerHTML = '<i class="fa fa-check-circle"></i> Create ' + count + ' Semester Fee Heads';
     }
 
     document.getElementById('preview_title').innerText = 'Semester-wise Fees & Amount Setup:';
     document.getElementById('preview_box').innerHTML = html;
-    document.getElementById('preview_count_badge').innerText = count + ' Semesters';
+    document.getElementById('preview_count_badge').innerText = (currentCourseClasses.length > 0 ? Math.min(count, currentCourseClasses.length) : count) + ' Semesters';
 }
 
 function updateSingleClassPreview() {
@@ -868,7 +926,13 @@ function updateHeadOnlyPreview() {
 }
 
 $(document).ready(function() {
-    updateSemPreview();
+    // Initial check: if course was selected, trigger auto-detect
+    var initCourse = document.getElementById('course_selector');
+    if (initCourse && initCourse.value) {
+        onCourseSelected(initCourse);
+    } else {
+        switchMode('semester');
+    }
     
     $(document).on('click', '.deleteData', function() {
         var delete_id = $(this).data('id');
@@ -892,6 +956,48 @@ $(document).ready(function() {
             'color': '#002c54',
             'border-color': '#ffffff'
         });
+    });
+
+    // Form Submission Client-side Validation
+    $('#quickForm').on('submit', function(e) {
+        var mode = $('#form_mode').val();
+        if (mode === 'semester') {
+            var courseVal = $('#course_selector').val();
+            if (!courseVal) {
+                e.preventDefault();
+                alert('Please select a Course first!');
+                $('#course_selector').focus();
+                return false;
+            }
+            if (currentCourseClasses.length === 0) {
+                e.preventDefault();
+                alert('No classes found for the selected course.');
+                return false;
+            }
+        } else if (mode === 'single_class') {
+            var classVal = $('#single_class_type_id').val();
+            var nameVal = $('#single_class_fee_name').val().trim();
+            if (!classVal) {
+                e.preventDefault();
+                alert('Please select a Class / Semester!');
+                $('#single_class_type_id').focus();
+                return false;
+            }
+            if (!nameVal) {
+                e.preventDefault();
+                alert('Please enter Fee Head Name!');
+                $('#single_class_fee_name').focus();
+                return false;
+            }
+        } else if (mode === 'single_head') {
+            var headVal = $('#head_only_name').val().trim();
+            if (!headVal) {
+                e.preventDefault();
+                alert('Please enter Fee Head Name!');
+                $('#head_only_name').focus();
+                return false;
+            }
+        }
     });
 });
 </script>
