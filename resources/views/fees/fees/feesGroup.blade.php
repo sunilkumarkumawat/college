@@ -8,8 +8,8 @@ $classType = Helper::classType();
 @section('content')
 
 <style>
-/* Clean, High-Contrast & Accessible Styles */
-:root {
+/* Strictly Scoped Styles for Fees Unified Setup Page (Does NOT affect Sidebar, Header, or other pages) */
+.fees-unified-page {
     --brand-dark: #002c54;
     --brand-dark-hover: #004b8d;
     --brand-darker: #001a33;
@@ -18,45 +18,47 @@ $classType = Helper::classType();
 }
 
 /* Base Buttons & Dark Background High-Contrast Rules */
-.btn-primary {
+.fees-unified-page .btn-primary {
     background-color: var(--brand-dark) !important;
     border-color: var(--brand-dark) !important;
     color: #ffffff !important;
 }
-.btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+.fees-unified-page .btn-primary:hover, 
+.fees-unified-page .btn-primary:focus, 
+.fees-unified-page .btn-primary:active {
     background-color: var(--brand-dark-hover) !important;
     border-color: var(--brand-dark-hover) !important;
     color: #ffffff !important;
     box-shadow: 0 2px 6px rgba(0,0,0,0.2) !important;
 }
-.btn-primary i {
+.fees-unified-page .btn-primary i {
     color: inherit !important;
 }
 
 /* Card Headers with Dark Background */
-.card-header.bg-primary {
+.fees-unified-page .card-header.bg-primary {
     background: var(--brand-dark) !important;
     color: #ffffff !important;
     border-bottom: 1px solid var(--brand-darker) !important;
 }
-.card-header.bg-primary .card-title,
-.card-header.bg-primary h3,
-.card-header.bg-primary h5 {
+.fees-unified-page .card-header.bg-primary .card-title,
+.fees-unified-page .card-header.bg-primary h3,
+.fees-unified-page .card-header.bg-primary h5 {
     color: #ffffff !important;
     margin-bottom: 0;
 }
-.card-header.bg-primary .card-title i,
-.card-header.bg-primary h3 i {
+.fees-unified-page .card-header.bg-primary .card-title i,
+.fees-unified-page .card-header.bg-primary h3 i {
     color: #ffffff !important;
 }
-.card-header.bg-primary .badge-light {
+.fees-unified-page .card-header.bg-primary .badge-light {
     background: #ffffff !important;
     color: var(--brand-dark) !important;
     font-weight: 700;
 }
 
 /* Course Selector Container */
-.course-selector-box {
+.fees-unified-page .course-selector-box {
     background: #f0f7ff !important;
     border: 1px solid #b8daff !important;
     border-radius: 6px;
@@ -65,7 +67,7 @@ $classType = Helper::classType();
 }
 
 /* Structure Mode Toggle Buttons */
-.mode-toggle-btn {
+.fees-unified-page .mode-toggle-btn {
     flex: 1;
     padding: 6px 8px;
     font-size: 11px;
@@ -77,35 +79,35 @@ $classType = Helper::classType();
     cursor: pointer;
     transition: all 0.2s ease;
 }
-.mode-toggle-btn:hover {
+.fees-unified-page .mode-toggle-btn:hover {
     background: #e2e8f0;
     color: var(--brand-dark);
     border-color: #94a3b8;
 }
-.mode-toggle-btn.active {
+.fees-unified-page .mode-toggle-btn.active {
     background: var(--brand-dark) !important;
     color: #ffffff !important;
     border-color: var(--brand-dark) !important;
     box-shadow: 0 2px 4px rgba(0,0,0,0.15);
 }
-.mode-toggle-btn.active:hover {
+.fees-unified-page .mode-toggle-btn.active:hover {
     background: var(--brand-dark-hover) !important;
     color: #ffffff !important;
 }
-.mode-toggle-btn.active small {
+.fees-unified-page .mode-toggle-btn.active small {
     color: #e2e8f0 !important;
 }
-.mode-toggle-btn:first-child {
+.fees-unified-page .mode-toggle-btn:first-child {
     border-top-left-radius: 4px;
     border-bottom-left-radius: 4px;
 }
-.mode-toggle-btn:last-child {
+.fees-unified-page .mode-toggle-btn:last-child {
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
 }
 
 /* Quick Preset Pills */
-.quick-preset-btn {
+.fees-unified-page .quick-preset-btn {
     display: inline-block;
     padding: 2px 8px;
     margin: 2px 1px;
@@ -118,7 +120,7 @@ $classType = Helper::classType();
     cursor: pointer;
     transition: all 0.15s ease-in-out;
 }
-.quick-preset-btn:hover {
+.fees-unified-page .quick-preset-btn:hover {
     background: var(--brand-dark) !important;
     color: #ffffff !important;
     border-color: var(--brand-dark) !important;
@@ -126,7 +128,7 @@ $classType = Helper::classType();
 }
 
 /* Preview Box */
-.preview-badge {
+.fees-unified-page .preview-badge {
     display: inline-block;
     padding: 3px 7px;
     margin: 2px 1px;
@@ -138,13 +140,13 @@ $classType = Helper::classType();
     border: 1px solid #99caff;
     box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
-.preview-box-container {
+.fees-unified-page .preview-box-container {
     background: #ffffff;
     border: 1px solid #c2d4ea;
     border-radius: 5px;
     padding: 8px;
 }
-.preview-header {
+.fees-unified-page .preview-header {
     background: #e8f2fc;
     color: var(--brand-dark);
     font-weight: 700;
@@ -153,7 +155,7 @@ $classType = Helper::classType();
     border-radius: 4px;
     margin-bottom: 6px;
 }
-.fee-master-amount-box {
+.fees-unified-page .fee-master-amount-box {
     background: #fffdf5;
     border: 1px solid #ffeeba;
     border-radius: 5px;
@@ -162,20 +164,20 @@ $classType = Helper::classType();
     margin-bottom: 8px;
 }
 
-/* Category Badges (Clean, Vivid & Light Text) */
-.badge-academic { background-color: #007bff !important; color: #ffffff !important; }
-.badge-examination { background-color: #e65100 !important; color: #ffffff !important; }
-.badge-practical { background-color: #00838f !important; color: #ffffff !important; }
-.badge-admission { background-color: #512da8 !important; color: #ffffff !important; }
-.badge-facility { background-color: #00796b !important; color: #ffffff !important; }
-.badge-refundable { background-color: #2e7d32 !important; color: #ffffff !important; }
-.badge-hostel_transport { background-color: #c2185b !important; color: #ffffff !important; }
-.badge-other { background-color: #455a64 !important; color: #ffffff !important; }
+/* Category Badges */
+.fees-unified-page .badge-academic { background-color: #007bff !important; color: #ffffff !important; }
+.fees-unified-page .badge-examination { background-color: #e65100 !important; color: #ffffff !important; }
+.fees-unified-page .badge-practical { background-color: #00838f !important; color: #ffffff !important; }
+.fees-unified-page .badge-admission { background-color: #512da8 !important; color: #ffffff !important; }
+.fees-unified-page .badge-facility { background-color: #00796b !important; color: #ffffff !important; }
+.fees-unified-page .badge-refundable { background-color: #2e7d32 !important; color: #ffffff !important; }
+.fees-unified-page .badge-hostel_transport { background-color: #c2185b !important; color: #ffffff !important; }
+.fees-unified-page .badge-other { background-color: #455a64 !important; color: #ffffff !important; }
 
 /* Table Headers (High-Contrast White on Dark) */
-.padding_table thead tr th,
-#example1 thead tr th,
-#example2 thead tr th {
+.fees-unified-page .padding_table thead tr th,
+.fees-unified-page #example1 thead tr th,
+.fees-unified-page #example2 thead tr th {
     background: var(--brand-dark) !important;
     color: #ffffff !important;
     font-size: 11.5px !important;
@@ -184,15 +186,15 @@ $classType = Helper::classType();
     border-color: var(--brand-darker) !important;
     vertical-align: middle !important;
 }
-.padding_table thead tr th a,
-.padding_table thead tr th i,
-#example1 thead tr th a,
-#example1 thead tr th i,
-#example2 thead tr th a,
-#example2 thead tr th i {
+.fees-unified-page .padding_table thead tr th a,
+.fees-unified-page .padding_table thead tr th i,
+.fees-unified-page #example1 thead tr th a,
+.fees-unified-page #example1 thead tr th i,
+.fees-unified-page #example2 thead tr th a,
+.fees-unified-page #example2 thead tr th i {
     color: #ffffff !important;
 }
-.padding_table td {
+.fees-unified-page .padding_table td {
     padding: 5px 8px !important;
     font-size: 11.5px !important;
     vertical-align: middle !important;
@@ -200,36 +202,36 @@ $classType = Helper::classType();
 }
 
 /* DataTables Sorting Arrows in Dark Header */
-table.dataTable thead .sorting:before, 
-table.dataTable thead .sorting_asc:before, 
-table.dataTable thead .sorting_desc:before,
-table.dataTable thead .sorting:after, 
-table.dataTable thead .sorting_asc:after, 
-table.dataTable thead .sorting_desc:after {
+.fees-unified-page table.dataTable thead .sorting:before, 
+.fees-unified-page table.dataTable thead .sorting_asc:before, 
+.fees-unified-page table.dataTable thead .sorting_desc:before,
+.fees-unified-page table.dataTable thead .sorting:after, 
+.fees-unified-page table.dataTable thead .sorting_asc:after, 
+.fees-unified-page table.dataTable thead .sorting_desc:after {
     color: #ffffff !important;
     opacity: 0.8 !important;
 }
 
 /* Header & Tab alignment */
-.card-header::after {
+.fees-unified-page .card-header::after {
     display: none !important;
 }
-.card-header {
+.fees-unified-page .card-header {
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
     min-height: 40px !important;
     padding: 5px 10px !important;
 }
-.card-header .nav-pills {
+.fees-unified-page .card-header .nav-pills {
     margin: 0 !important;
 }
-.card-header .nav-pills .nav-link {
+.fees-unified-page .card-header .nav-pills .nav-link {
     margin: 0 !important;
 }
 
 /* Top Tab Link Hover & Active States */
-#feesTab a.nav-link {
+.fees-unified-page #feesTab a.nav-link {
     background: rgba(255, 255, 255, 0.15) !important;
     color: #ffffff !important;
     border-radius: 4px;
@@ -238,47 +240,43 @@ table.dataTable thead .sorting_desc:after {
     cursor: pointer;
     transition: all 0.15s ease-in-out;
 }
-#feesTab a.nav-link i {
+.fees-unified-page #feesTab a.nav-link i {
     color: #ffffff !important;
 }
-#feesTab a.nav-link:hover:not(.active) {
+.fees-unified-page #feesTab a.nav-link:hover:not(.active) {
     background: #ffffff !important;
     color: var(--brand-dark) !important;
     border-color: #ffffff !important;
     box-shadow: 0 2px 4px rgba(0,0,0,0.15);
 }
-#feesTab a.nav-link:hover:not(.active) i {
+.fees-unified-page #feesTab a.nav-link:hover:not(.active) i {
     color: var(--brand-dark) !important;
 }
-#feesTab a.nav-link.active {
+.fees-unified-page #feesTab a.nav-link.active {
     background: #ffffff !important;
     color: var(--brand-dark) !important;
     border-color: #ffffff !important;
     box-shadow: 0 2px 4px rgba(0,0,0,0.18) !important;
 }
-#feesTab a.nav-link.active i {
+.fees-unified-page #feesTab a.nav-link.active i {
     color: var(--brand-dark) !important;
 }
 
 /* Executive Course Cards, KPI Chips & Quick Filters */
-.bg-light {
-    background-color: #f8fafc !important;
-    color: #1e293b !important;
-}
-.badge-light {
+.fees-unified-page .badge-light {
     background-color: #f1f5f9 !important;
     color: #1e293b !important;
     border: 1px solid #cbd5e1 !important;
 }
-.card-header.bg-primary .badge-light,
-.course-card-header .badge-light {
+.fees-unified-page .card-header.bg-primary .badge-light,
+.fees-unified-page .course-card-header .badge-light {
     background-color: #ffffff !important;
     color: var(--brand-dark) !important;
     font-weight: 700 !important;
     border: none !important;
 }
 
-.kpi-chip-card {
+.fees-unified-page .kpi-chip-card {
     background: #ffffff !important;
     border: 1px solid var(--brand-border) !important;
     border-radius: 6px;
@@ -289,11 +287,11 @@ table.dataTable thead .sorting_desc:after {
     gap: 8px;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-.kpi-chip-card:hover {
+.fees-unified-page .kpi-chip-card:hover {
     transform: translateY(-1px);
     box-shadow: 0 3px 6px rgba(0,0,0,0.08);
 }
-.kpi-chip-icon {
+.fees-unified-page .kpi-chip-icon {
     width: 34px;
     height: 34px;
     border-radius: 6px;
@@ -303,29 +301,29 @@ table.dataTable thead .sorting_desc:after {
     font-size: 15px;
     flex-shrink: 0;
 }
-.kpi-chip-icon.icon-courses {
+.fees-unified-page .kpi-chip-icon.icon-courses {
     background: #e0f2fe !important;
     color: #0284c7 !important;
 }
-.kpi-chip-icon.icon-classes {
+.fees-unified-page .kpi-chip-icon.icon-classes {
     background: #e0e7ff !important;
     color: #4338ca !important;
 }
-.kpi-chip-icon.icon-pool {
+.fees-unified-page .kpi-chip-icon.icon-pool {
     background: #dcfce7 !important;
     color: #15803d !important;
 }
-.kpi-chip-icon.icon-heads {
+.fees-unified-page .kpi-chip-icon.icon-heads {
     background: #fef3c7 !important;
     color: #b45309 !important;
 }
-.kpi-chip-val {
+.fees-unified-page .kpi-chip-val {
     font-size: 13.5px;
     font-weight: 700;
     line-height: 1.1;
     color: #0f172a;
 }
-.kpi-chip-label {
+.fees-unified-page .kpi-chip-label {
     font-size: 9px;
     font-weight: 700;
     color: #64748b;
@@ -334,92 +332,75 @@ table.dataTable thead .sorting_desc:after {
 }
 
 /* Quick Filters Box Container */
-.quick-filters-box {
+.fees-unified-page .quick-filters-box {
     background: #f1f5f9 !important;
     border: 1px solid #cbd5e1 !important;
     border-radius: 6px;
     padding: 8px 10px;
     margin-bottom: 10px;
 }
-.quick-filters-box label {
+.fees-unified-page .quick-filters-box label {
     color: var(--brand-dark) !important;
     font-weight: 700 !important;
     font-size: 11.5px !important;
 }
-.quick-filters-box label i {
+.fees-unified-page .quick-filters-box label i {
     color: var(--brand-dark-hover) !important;
 }
-.quick-filters-box .text-muted,
-.quick-filters-box small {
+.fees-unified-page .quick-filters-box .text-muted,
+.fees-unified-page .quick-filters-box small {
     color: #475569 !important;
     font-weight: 600 !important;
     font-size: 10px !important;
 }
 
-/* Empty Course State */
-.empty-course-box {
-    background: #f8fafc !important;
-    border: 1.5px dashed #cbd5e1 !important;
-    border-radius: 6px;
-    padding: 16px 12px;
-    text-align: center;
+/* Course Filter Scroll with Left & Right Arrows */
+.fees-unified-page .course-filter-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+    width: 100%;
 }
-.empty-course-box .empty-msg {
-    color: #334155 !important;
-    font-size: 12px !important;
-    font-weight: 600 !important;
-    margin-bottom: 8px;
-}
-.empty-course-box .empty-msg i {
-    color: #0284c7 !important;
-    margin-right: 4px;
-}
-.empty-course-box .empty-msg strong {
+.fees-unified-page .course-scroll-btn {
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    border-radius: 50%;
+    background: #ffffff !important;
+    border: 1px solid var(--brand-border) !important;
     color: var(--brand-dark) !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: all 0.15s ease-in-out;
+    padding: 0;
+    font-size: 11px;
 }
-.btn-configure-course {
+.fees-unified-page .course-scroll-btn:hover {
     background: var(--brand-dark) !important;
     color: #ffffff !important;
-    border: 1px solid var(--brand-dark) !important;
-    font-weight: 700 !important;
-    font-size: 11px !important;
-    padding: 4px 12px !important;
-    border-radius: 4px;
-    transition: all 0.15s ease-in-out;
+    border-color: var(--brand-dark) !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2) !important;
 }
-.btn-configure-course:hover {
-    background: var(--brand-dark-hover) !important;
-    color: #ffffff !important;
-    border-color: var(--brand-dark-hover) !important;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.18) !important;
-}
-.btn-configure-course i {
-    color: #ffffff !important;
-}
-
-/* Modal Table Headers */
-.modal table thead th,
-.modal table thead tr th {
-    background: #f1f5f9 !important;
-    color: #0f172a !important;
-    font-weight: 700 !important;
-    border-bottom: 2px solid #cbd5e1 !important;
-    font-size: 11.5px !important;
-}
-.modal table tbody td {
-    color: #1e293b !important;
-    font-size: 11.5px !important;
-}
-
-/* Course Filter Pills */
-.course-filter-scroll {
+.fees-unified-page .course-filter-scroll {
     display: flex;
     overflow-x: auto;
     gap: 6px;
-    padding-bottom: 4px;
-    scrollbar-width: thin;
+    padding: 3px 2px;
+    flex-grow: 1;
+    scroll-behavior: smooth;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE & Edge */
 }
-.course-pill-btn {
+.fees-unified-page .course-filter-scroll::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
+/* Course Filter Pills */
+.fees-unified-page .course-pill-btn {
     display: inline-flex;
     align-items: center;
     gap: 5px;
@@ -427,54 +408,58 @@ table.dataTable thead .sorting_desc:after {
     font-size: 11px;
     font-weight: 600;
     border-radius: 20px;
-    border: 1px solid var(--brand-border);
-    background: #ffffff;
-    color: #1e293b;
+    border: 1px solid var(--brand-border) !important;
+    background: #ffffff !important;
+    color: #1e293b !important;
     cursor: pointer;
     white-space: nowrap;
     transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
 }
-.course-pill-btn:hover {
-    background: var(--brand-dark) !important;
-    color: #ffffff !important;
-    border-color: var(--brand-dark) !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+.fees-unified-page .course-pill-btn i {
+    color: #0284c7 !important;
 }
-.course-pill-btn:hover i {
-    color: #ffffff !important;
-}
-.course-pill-btn:hover .badge-counter {
-    background: rgba(255,255,255,0.25) !important;
-    color: #ffffff !important;
-}
-.course-pill-btn.active {
-    background: var(--brand-dark) !important;
-    color: #ffffff !important;
-    border-color: var(--brand-dark) !important;
-    box-shadow: 0 2px 4px rgba(0,44,84,0.25);
-}
-.course-pill-btn.active:hover {
-    background: var(--brand-dark-hover) !important;
-    color: #ffffff !important;
-}
-.course-pill-btn.active i {
-    color: #ffffff !important;
-}
-.course-pill-btn .badge-counter {
-    background: rgba(0,0,0,0.08);
-    color: inherit;
+.fees-unified-page .course-pill-btn .badge-counter {
+    background: #e2e8f0 !important;
+    color: #0f172a !important;
     border-radius: 10px;
     padding: 1px 6px;
     font-size: 9.5px;
     font-weight: 700;
 }
-.course-pill-btn.active .badge-counter {
+.fees-unified-page .course-pill-btn:hover {
+    background: var(--brand-dark) !important;
+    color: #ffffff !important;
+    border-color: var(--brand-dark) !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+.fees-unified-page .course-pill-btn:hover i {
+    color: #ffffff !important;
+}
+.fees-unified-page .course-pill-btn:hover .badge-counter {
+    background: rgba(255,255,255,0.25) !important;
+    color: #ffffff !important;
+}
+.fees-unified-page .course-pill-btn.active {
+    background: var(--brand-dark) !important;
+    color: #ffffff !important;
+    border-color: var(--brand-dark) !important;
+    box-shadow: 0 2px 5px rgba(0,44,84,0.3) !important;
+}
+.fees-unified-page .course-pill-btn.active:hover {
+    background: var(--brand-dark-hover) !important;
+    color: #ffffff !important;
+}
+.fees-unified-page .course-pill-btn.active i {
+    color: #ffffff !important;
+}
+.fees-unified-page .course-pill-btn.active .badge-counter {
     background: rgba(255,255,255,0.25) !important;
     color: #ffffff !important;
 }
 
 /* Course Cards */
-.course-card {
+.fees-unified-page .course-card {
     background: #ffffff;
     border: 1px solid var(--brand-border);
     border-radius: 8px;
@@ -483,11 +468,11 @@ table.dataTable thead .sorting_desc:after {
     transition: all 0.2s ease;
     overflow: hidden;
 }
-.course-card:hover {
+.fees-unified-page .course-card:hover {
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     border-color: #94a3b8;
 }
-.course-card-header {
+.fees-unified-page .course-card-header {
     background: linear-gradient(135deg, var(--brand-dark) 0%, var(--brand-dark-hover) 100%) !important;
     color: #ffffff !important;
     padding: 8px 12px;
@@ -497,7 +482,7 @@ table.dataTable thead .sorting_desc:after {
     flex-wrap: wrap;
     gap: 6px;
 }
-.course-card-title {
+.fees-unified-page .course-card-title {
     font-size: 13px;
     font-weight: 700;
     margin: 0;
@@ -506,30 +491,30 @@ table.dataTable thead .sorting_desc:after {
     align-items: center;
     gap: 6px;
 }
-.course-card-title i {
+.fees-unified-page .course-card-title i {
     color: #ffffff !important;
 }
 
 /* Setup Button Inside Course Card */
-.course-card-header .btn-setup-course {
+.fees-unified-page .course-card-header .btn-setup-course {
     background: #ffffff !important;
     color: var(--brand-dark) !important;
     border: 1px solid #ffffff !important;
     font-weight: 700 !important;
     transition: all 0.15s ease-in-out;
 }
-.course-card-header .btn-setup-course:hover {
+.fees-unified-page .course-card-header .btn-setup-course:hover {
     background: var(--brand-darker) !important;
     color: #ffffff !important;
     border-color: var(--brand-darker) !important;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2) !important;
 }
-.course-card-header .btn-setup-course:hover i {
+.fees-unified-page .course-card-header .btn-setup-course:hover i {
     color: #ffffff !important;
 }
 
 /* Dual View Switch Buttons */
-.view-switch-btn {
+.fees-unified-page .view-switch-btn {
     font-size: 11px;
     font-weight: 600;
     padding: 3px 10px;
@@ -539,31 +524,31 @@ table.dataTable thead .sorting_desc:after {
     cursor: pointer;
     transition: all 0.15s ease;
 }
-.view-switch-btn:hover {
+.fees-unified-page .view-switch-btn:hover {
     background: #e2e8f0;
     color: var(--brand-dark);
     border-color: #94a3b8;
 }
-.view-switch-btn.active {
+.fees-unified-page .view-switch-btn.active {
     background: var(--brand-dark) !important;
     color: #ffffff !important;
     border-color: var(--brand-dark) !important;
 }
-.view-switch-btn.active:hover {
+.fees-unified-page .view-switch-btn.active:hover {
     background: var(--brand-dark-hover) !important;
     color: #ffffff !important;
 }
-.view-switch-btn:first-child {
+.fees-unified-page .view-switch-btn:first-child {
     border-top-left-radius: 4px;
     border-bottom-left-radius: 4px;
 }
-.view-switch-btn:last-child {
+.fees-unified-page .view-switch-btn:last-child {
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
 }
 
 /* Quick Export Toolbar Buttons */
-.quick-export-btn {
+.fees-unified-page .quick-export-btn {
     font-size: 10.5px;
     font-weight: 600;
     padding: 3px 8px;
@@ -574,18 +559,18 @@ table.dataTable thead .sorting_desc:after {
     cursor: pointer;
     transition: all 0.15s ease;
 }
-.quick-export-btn:hover {
+.fees-unified-page .quick-export-btn:hover {
     background: var(--brand-dark) !important;
     color: #ffffff !important;
     border-color: var(--brand-dark) !important;
     box-shadow: 0 2px 4px rgba(0,0,0,0.12);
 }
-.quick-export-btn:hover i {
+.fees-unified-page .quick-export-btn:hover i {
     color: #ffffff !important;
 }
 
-/* DataTables Buttons (Excel, CSV, PDF, Print) */
-.dt-buttons .btn {
+/* DataTables Buttons */
+.fees-unified-page .dt-buttons .btn {
     background: #ffffff !important;
     color: #1e293b !important;
     border: 1px solid var(--brand-border) !important;
@@ -594,47 +579,105 @@ table.dataTable thead .sorting_desc:after {
     padding: 3px 8px !important;
     transition: all 0.15s ease !important;
 }
-.dt-buttons .btn:hover {
+.fees-unified-page .dt-buttons .btn:hover {
     background: var(--brand-dark) !important;
     color: #ffffff !important;
     border-color: var(--brand-dark) !important;
 }
 
-/* Modal Headers */
-.modal-header.bg-primary {
+/* Empty Course State */
+.fees-unified-page .empty-course-box {
+    background: #f8fafc !important;
+    border: 1.5px dashed #cbd5e1 !important;
+    border-radius: 6px;
+    padding: 16px 12px;
+    text-align: center;
+}
+.fees-unified-page .empty-course-box .empty-msg {
+    color: #334155 !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    margin-bottom: 8px;
+}
+.fees-unified-page .empty-course-box .empty-msg i {
+    color: #0284c7 !important;
+    margin-right: 4px;
+}
+.fees-unified-page .empty-course-box .empty-msg strong {
+    color: var(--brand-dark) !important;
+}
+.fees-unified-page .btn-configure-course {
+    background: var(--brand-dark) !important;
+    color: #ffffff !important;
+    border: 1px solid var(--brand-dark) !important;
+    font-weight: 700 !important;
+    font-size: 11px !important;
+    padding: 4px 12px !important;
+    border-radius: 4px;
+    transition: all 0.15s ease-in-out;
+}
+.fees-unified-page .btn-configure-course:hover {
+    background: var(--brand-dark-hover) !important;
+    color: #ffffff !important;
+    border-color: var(--brand-dark-hover) !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.18) !important;
+}
+.fees-unified-page .btn-configure-course i {
+    color: #ffffff !important;
+}
+
+/* Modal Headers & Tables */
+.fees-unified-page.modal .modal-header.bg-primary,
+.modal.fees-unified-page .modal-header.bg-primary {
     background: var(--brand-dark) !important;
     color: #ffffff !important;
     border-bottom: 1px solid var(--brand-darker) !important;
 }
-.modal-header.bg-primary .modal-title {
+.fees-unified-page.modal .modal-header.bg-primary .modal-title,
+.modal.fees-unified-page .modal-header.bg-primary .modal-title {
     color: #ffffff !important;
 }
-.modal-header.bg-primary .close {
+.fees-unified-page.modal .modal-header.bg-primary .close,
+.modal.fees-unified-page .modal-header.bg-primary .close {
     color: #ffffff !important;
     text-shadow: none;
     opacity: 0.9;
     transition: opacity 0.15s ease, color 0.15s ease;
 }
-.modal-header.bg-primary .close:hover {
+.fees-unified-page.modal .modal-header.bg-primary .close:hover,
+.modal.fees-unified-page .modal-header.bg-primary .close:hover {
     color: #ffdd57 !important;
     opacity: 1;
 }
+.fees-unified-page.modal table thead th,
+.modal.fees-unified-page table thead th {
+    background: #f1f5f9 !important;
+    color: #0f172a !important;
+    font-weight: 700 !important;
+    border-bottom: 2px solid #cbd5e1 !important;
+    font-size: 11.5px !important;
+}
+.fees-unified-page.modal table tbody td,
+.modal.fees-unified-page table tbody td {
+    color: #1e293b !important;
+    font-size: 11.5px !important;
+}
 
 /* Back Button in Card Header */
-.card-header .btn-back-header {
+.fees-unified-page .card-header .btn-back-header {
     background: #ffffff !important;
     color: var(--brand-dark) !important;
     font-weight: 700 !important;
     border: 1px solid #ffffff !important;
     transition: all 0.15s ease;
 }
-.card-header .btn-back-header:hover {
+.fees-unified-page .card-header .btn-back-header:hover {
     background: #e2e8f0 !important;
     color: var(--brand-darker) !important;
 }
 </style>
 
-<div class="content-wrapper">
+<div class="content-wrapper fees-unified-page">
     <section class="content pt-2">
         <div class="container-fluid">
             <!-- Top Action Header Bar -->
@@ -1096,31 +1139,39 @@ table.dataTable thead .sorting_desc:after {
                                             </label>
                                             <small>Click course to filter instantly</small>
                                         </div>
-                                        <div class="course-filter-scroll" id="course_pill_list">
-                                            <button type="button" class="course-pill-btn active" data-course-id="all" onclick="filterByCourse('all', this)">
-                                                <i class="fa fa-globe"></i> All Courses <span class="badge-counter">{{ $totalConfiguredCourses }}</span>
+                                        <div class="course-filter-wrapper">
+                                            <button type="button" class="course-scroll-btn" onclick="scrollCourseFilters(-220)" title="Scroll Left">
+                                                <i class="fa fa-chevron-left"></i>
                                             </button>
-                                            @if(!empty($courses))
-                                                @foreach($courses as $c)
-                                                    @php
-                                                        $cClasses = !empty($allClassType) ? $allClassType->where('course_id', $c->id) : collect();
-                                                        $cConfiguredCount = 0;
-                                                        $cTotalFee = 0;
-                                                        foreach($cClasses as $cl) {
-                                                            if (isset($feesMasterByClass[$cl->id])) {
-                                                                $cConfiguredCount++;
-                                                                foreach($feesMasterByClass[$cl->id] as $fRow) {
-                                                                    $cTotalFee += (float)($fRow->amount ?? 0);
+                                            <div class="course-filter-scroll" id="course_pill_list">
+                                                <button type="button" class="course-pill-btn active" data-course-id="all" onclick="filterByCourse('all', this)">
+                                                    <i class="fa fa-globe"></i> All Courses <span class="badge-counter">{{ $totalConfiguredCourses }}</span>
+                                                </button>
+                                                @if(!empty($courses))
+                                                    @foreach($courses as $c)
+                                                        @php
+                                                            $cClasses = !empty($allClassType) ? $allClassType->where('course_id', $c->id) : collect();
+                                                            $cConfiguredCount = 0;
+                                                            $cTotalFee = 0;
+                                                            foreach($cClasses as $cl) {
+                                                                if (isset($feesMasterByClass[$cl->id])) {
+                                                                    $cConfiguredCount++;
+                                                                    foreach($feesMasterByClass[$cl->id] as $fRow) {
+                                                                        $cTotalFee += (float)($fRow->amount ?? 0);
+                                                                    }
                                                                 }
                                                             }
-                                                        }
-                                                    @endphp
-                                                    <button type="button" class="course-pill-btn" data-course-id="{{ $c->id }}" onclick="filterByCourse('{{ $c->id }}', this)">
-                                                        <i class="fa fa-graduation-cap text-primary"></i> {{ $c->name }}
-                                                        <span class="badge-counter">₹{{ number_format($cTotalFee) }}</span>
-                                                    </button>
-                                                @endforeach
-                                            @endif
+                                                        @endphp
+                                                        <button type="button" class="course-pill-btn" data-course-id="{{ $c->id }}" onclick="filterByCourse('{{ $c->id }}', this)">
+                                                            <i class="fa fa-graduation-cap"></i> {{ $c->name }}
+                                                            <span class="badge-counter">₹{{ number_format($cTotalFee) }}</span>
+                                                        </button>
+                                                    @endforeach
+                                                @endif
+                                            </div>
+                                            <button type="button" class="course-scroll-btn" onclick="scrollCourseFilters(220)" title="Scroll Right">
+                                                <i class="fa fa-chevron-right"></i>
+                                            </button>
                                         </div>
                                     </div>
 
@@ -1496,7 +1547,7 @@ table.dataTable thead .sorting_desc:after {
 <!-- Modals Section for Unified Fees Setup -->
 
 <!-- 1. Registration / Special Fee Modal -->
-<div class="modal fade" id="special_fee_modal" data-keyboard="false" data-backdrop="static">
+<div class="modal fade fees-unified-page" id="special_fee_modal" data-keyboard="false" data-backdrop="static">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
       <div class="modal-header bg-primary py-2">
@@ -1552,7 +1603,7 @@ table.dataTable thead .sorting_desc:after {
 </div>
 
 <!-- 2. Student Fee Assign Modal (Bulk) -->
-<div class="modal fade" id="students_list_modal" data-keyboard="false" data-backdrop="static">
+<div class="modal fade fees-unified-page" id="students_list_modal" data-keyboard="false" data-backdrop="static">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
             <div class="modal-header bg-primary py-2">
@@ -1641,7 +1692,7 @@ table.dataTable thead .sorting_desc:after {
 </div>
 
 <!-- 3. Student Fee Modification Modal -->
-<div class="modal fade" id="fees_modification" tabindex="-1" aria-labelledby="feesModalLabel" aria-hidden="true">
+<div class="modal fade fees-unified-page" id="fees_modification" tabindex="-1" aria-labelledby="feesModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header bg-primary py-2">
@@ -1731,6 +1782,16 @@ table.dataTable thead .sorting_desc:after {
 </div>
 
 <script>
+function scrollCourseFilters(offset) {
+    var container = document.getElementById('course_pill_list');
+    if (container) {
+        container.scrollBy({
+            left: offset,
+            behavior: 'smooth'
+        });
+    }
+}
+
 var currentMode = 'semester';
 var currentCourseClasses = [];
 
