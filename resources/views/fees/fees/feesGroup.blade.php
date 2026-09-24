@@ -152,6 +152,30 @@ $classType = Helper::classType();
 <div class="content-wrapper">
     <section class="content pt-2">
         <div class="container-fluid">
+            <!-- Top Action Header Bar -->
+            <div class="row align-items-center mb-2">
+                <div class="col-md-4">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb p-0 mb-0" style="background:none;">
+                            <li class="breadcrumb-item"><a href="{{url('/')}}">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="{{url('fee_dashboard')}}">Fee Dashboard</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Unified Fees Setup</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col-md-8 text-md-right d-flex justify-content-end align-items-center flex-wrap" style="gap: 6px;">
+                    <button type="button" class="btn btn-primary btn-sm font-weight-bold" data-bs-toggle="modal" data-bs-target="#students_list_modal" style="font-size:11.5px;">
+                        <i class="fa fa-users"></i> Student Fee Assign
+                    </button>
+                    <button type="button" id="fees_modification_btn" class="btn btn-primary btn-sm font-weight-bold" data-bs-toggle="modal" data-bs-target="#fees_modification" style="font-size:11.5px;">
+                        <i class="fa fa-pencil-square-o"></i> Student Fee Modification
+                    </button>
+                    <button type="button" class="btn btn-primary btn-sm font-weight-bold" data-bs-toggle="modal" data-bs-target="#special_fee_modal" style="font-size:11.5px;">
+                        <i class="fa fa-star"></i> Registration Fee
+                    </button>
+                </div>
+            </div>
+
             <div class="row">   
                 <!-- Left Side: Create Fee Heads & Assign to Fees Master -->
                 <div class="col-md-5 pr-0 {{($getPermission->add == 1) ? '' : 'd-none'}}">
@@ -709,6 +733,243 @@ $classType = Helper::classType();
     </div>
 </div>
 
+<!-- Modals Section for Unified Fees Setup -->
+
+<!-- 1. Registration / Special Fee Modal -->
+<div class="modal fade" id="special_fee_modal" data-keyboard="false" data-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-primary py-2">
+        <h5 class="modal-title font-weight-bold" style="font-size:14px;"><i class="fa fa-star"></i> Assign Amount for Registration / Special Fee Heads</h5>
+        <button type="button" class="close text-white" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form action="{{ url('specialFeesMaster') }}" method="POST" class="submit-form reload">
+        @csrf
+        <div class="modal-body p-3">
+          <div class="col-md-5 pl-0 mb-2">
+            <div class="form-group mb-2">
+              <label class="font-weight-bold" style="font-size:11.5px;">{{ __('Course') }}<span class="text-danger">*</span></label>
+              <select class="form-control form-control-sm select2" id="special_course_id" name="course_id" required>
+                <option value="">-- {{ __('common.Select') }} Course --</option>
+                @if(!empty($courses))
+                  @foreach($courses as $course)
+                    <option value="{{ $course->id }}">{{ $course->name }}</option>
+                  @endforeach
+                @endif
+              </select>
+            </div>
+          </div>
+
+          <div class="table-responsive" style="max-height: 280px; overflow-y: auto;">
+            <table class="table table-bordered table-striped table-sm mb-0" style="font-size: 11.5px;">
+              <thead class="bg-light">
+                <tr>
+                  <th>{{ __('fees.Fees Group') }}* &nbsp; (Type : Registration)</th>
+                  <th width="100px">{{ __('NRI') }}*</th>
+                  <th width="100px">{{ __('Management') }}*</th>
+                  <th width="100px">{{ __('Govt.') }}*</th>
+                  <th width="120px" class="text-center">Partial Payable (50%)</th>
+                </tr>
+              </thead>
+              <tbody id="table_bodyregistration">
+                <tr>
+                  <td colspan="5" class="text-center text-muted py-3">Please select a course to load data</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <div class="modal-footer py-1">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">{{ __('common.Close') }}</button>
+          <button type="submit" class="btn btn-primary btn-sm submit-btn font-weight-bold"><i class="fa fa-check"></i> Update Registration Fees</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- 2. Student Fee Assign Modal (Bulk) -->
+<div class="modal fade" id="students_list_modal" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-primary py-2">
+                <h5 class="modal-title font-weight-bold" style="font-size:14px;"><i class="fa fa-users"></i> Assign Fee Structure to Students for Selected Class</h5>
+                <button type="button" class="close text-white" data-bs-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="assignFeesMultiple" action="{{ url('assignFeesMultipleStudents') }}" method="POST">
+            @csrf    
+            <div class="modal-body p-3">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group mb-2">
+                            <label class="font-weight-bold mb-1" style="font-size:11px;">{{ __('Course') }}</label>
+                            <select class="form-control form-control-sm select2" id="bulk_course_id" name="course_id">
+                                <option value="">-- Select Course --</option>
+                                @if(!empty($courses))
+                                    @foreach($courses as $course)
+                                        <option value="{{ $course->id }}">{{ $course->name ?? '' }}</option>
+                                    @endforeach
+                                @endif
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group mb-2">
+                            <label class="font-weight-bold mb-1" style="font-size:11px;">{{ __('common.Class') }} / Sem*</label>
+                            <select class="form-control form-control-sm select2" id="bulk_class_type_id" name="class_type_id" required>
+                              <option value="">-- Select Class / Sem --</option>
+                              @if(!empty($classType))
+                                @foreach($classType as $type)
+                                  <option value="{{ $type->id }}">{{ $type->name ?? ''  }}</option>
+                                @endforeach
+                              @endif
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group mb-2">
+                            <label class="font-weight-bold mb-1" style="font-size:11px;">{{ __('student.Admission No.') }}</label>
+                            <input type="text" class="form-control form-control-sm" placeholder="Filter Admission No." name="admissionNo" id="bulk_admission_no">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group mb-2">
+                            <label class="font-weight-bold mb-1" style="font-size:11px;">Fees Master Heads to Assign*</label>
+                            <select class="form-control form-control-sm select2" multiple id="bulk_fees_master_ids" name="fees_master_ids[]" required>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                        
+                <div class="table-responsive border rounded mb-2" style="max-height:280px; overflow-y:auto;">
+                    <table class="table table-bordered table-striped table-sm text-center mb-0" style="font-size:11.5px;">
+                        <thead class="bg-light sticky-top">
+                            <tr>
+                                <th width="30px"><input type='checkbox' id="all_students" /></th>
+                                <th>Student Name</th>
+                                <th>{{ __('student.Admission No.') }}</th>
+                                <th>Mobile</th>
+                                <th>Father Name</th>
+                                <th>Assigned Fees</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody_students_list">
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-3">Please select a class above to load students list</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="alert alert-info py-1 px-2 mb-0" style="font-size:11px;">
+                    <i class="fa fa-info-circle"></i> <b>Note:</b> If any selected fee head is already assigned to a student, the system will skip that head and assign the remaining heads.
+                </div>
+            </div>
+            
+            <div class="modal-footer py-1">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">{{ __('common.Close') }}</button>
+                <button type="submit" class="btn btn-success btn-sm font-weight-bold"><i class="fa fa-check"></i> Assign Fees to Selected Students</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 3. Student Fee Modification Modal -->
+<div class="modal fade" id="fees_modification" tabindex="-1" aria-labelledby="feesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-primary py-2">
+                <h5 class="modal-title font-weight-bold" style="font-size:14px;"><i class="fa fa-pencil-square-o"></i> Student Fee Modification & Concession</h5>
+                <button type="button" class="close text-white" data-bs-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-3">
+                <form id="feesForm" class="mb-2">
+                    <div class="row align-items-end">
+                        <div class="col-md-2">
+                            <div class="form-group mb-1">
+                                <label for="admission_modification" class="font-weight-bold mb-0" style="font-size:11px;">{{ __('student.Admission No.') }}</label>
+                                <input type="text" class="form-control form-control-sm" id="admission_modification" placeholder="Admission No.">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group mb-1">
+                                <label for="modification_course_id" class="font-weight-bold mb-0" style="font-size:11px;">{{ __('Course') }}</label>
+                                <select class="form-control form-control-sm select2" id="modification_course_id" name="modification_course_id">
+                                    <option value="">-- Select Course --</option>
+                                    @if(!empty($courses))
+                                        @foreach($courses as $course)
+                                            <option value="{{ $course->id }}">{{ $course->name ?? '' }}</option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group mb-1">
+                                <label for="class_modification" class="font-weight-bold mb-0" style="font-size:11px;">{{ __('common.Class') }}</label>
+                                <select class="form-control form-control-sm select2" id="class_modification" name="class_type_id">
+                                    <option value="">-- Select Class --</option>
+                                    @if(!empty($classType))
+                                    @foreach($classType as $type)
+                                    <option value="{{ $type->id }}">{{ $type->name ?? '' }}</option>
+                                    @endforeach
+                                    @endif
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group mb-1">
+                                <button type="button" class="btn btn-primary btn-sm btn-block font-weight-bold" id="searchButton" style="height:31px;">
+                                    <i class="fa fa-spinner fa-spin d-none" id="waitBtn"></i> <i class="fa fa-search"></i> Search
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-12 mt-1">
+                            <small class="text-danger d-block" style="font-size:10.5px; line-height:1.2;">
+                                1. Verify if there are any payments under the current fee head. If payments exist, modifications are not allowed.<br>
+                                2. Changes are auto-saved in the background as soon as you change amount or discount.
+                            </small>
+                        </div>
+                    </div>
+                </form>
+                
+                <div class="table-responsive border rounded mt-2" style="max-height:300px; overflow-y:auto;"> 
+                    <table class="table table-bordered table-striped table-sm text-center mb-0" style="font-size:11.5px;">
+                        <thead class="bg-light sticky-top">
+                            <tr>
+                                <th>Name</th>
+                                <th>{{ __('student.Admission No.') }}</th>
+                                <th>Mobile</th>
+                                <th>Fees Assign Detail</th>
+                                <th style="width:100px;">Discount (% / Amt)</th>
+                                <th>Due Date</th>
+                                <th style="width:70px;">Fine %</th>
+                                <th style="width:80px;">Refundable</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody_modification">
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-3">Search with Admission No. or Class to view student assigned fees</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer py-1">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">{{ __('common.Close') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 var currentMode = 'semester';
 var currentCourseClasses = [];
@@ -1074,46 +1335,230 @@ $(document).ready(function() {
         });
     });
 
-    // Form Submission Client-side Validation
-    $('#quickForm').on('submit', function(e) {
-        var mode = $('#form_mode').val();
-        if (mode === 'semester') {
-            var courseVal = $('#course_selector').val();
-            if (!courseVal) {
-                e.preventDefault();
-                alert('Please select a Course first!');
-                $('#course_selector').focus();
-                return false;
-            }
-            if (currentCourseClasses.length === 0) {
-                e.preventDefault();
-                alert('No classes found for the selected course.');
-                return false;
-            }
-        } else if (mode === 'single_class') {
-            var classVal = $('#single_class_type_id').val();
-            var nameVal = $('#single_class_fee_name').val().trim();
-            if (!classVal) {
-                e.preventDefault();
-                alert('Please select a Class / Semester!');
-                $('#single_class_type_id').focus();
-                return false;
-            }
-            if (!nameVal) {
-                e.preventDefault();
-                alert('Please enter Fee Head Name!');
-                $('#single_class_fee_name').focus();
-                return false;
-            }
-        } else if (mode === 'single_head') {
-            var headVal = $('#head_only_name').val().trim();
-            if (!headVal) {
-                e.preventDefault();
-                alert('Please enter Fee Head Name!');
-                $('#head_only_name').focus();
-                return false;
+// --- Unified Modals JavaScript Logic ---
+
+function getStudents(class_type_id, bulk_admission_no, admission_type_id) {
+    $('#tbody_students_list').html('<tr><td colspan="6" class="text-center py-2"><i class="fa fa-spinner fa-spin"></i> Loading students...</td></tr>');
+    $.ajax({
+        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+        url: "{{ url('getStudentsList') }}",
+        method: 'POST',
+        data: {
+            admissionNo: bulk_admission_no,
+            class_type_id: class_type_id,
+            admission_type_id: admission_type_id
+        },
+        success: function(response) {
+            $('#tbody_students_list').html(response);
+            $('#all_students').prop('checked', false);
+            $('#bulk_class_type_id').val(class_type_id);
+        },
+        error: function(xhr) {
+            $('#tbody_students_list').html('<tr><td colspan="6" class="text-center text-danger py-2">Error loading students</td></tr>');
+        }
+    });
+}
+
+function getMasterData(class_type_id) {
+    $.ajax({
+        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+        url: "{{ url('getMasterData') }}",
+        method: 'POST',
+        data: { class_type_id: class_type_id },
+        success: function(response) {
+            var masterData = [];
+            if (response && response.length > 0) {
+                $('#bulk_fees_master_ids').empty();
+                for (var i = 0; i < response.length; i++) {
+                    var code = '<option value="' + response[i].id + '" selected>' + response[i].fees_group_name + ' (₹' + (response[i].amount || 0) + ')</option>';
+                    masterData.push(code);
+                }
+                $('#bulk_fees_master_ids').html(masterData.join(''));
+            } else {
+                $('#bulk_fees_master_ids').empty();
             }
         }
+    });
+}
+
+$(document).ready(function() {
+    // Select All Checkbox for Student Assignment
+    $('#all_students').click(function() {
+        $('.student_select_checkbox').prop('checked', $(this).prop('checked'));
+    });
+    
+    $(document).on('click', '.student_select_checkbox', function() {
+        var total = $('.student_select_checkbox').length;
+        var checked = $('.student_select_checkbox:checked').length;
+        $('#all_students').prop('checked', total === checked);
+    });
+
+    $('#bulk_class_type_id').change(function() {
+        var class_type_id = $(this).val();
+        var bulk_admission_no = $('#bulk_admission_no').val();
+        if (!class_type_id) {
+            $('#tbody_students_list').html('<tr><td colspan="6" class="text-center text-muted py-2">Please select class</td></tr>');
+            $('#bulk_fees_master_ids').empty();
+        } else {
+            getStudents(class_type_id, bulk_admission_no, null);
+            getMasterData(class_type_id);
+        }
+    });
+
+    $('#bulk_admission_no').blur(function() {
+        var class_type_id = $('#bulk_class_type_id').val();
+        var bulk_admission_no = $(this).val();
+        if (class_type_id) {
+            getStudents(class_type_id, bulk_admission_no, null);
+        }
+    });
+
+    $('#assignFeesMultiple').on('submit', function(event) {
+        var checkedCount = $('.student_select_checkbox:checked').length;
+        if (checkedCount === 0) {
+            event.preventDefault();
+            alert("Please select at least one student!");
+            return false;
+        }
+    });
+
+    // Special Fees / Registration Modal Course Change
+    $("#special_course_id").change(function() {
+        var course_id = $(this).val();
+        if (course_id) {
+            $("#table_bodyregistration").html('<tr><td colspan="5" class="text-center py-2"><i class="fa fa-spinner fa-spin"></i> Loading...</td></tr>');
+            $.ajax({
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                url: "{{ url('specialFeesMastercourseData') }}",
+                method: 'POST',
+                data: { course_id: course_id },
+                success: function(response) {
+                    $('#table_bodyregistration').html(response);
+                },
+                error: function() {
+                    $('#table_bodyregistration').html('<tr><td colspan="5" class="text-center text-danger py-2">Error loading registration fee heads</td></tr>');
+                }
+            });
+        } else {
+            $('#table_bodyregistration').html('<tr><td colspan="5" class="text-center text-muted py-2">Please select a course to load data</td></tr>');
+        }
+    });
+
+    // Student Fee Modification Search Handler
+    $('#searchButton').click(function() {
+        var admissionNo = $('#admission_modification').val();
+        var classTypeId = $('#class_modification').val();
+        $('#waitBtn').removeClass('d-none');
+        $('#tbody_modification').html('<tr><td colspan="8" class="text-center py-2"><i class="fa fa-spinner fa-spin"></i> Searching...</td></tr>');
+
+        $.ajax({
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            url: "{{ url('feesModification') }}",
+            method: 'POST',
+            data: {
+                admissionNo: admissionNo,
+                class_type_id: classTypeId
+            },
+            success: function(response) {
+                $('#waitBtn').addClass('d-none');
+                $('#tbody_modification').html(response);
+            },
+            error: function(xhr) {
+                $('#waitBtn').addClass('d-none');
+                $('#tbody_modification').html('<tr><td colspan="8" class="text-center text-danger py-2">Error searching student fees</td></tr>');
+            }
+        });
+    });
+
+    // Student Fee Modification - Live Blur Auto-Save Handler
+    $('#tbody_modification').on('blur', '.fees_assign_detail', function() {
+        var currentTd = $(this);
+        var id = currentTd.data('detail_id');
+        var value = currentTd.val();
+        var oldValue = currentTd.data('old_value');
+        var payFees = currentTd.data('pay_fees');
+        var field = currentTd.attr('name');
+        var discountType = currentTd.data('type') || '';
+        var discountValue = currentTd.val();
+
+        if (payFees == 0) {
+            if (value !== oldValue) {
+                $.ajax({
+                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                    url: "{{ url('updateAssignedFees') }}",
+                    method: 'POST',
+                    data: {
+                        fees_assign_detail_id: id,
+                        value: value,
+                        field: field,
+                        discountType: discountType,
+                        discountValue: discountValue
+                    },
+                    success: function(response) {
+                        currentTd.data('old_value', value);
+                    },
+                    error: function(xhr) {
+                        alert('An error occurred updating fee.');
+                    }
+                });
+            }
+        } else {
+            alert('Cannot modify fees: payments already exist under this fee head for this student.');
+            currentTd.val(oldValue);
+        }
+    });
+
+    $('#tbody_modification').on('keyup', '.discountInPercent', function() {
+        var discountInPercentId = $(this).data('id');
+        var discountInPercent = parseFloat($(this).val());
+        var feesGroupAmount = parseFloat($('#feesGroupAmount_' + discountInPercentId).val());
+        var discountInAmount = (discountInPercent * feesGroupAmount) / 100;
+        $('#discountInAmount_' + discountInPercentId).val(isNaN(discountInAmount) ? '' : discountInAmount.toFixed(2));
+    });
+
+    // Synchronize Course Dropdowns with Classes in Modals
+    function updateClassDropdownByCourse(courseId, classSelect, defaultClasses) {
+        if (courseId) {
+            $.ajax({
+                url: "{{ url('getClassesByCourse') }}",
+                type: "POST",
+                data: { _token: "{{ csrf_token() }}", course_id: courseId },
+                dataType: "json",
+                success: function(data) {
+                    classSelect.empty().append('<option value="">-- {{ __("common.Select") }} --</option>');
+                    if (data && data.length > 0) {
+                        $.each(data, function(key, val) {
+                            classSelect.append('<option value="' + val.id + '">' + val.name + '</option>');
+                        });
+                    }
+                    classSelect.val('').trigger('change');
+                }
+            });
+        } else {
+            classSelect.empty().append('<option value="">-- {{ __("common.Select") }} --</option>');
+            if (defaultClasses && defaultClasses.length > 0) {
+                $.each(defaultClasses, function(key, val) {
+                    classSelect.append('<option value="' + val.id + '">' + val.name + '</option>');
+                });
+            }
+            classSelect.val('').trigger('change');
+        }
+    }
+
+    var allDefaultClasses = [
+        @if(!empty($allClassType))
+            @foreach($allClassType as $type)
+                { id: "{{ $type->id }}", name: "{{ $type->name }}" },
+            @endforeach
+        @endif
+    ];
+
+    $(document).on('change', '#bulk_course_id', function() {
+        updateClassDropdownByCourse($(this).val(), $('#bulk_class_type_id'), allDefaultClasses);
+    });
+
+    $(document).on('change', '#modification_course_id', function() {
+        updateClassDropdownByCourse($(this).val(), $('#class_modification'), allDefaultClasses);
     });
 });
 </script>

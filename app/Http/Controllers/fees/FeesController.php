@@ -437,12 +437,18 @@ class FeesController extends Controller
 
                 $courses = Helper::getCourses();
                 $classType = Helper::classType();
+                $allClassType = Helper::classType();
+                $getFeesGroup = Helper::getFeesGroup();
+                $getSession = Helper::getSession();
 
                 return view('fees.fees.feesGroup', [
                     'dataview' => $fees_group_list,
                     'feesMasterList' => $fees_master_list,
                     'courses' => $courses,
                     'classType' => $classType,
+                    'allClassType' => $allClassType,
+                    'getFeesGroup' => $getFeesGroup,
+                    'getSession' => $getSession,
                     'search' => $search
                 ]);
             }

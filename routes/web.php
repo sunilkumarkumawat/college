@@ -258,7 +258,9 @@ Route::match(['get', 'post'], 'temp_fees_collect', 'fees\FeesController@temp_fee
  
 
 //Fees Master
-Route::match(['get', 'post'], 'feesMasterAdd', 'fees\FeesMasterController@feesMaster');
+Route::match(['get', 'post'], 'feesMasterAdd', function() {
+    return redirect('feesGroup');
+});
 Route::match(['get', 'post'], 'feesMasterEdit/{id}', 'fees\FeesMasterController@feesMasterEdit');
 Route::match(['get', 'post'], 'feesMasterDelete', 'fees\FeesMasterController@feesMasterDelete');
 Route::match(['get', 'post'], 'mesterClassAmt', 'fees\FeesMasterController@mesterClassAmt');
