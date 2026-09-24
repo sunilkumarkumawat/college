@@ -127,6 +127,7 @@ $classType = Helper::classType();
     font-size: 11px !important;
     font-weight: 700 !important;
     color: #1e293b !important;
+}
 /* Header & Tab alignment */
 .card-header::after {
     display: none !important;
@@ -164,13 +165,13 @@ $classType = Helper::classType();
                     </nav>
                 </div>
                 <div class="col-md-8 text-md-right d-flex justify-content-end align-items-center flex-wrap" style="gap: 6px;">
-                    <button type="button" class="btn btn-primary btn-sm font-weight-bold" data-bs-toggle="modal" data-bs-target="#students_list_modal" style="font-size:11.5px;">
+                    <button type="button" class="btn btn-primary btn-sm font-weight-bold" data-toggle="modal" data-target="#students_list_modal" data-bs-toggle="modal" data-bs-target="#students_list_modal" style="font-size:11.5px;">
                         <i class="fa fa-users"></i> Student Fee Assign
                     </button>
-                    <button type="button" id="fees_modification_btn" class="btn btn-primary btn-sm font-weight-bold" data-bs-toggle="modal" data-bs-target="#fees_modification" style="font-size:11.5px;">
+                    <button type="button" id="fees_modification_btn" class="btn btn-primary btn-sm font-weight-bold" data-toggle="modal" data-target="#fees_modification" data-bs-toggle="modal" data-bs-target="#fees_modification" style="font-size:11.5px;">
                         <i class="fa fa-pencil-square-o"></i> Student Fee Modification
                     </button>
-                    <button type="button" class="btn btn-primary btn-sm font-weight-bold" data-bs-toggle="modal" data-bs-target="#special_fee_modal" style="font-size:11.5px;">
+                    <button type="button" class="btn btn-primary btn-sm font-weight-bold" data-toggle="modal" data-target="#special_fee_modal" data-bs-toggle="modal" data-bs-target="#special_fee_modal" style="font-size:11.5px;">
                         <i class="fa fa-star"></i> Registration Fee
                     </button>
                 </div>
@@ -974,6 +975,14 @@ $classType = Helper::classType();
 var currentMode = 'semester';
 var currentCourseClasses = [];
 
+var allDefaultClasses = [
+    @if(!empty($allClassType))
+        @foreach($allClassType as $type)
+            { id: "{{ $type->id }}", name: "{{ $type->name }}" },
+        @endforeach
+    @endif
+];
+
 function onCourseSelected(selectElem) {
     var opt = selectElem.options[selectElem.selectedIndex];
     var infoDiv = document.getElementById('course_detected_info');
@@ -1302,41 +1311,6 @@ function updateHeadOnlyPreview() {
     document.getElementById('submit_btn').innerHTML = '<i class="fa fa-plus-circle"></i> Create Fee Head';
 }
 
-$(document).ready(function() {
-    // Initial check: if course was selected, trigger auto-detect
-    var initCourse = document.getElementById('course_selector');
-    if (initCourse && initCourse.value) {
-        onCourseSelected(initCourse);
-    } else {
-        switchMode('semester');
-    }
-    
-    $(document).on('click', '.deleteData', function() {
-        var delete_id = $(this).data('id');
-        $('#delete_id').val(delete_id);
-    });
-
-    // Dynamic Tab Pill Switch Styling
-    $('#feesTab a').on('click', function (e) {
-        e.preventDefault();
-        $(this).tab('show');
-    });
-
-    $('#feesTab a').on('shown.bs.tab', function (e) {
-        $('#feesTab a').css({
-            'background': 'rgba(255,255,255,0.2)',
-            'color': '#ffffff',
-            'border-color': 'rgba(255,255,255,0.4)'
-        });
-        $(e.target).css({
-            'background': '#ffffff',
-            'color': '#002c54',
-            'border-color': '#ffffff'
-        });
-    });
-
-// --- Unified Modals JavaScript Logic ---
-
 function getStudents(class_type_id, bulk_admission_no, admission_type_id) {
     $('#tbody_students_list').html('<tr><td colspan="6" class="text-center py-2"><i class="fa fa-spinner fa-spin"></i> Loading students...</td></tr>');
     $.ajax({
@@ -1381,7 +1355,69 @@ function getMasterData(class_type_id) {
     });
 }
 
+function updateClassDropdownByCourse(courseId, classSelect, defaultClasses) {
+    if (courseId) {
+        $.ajax({
+            url: "{{ url('getClassesByCourse') }}",
+            type: "POST",
+            data: { _token: "{{ csrf_token() }}", course_id: courseId },
+            dataType: "json",
+            success: function(data) {
+                classSelect.empty().append('<option value="">-- {{ __("common.Select") }} --</option>');
+                if (data && data.length > 0) {
+                    $.each(data, function(key, val) {
+                        classSelect.append('<option value="' + val.id + '">' + val.name + '</option>');
+                    });
+                }
+                classSelect.val('').trigger('change');
+            }
+        });
+    } else {
+        classSelect.empty().append('<option value="">-- {{ __("common.Select") }} --</option>');
+        if (defaultClasses && defaultClasses.length > 0) {
+            $.each(defaultClasses, function(key, val) {
+                classSelect.append('<option value="' + val.id + '">' + val.name + '</option>');
+            });
+        }
+        classSelect.val('').trigger('change');
+    }
+}
+
 $(document).ready(function() {
+    // Initial check: if course was selected, trigger auto-detect
+    var initCourse = document.getElementById('course_selector');
+    if (initCourse && initCourse.value) {
+        onCourseSelected(initCourse);
+    } else {
+        switchMode('semester');
+    }
+    
+    $(document).on('click', '.deleteData', function() {
+        var delete_id = $(this).data('id');
+        $('#delete_id').val(delete_id);
+    });
+
+    // Dynamic Tab Switching
+    $(document).on('click', '#feesTab a', function(e) {
+        e.preventDefault();
+        var target = $(this).attr('href');
+        
+        $('#feesTab a').css({
+            'background': 'rgba(255,255,255,0.2)',
+            'color': '#ffffff',
+            'border-color': 'rgba(255,255,255,0.4)'
+        }).removeClass('active');
+        
+        $(this).css({
+            'background': '#ffffff',
+            'color': '#002c54',
+            'border-color': '#ffffff'
+        }).addClass('active');
+
+        $('#feesTabContent .tab-pane').removeClass('show active');
+        $(target).addClass('show active');
+    });
+
     // Select All Checkbox for Student Assignment
     $('#all_students').click(function() {
         $('.student_select_checkbox').prop('checked', $(this).prop('checked'));
@@ -1515,43 +1551,6 @@ $(document).ready(function() {
         var discountInAmount = (discountInPercent * feesGroupAmount) / 100;
         $('#discountInAmount_' + discountInPercentId).val(isNaN(discountInAmount) ? '' : discountInAmount.toFixed(2));
     });
-
-    // Synchronize Course Dropdowns with Classes in Modals
-    function updateClassDropdownByCourse(courseId, classSelect, defaultClasses) {
-        if (courseId) {
-            $.ajax({
-                url: "{{ url('getClassesByCourse') }}",
-                type: "POST",
-                data: { _token: "{{ csrf_token() }}", course_id: courseId },
-                dataType: "json",
-                success: function(data) {
-                    classSelect.empty().append('<option value="">-- {{ __("common.Select") }} --</option>');
-                    if (data && data.length > 0) {
-                        $.each(data, function(key, val) {
-                            classSelect.append('<option value="' + val.id + '">' + val.name + '</option>');
-                        });
-                    }
-                    classSelect.val('').trigger('change');
-                }
-            });
-        } else {
-            classSelect.empty().append('<option value="">-- {{ __("common.Select") }} --</option>');
-            if (defaultClasses && defaultClasses.length > 0) {
-                $.each(defaultClasses, function(key, val) {
-                    classSelect.append('<option value="' + val.id + '">' + val.name + '</option>');
-                });
-            }
-            classSelect.val('').trigger('change');
-        }
-    }
-
-    var allDefaultClasses = [
-        @if(!empty($allClassType))
-            @foreach($allClassType as $type)
-                { id: "{{ $type->id }}", name: "{{ $type->name }}" },
-            @endforeach
-        @endif
-    ];
 
     $(document).on('change', '#bulk_course_id', function() {
         updateClassDropdownByCourse($(this).val(), $('#bulk_class_type_id'), allDefaultClasses);
