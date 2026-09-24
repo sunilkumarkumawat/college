@@ -246,69 +246,84 @@ class FeesController extends Controller
                 $user_id = Session::get('id');
 
                 if ($request->isMethod('post')) {
+                    $formMode = $request->form_mode ?? 'semester';
+
                     // Case 1: Multiple Class / Semester Batch Assignment (with Amount & Due Date)
-                    if ($request->has('class_type_id') && is_array($request->class_type_id) && $request->has('fee_name')) {
+                    if ($formMode === 'semester' || ($request->has('class_type_id') && is_array($request->class_type_id) && $request->has('fee_name'))) {
                         $assignedCount = 0;
-                        foreach ($request->class_type_id as $k => $cTypeId) {
-                            $cTypeId = (int)$cTypeId;
-                            $fName = trim($request->fee_name[$k] ?? '');
-                            $amt = floatval($request->amount[$k] ?? 0);
-                            $dueDate = !empty($request->due_date[$k]) ? $request->due_date[$k] : null;
+                        if ($request->has('class_type_id') && is_array($request->class_type_id)) {
+                            foreach ($request->class_type_id as $k => $cTypeId) {
+                                $cTypeId = (int)$cTypeId;
+                                $fName = trim($request->fee_name[$k] ?? '');
+                                $amt = floatval($request->amount[$k] ?? 0);
+                                $dueDate = !empty($request->due_date[$k]) ? $request->due_date[$k] : null;
+                                $groupType = $request->sem_group_type ?? $request->group_type ?? null;
 
-                            if (!empty($cTypeId) && !empty($fName)) {
-                                // 1. Find or create FeesGroup
-                                $fg = FeesGroup::where('branch_id', $branch_id)
-                                    ->where('session_id', $session_id)
-                                    ->where('name', $fName)
-                                    ->whereNull('deleted_at')
-                                    ->first();
-                                if (!$fg) {
-                                    $fg = new FeesGroup;
-                                    $fg->user_id = $user_id;
-                                    $fg->session_id = $session_id;
-                                    $fg->branch_id = $branch_id;
-                                    $fg->name = $fName;
-                                    $fg->fees_refund = $request->fees_refund ?? 'no';
-                                    $fg->fees_partial = $request->fees_partial ?? 0;
-                                    $fg->group_type = $request->group_type ?? null;
-                                    $fg->fees_type = 'full';
-                                    $fg->save();
-                                }
+                                if (!empty($cTypeId) && !empty($fName)) {
+                                    // 1. Find or create FeesGroup
+                                    $fg = FeesGroup::where('branch_id', $branch_id)
+                                        ->where('session_id', $session_id)
+                                        ->where('name', $fName)
+                                        ->whereNull('deleted_at')
+                                        ->first();
+                                    if (!$fg) {
+                                        $fg = new FeesGroup;
+                                        $fg->user_id = $user_id;
+                                        $fg->session_id = $session_id;
+                                        $fg->branch_id = $branch_id;
+                                        $fg->name = $fName;
+                                        $fg->fees_refund = $request->fees_refund ?? 'no';
+                                        $fg->fees_partial = $request->fees_partial ?? 0;
+                                        $fg->group_type = $groupType;
+                                        $fg->fees_type = 'full';
+                                        $fg->save();
+                                    }
 
-                                // 2. Create or update FeesMaster for this class
-                                $fm = \App\Models\FeesMaster::where('session_id', $session_id)
-                                    ->where('branch_id', $branch_id)
-                                    ->where('class_type_id', $cTypeId)
-                                    ->where('fees_group_id', $fg->id)
-                                    ->whereNull('deleted_at')
-                                    ->first();
-                                if (!$fm) {
-                                    $fm = new \App\Models\FeesMaster;
-                                    $fm->user_id = $user_id;
-                                    $fm->session_id = $session_id;
-                                    $fm->branch_id = $branch_id;
-                                    $fm->class_type_id = $cTypeId;
-                                    $fm->fees_group_id = $fg->id;
+                                    // 2. Create or update FeesMaster for this class
+                                    $fm = \App\Models\FeesMaster::where('session_id', $session_id)
+                                        ->where('branch_id', $branch_id)
+                                        ->where('class_type_id', $cTypeId)
+                                        ->where('fees_group_id', $fg->id)
+                                        ->whereNull('deleted_at')
+                                        ->first();
+                                    if (!$fm) {
+                                        $fm = new \App\Models\FeesMaster;
+                                        $fm->user_id = $user_id;
+                                        $fm->session_id = $session_id;
+                                        $fm->branch_id = $branch_id;
+                                        $fm->class_type_id = $cTypeId;
+                                        $fm->fees_group_id = $fg->id;
+                                    }
+                                    $fm->amount = $amt;
+                                    $fm->nri = $amt;
+                                    $fm->management = $amt;
+                                    $fm->govt = $amt;
+                                    $fm->installment_due_date = $dueDate;
+                                    $fm->editable = 0;
+                                    $fm->save();
+                                    $assignedCount++;
                                 }
-                                $fm->amount = $amt;
-                                $fm->nri = $amt;
-                                $fm->management = $amt;
-                                $fm->govt = $amt;
-                                $fm->installment_due_date = $dueDate;
-                                $fm->editable = 0;
-                                $fm->save();
-                                $assignedCount++;
                             }
                         }
-                        return redirect::to('feesGroup')->with('message', 'Fees Structure & Heads Saved Successfully for ' . $assignedCount . ' Classes/Semesters !');
+                        if ($assignedCount > 0) {
+                            return redirect::to('feesGroup')->with('message', 'Fees Structure & Heads Saved Successfully for ' . $assignedCount . ' Classes/Semesters !');
+                        }
                     }
 
                     // Case 2: Single Class Assignment
-                    if (!empty($request->single_class_type_id) && !empty($request->name)) {
-                        $fName = trim($request->name);
+                    if ($formMode === 'single_class' || !empty($request->single_class_type_id)) {
+                        $fName = trim($request->single_class_fee_name ?? $request->name ?? '');
                         $cTypeId = (int)$request->single_class_type_id;
                         $amt = floatval($request->single_amount ?? 0);
                         $dueDate = !empty($request->single_due_date) ? $request->single_due_date : null;
+                        $groupType = $request->single_class_group_type ?? $request->group_type ?? null;
+
+                        if (empty($cTypeId)) {
+                            return redirect::to('feesGroup')->with('error', 'Please select a Class / Semester!');
+                        }
+                        if (empty($fName)) {
+                            return redirect::to('feesGroup')->with('error', 'Please enter a valid Fee Head Name!');
+                        }
 
                         $fg = FeesGroup::where('branch_id', $branch_id)
                             ->where('session_id', $session_id)
@@ -323,7 +338,7 @@ class FeesController extends Controller
                             $fg->name = $fName;
                             $fg->fees_refund = $request->fees_refund ?? 'no';
                             $fg->fees_partial = $request->fees_partial ?? 0;
-                            $fg->group_type = $request->group_type ?? null;
+                            $fg->group_type = $groupType;
                             $fg->fees_type = 'full';
                             $fg->save();
                         }
@@ -355,51 +370,32 @@ class FeesController extends Controller
                     }
 
                     // Case 3: Fee Heads Batch / Single Creation
-                    $names = [];
-                    if ($request->has('names') && is_array($request->names)) {
-                        $names = array_filter(array_map('trim', $request->names));
-                    } elseif (!empty($request->name)) {
-                        $names = [trim($request->name)];
-                    }
+                    $fName = trim($request->head_only_name ?? $request->name ?? '');
+                    $groupType = $request->head_only_group_type ?? $request->group_type ?? null;
 
-                    if (empty($names)) {
+                    if (empty($fName)) {
                         return redirect::to('feesGroup')->with('error', 'Please enter a valid Fee Head Name!');
                     }
 
-                    $addedCount = 0;
-                    $alreadyExistsCount = 0;
-
-                    foreach ($names as $feeName) {
-                        $exists = FeesGroup::where('branch_id', $branch_id)
-                                           ->where('session_id', $session_id)
-                                           ->where('name', $feeName)
-                                           ->whereNull('deleted_at')
-                                           ->first();
-                        if (!$exists) {
-                            $fees_group = new FeesGroup;
-                            $fees_group->user_id = $user_id;
-                            $fees_group->session_id = $session_id;
-                            $fees_group->branch_id = $branch_id;
-                            $fees_group->name = $feeName;
-                            $fees_group->fees_refund = $request->fees_refund ?? 'no';
-                            $fees_group->fees_partial = $request->fees_partial ?? 0;
-                            $fees_group->group_type = $request->group_type ?? null;
-                            $fees_group->fees_type = 'full';
-                            $fees_group->save();
-                            $addedCount++;
-                        } else {
-                            $alreadyExistsCount++;
-                        }
-                    }
-
-                    if ($addedCount > 0) {
-                        $msg = ($addedCount == 1) ? 'Fees Head Added Successfully !' : ($addedCount . ' Fees Heads Added Successfully !');
-                        if ($alreadyExistsCount > 0) {
-                            $msg .= ' (' . $alreadyExistsCount . ' already existed)';
-                        }
-                        return redirect::to('feesGroup')->with('message', $msg);
+                    $exists = FeesGroup::where('branch_id', $branch_id)
+                                       ->where('session_id', $session_id)
+                                       ->where('name', $fName)
+                                       ->whereNull('deleted_at')
+                                       ->first();
+                    if (!$exists) {
+                        $fees_group = new FeesGroup;
+                        $fees_group->user_id = $user_id;
+                        $fees_group->session_id = $session_id;
+                        $fees_group->branch_id = $branch_id;
+                        $fees_group->name = $fName;
+                        $fees_group->fees_refund = $request->fees_refund ?? 'no';
+                        $fees_group->fees_partial = $request->fees_partial ?? 0;
+                        $fees_group->group_type = $groupType;
+                        $fees_group->fees_type = 'full';
+                        $fees_group->save();
+                        return redirect::to('feesGroup')->with('message', 'Fees Head Added Successfully !');
                     } else {
-                        return redirect::to('feesGroup')->with('error', 'Fee Head(s) already exist !');
+                        return redirect::to('feesGroup')->with('error', 'Fee Head already exists !');
                     }
                 }
 

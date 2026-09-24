@@ -283,7 +283,7 @@ $classType = Helper::classType();
                                             <div class="col-md-6">
                                                 <div class="form-group mb-2">
                                                     <label class="font-weight-bold mb-1" style="font-size:11px;">Category</label>
-                                                    <select class="form-control form-control-sm" name="group_type" id="sem_group_type">
+                                                    <select class="form-control form-control-sm" name="sem_group_type" id="sem_group_type">
                                                         <option value="academic" selected>Academic (Tuition / University)</option>
                                                         <option value="examination">Examination</option>
                                                         <option value="practical">Laboratory & Practical</option>
@@ -393,7 +393,7 @@ $classType = Helper::classType();
                                             <span class="quick-preset-btn" onclick="setSingleClassName('Caution Money (Refundable)', 'refundable')">Caution Money</span>
                                             <span class="quick-preset-btn" onclick="setSingleClassName('Semester Exam Fee', 'examination')">Exam Fee</span>
                                         </div>
-                                        <input type="text" class="form-control form-control-sm font-weight-bold" id="single_class_fee_name" name="name" placeholder="e.g. Tuition Fee, Admission Fee" oninput="updateSingleClassPreview()">
+                                        <input type="text" class="form-control form-control-sm font-weight-bold" id="single_class_fee_name" name="single_class_fee_name" placeholder="e.g. Tuition Fee, Admission Fee" oninput="updateSingleClassPreview()">
                                     </div>
 
                                     <div class="row">
@@ -413,7 +413,7 @@ $classType = Helper::classType();
 
                                     <div class="form-group mb-2">
                                         <label class="font-weight-bold mb-1" style="font-size:11px;">Category</label>
-                                        <select class="form-control form-control-sm" name="group_type" id="single_class_group_type">
+                                        <select class="form-control form-control-sm" name="single_class_group_type" id="single_class_group_type">
                                             <option value="academic">Academic (Tuition / University)</option>
                                             <option value="admission">Admission & Registration</option>
                                             <option value="examination">Examination</option>
@@ -437,12 +437,12 @@ $classType = Helper::classType();
                                             <span class="quick-preset-btn" onclick="setHeadOnly('Hostel & Mess Fee', 'hostel_transport', 'no')">Hostel Fee</span>
                                             <span class="quick-preset-btn" onclick="setHeadOnly('Transportation Fee', 'hostel_transport', 'no')">Transport Fee</span>
                                         </div>
-                                        <input type="text" class="form-control form-control-sm" id="head_only_name" name="name" placeholder="e.g. Admission Fee, Caution Money" oninput="updateHeadOnlyPreview()">
+                                        <input type="text" class="form-control form-control-sm" id="head_only_name" name="head_only_name" placeholder="e.g. Admission Fee, Caution Money" oninput="updateHeadOnlyPreview()">
                                     </div>
 
                                     <div class="form-group mb-2">
                                         <label class="font-weight-bold mb-1" style="font-size:11px;">Category</label>
-                                        <select class="form-control form-control-sm" name="group_type" id="head_only_group_type">
+                                        <select class="form-control form-control-sm" name="head_only_group_type" id="head_only_group_type">
                                             <option value="admission">Admission & Registration</option>
                                             <option value="refundable">Refundable Deposit</option>
                                             <option value="academic">Academic</option>
