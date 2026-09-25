@@ -670,11 +670,8 @@ $classType = Helper::classType();
                 <!-- Left Side: Create Fee Heads & Assign to Fees Master -->
                 <div class="col-md-5 pr-0 {{($getPermission->add == 1) ? '' : 'd-none'}}">
                     <div class="card card-outline card-orange mr-1">
-                        <div class="card-header bg-primary py-2 d-flex align-items-center justify-content-between">
+                        <div class="card-header bg-primary py-2">
                             <h3 class="card-title font-weight-bold mb-0" style="font-size:14px;"><i class="fa fa-money"></i> &nbsp;Fee Structure & Heads Setup</h3>
-                            <div class="card-tools d-flex align-items-center">
-                                <span class="badge badge-light" style="font-size:10px;">Unified Setup</span>
-                            </div>
                         </div>                 
                         
                         <div class="card-body p-2">
@@ -986,11 +983,8 @@ $classType = Helper::classType();
                 <!-- Right Side: Class-wise Fees Master Structure -->
                 <div class="{{($getPermission->add == 1) ? 'col-md-7 pl-0' : 'col-md-12 pl-0'}}">
                     <div class="card card-outline card-orange ml-1">
-                        <div class="card-header bg-primary py-2 d-flex align-items-center justify-content-between">
+                        <div class="card-header bg-primary py-2">
                             <h3 class="card-title font-weight-bold mb-0" style="font-size:14px;"><i class="fa fa-table"></i> &nbsp;Class-wise Fees Master</h3>
-                            <div class="card-tools d-flex align-items-center" style="gap: 6px;">
-                                <span class="badge badge-light" style="font-size:10px;">Structure & Breakdown</span>
-                            </div>
                         </div>  
                         
                         <div class="card-body p-2">
