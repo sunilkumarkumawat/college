@@ -243,6 +243,7 @@ Route::match(['get', 'post'], 'feesGroup', 'fees\FeesController@feesGroup');
 Route::match(['get', 'post'], 'getFeesGroup', 'fees\FeesController@getFeesGroup');
 Route::match(['get', 'post'], 'feesGroupEdit/{id}', 'fees\FeesController@feesGroupEdit');
 Route::match(['get', 'post'], 'feesGroupDelete', 'fees\FeesController@feesGroupDelete');
+Route::match(['get', 'post'], 'assignFeeHeadToClasses', 'fees\FeesController@assignFeeHeadToClasses');
 Route::match(['get', 'post'], 'createFeesInstallment', 'fees\FeesController@createFeesInstallment');
 Route::match(['get', 'post'], 'createFeesInstallmentClassWise', 'fees\FeesController@createFeesInstallmentClassWise');
 Route::match(['get', 'post'], 'assignFeesMultipleStudents', 'fees\FeesController@assignFeesMultipleStudents');

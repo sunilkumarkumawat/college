@@ -527,6 +527,65 @@ class FeesController extends Controller
                 }
                 return redirect()->back()->with('error', $msg);
             }
+
+            public function assignFeeHeadToClasses(Request $request){
+                $fees_group_id = $request->fees_group_id;
+                $feesGroup = FeesGroup::find($fees_group_id);
+                if (!$feesGroup) {
+                    if ($request->ajax()) {
+                        return response()->json(['status' => false, 'message' => 'Fee Head not found!'], 404);
+                    }
+                    return redirect()->back()->with('error', 'Fee Head not found!');
+                }
+
+                $class_type_ids = $request->class_type_id ?? [];
+                if (empty($class_type_ids)) {
+                    if ($request->ajax()) {
+                        return response()->json(['status' => false, 'message' => 'Please select at least one class / semester to assign!'], 422);
+                    }
+                    return redirect()->back()->with('error', 'Please select at least one class / semester to assign!');
+                }
+
+                $session_id = Session::get('session_id');
+                $branch_id = Session::get('branch_id');
+                $user_id = Session::get('id');
+                $assignedCount = 0;
+
+                foreach ($class_type_ids as $cId) {
+                    $amt = (float)($request->amount[$cId] ?? 0);
+                    $dueDate = !empty($request->due_date[$cId]) ? $request->due_date[$cId] : null;
+
+                    $fm = FeesMaster::where('session_id', $session_id)
+                        ->where('branch_id', $branch_id)
+                        ->where('fees_group_id', $fees_group_id)
+                        ->where('class_type_id', $cId)
+                        ->whereNull('deleted_at')
+                        ->first();
+
+                    if (!$fm) {
+                        $fm = new FeesMaster;
+                        $fm->user_id = $user_id;
+                        $fm->session_id = $session_id;
+                        $fm->branch_id = $branch_id;
+                        $fm->fees_group_id = $fees_group_id;
+                        $fm->class_type_id = $cId;
+                    }
+                    $fm->amount = $amt;
+                    $fm->nri = $amt;
+                    $fm->management = $amt;
+                    $fm->govt = $amt;
+                    $fm->installment_due_date = $dueDate;
+                    $fm->editable = 0;
+                    $fm->save();
+                    $assignedCount++;
+                }
+
+                $msg = 'Fee Head "' . $feesGroup->name . '" successfully assigned to ' . $assignedCount . ' class(es) in Fees Master!';
+                if ($request->ajax()) {
+                    return response()->json(['status' => true, 'message' => $msg]);
+                }
+                return redirect('feesGroup')->with('message', $msg);
+            }
  
             public function studentFeesOnclick(Request $request){
                 //$this->FeesGroupRemoveDuplicateEntries();

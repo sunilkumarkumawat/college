@@ -2,6 +2,7 @@
 $getPermission = Helper::getPermission();
 $getSession = Helper::getSession();
 $classType = Helper::classType();
+$courses = $courses ?? Helper::getCourses();
 
 // Usage map to find which heads are used in fees_master
 $feesGroupUsageMap = [];
@@ -1473,6 +1474,14 @@ foreach ($collectedRows as $cr) {
                                                                             style="font-size: 11px; padding: 2px 7px;">
                                                                         <i class="fa fa-pencil"></i>
                                                                     </button>
+                                                                    <button type="button" 
+                                                                            class="btn btn-xs text-white btn-assign-fee-head" 
+                                                                            data-id="{{ $nh->id }}" 
+                                                                            data-name="{{ addslashes($nh->name) }}"
+                                                                            title="Assign this Fee Head to Classes / Semesters" 
+                                                                            style="font-size: 11px; padding: 2px 8px; background-color: #002c54; border-color: #002c54;">
+                                                                        <i class="fa fa-share-square-o mr-1"></i> Assign to Classes
+                                                                    </button>
                                                                     @php
                                                                         $isNhAssigned = !empty($assignedMap[$nh->id]);
                                                                         $isNhCollected = !empty($collectedMap[$nh->id]);
@@ -1679,6 +1688,130 @@ foreach ($collectedRows as $cr) {
     </div>
 </div>
 
+<!-- Assign Fee Head to Classes Modal -->
+<div class="modal fade fees-unified-page" id="assign_fee_head_modal" tabindex="-1" aria-labelledby="assignFeeHeadModalLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable" style="max-width: 850px;">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header py-2 text-white" style="background: linear-gradient(135deg, #002c54 0%, #004b8d 100%);">
+                <h5 class="modal-title font-weight-bold text-white mb-0" style="font-size: 13.5px;" id="assignFeeHeadModalLabel">
+                    <i class="fa fa-share-square-o mr-1"></i> Assign Fee Head to Classes / Semesters: <span id="assign_fee_head_title" class="text-warning font-weight-bold"></span>
+                </h5>
+                <button type="button" class="close text-white" data-bs-dismiss="modal" data-dismiss="modal" aria-label="Close" style="opacity: 0.9;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="assign_fee_head_form" action="{{ url('assignFeeHeadToClasses') }}" method="post">
+                @csrf
+                <input type="hidden" name="fees_group_id" id="assign_fees_group_id" value="">
+                
+                <div class="modal-body p-3 bg-light">
+                    <!-- Quick Filter & Apply Bar -->
+                    <div class="card border mb-3 shadow-none bg-white">
+                        <div class="card-body p-2.5">
+                            <div class="row align-items-center">
+                                <div class="col-md-4 mb-2 mb-md-0">
+                                    <label class="small font-weight-bold text-dark mb-1 d-block"><i class="fa fa-filter text-primary"></i> Filter by Course:</label>
+                                    <select id="assign_modal_course_filter" class="form-control form-control-sm" onchange="filterModalAssignClasses(this.value)">
+                                        <option value="">-- All Courses --</option>
+                                        @if(!empty($courses))
+                                            @foreach($courses as $c)
+                                                <option value="{{ $c->id }}">{{ $c->name }}</option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                </div>
+                                <div class="col-md-3 mb-2 mb-md-0">
+                                    <label class="small font-weight-bold text-dark mb-1 d-block"><i class="fa fa-inr text-success"></i> Common Amount (₹):</label>
+                                    <input type="number" step="0.01" min="0" id="assign_modal_common_amount" class="form-control form-control-sm font-weight-bold" placeholder="e.g. 500.00">
+                                </div>
+                                <div class="col-md-3 mb-2 mb-md-0">
+                                    <label class="small font-weight-bold text-dark mb-1 d-block"><i class="fa fa-calendar text-info"></i> Common Due Date:</label>
+                                    <input type="date" id="assign_modal_common_due_date" class="form-control form-control-sm">
+                                </div>
+                                <div class="col-md-2 mt-auto">
+                                    <button type="button" class="btn btn-sm btn-info btn-block font-weight-bold" onclick="applyModalCommonAssignValues()" title="Apply common amount and date to selected classes" style="padding: 5px 8px; font-size: 11px;">
+                                        <i class="fa fa-bolt"></i> Apply All
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Classes Selection Table -->
+                    <div class="card border shadow-none bg-white mb-0">
+                        <div class="card-header py-2 bg-white d-flex justify-content-between align-items-center border-bottom">
+                            <div class="d-flex align-items-center">
+                                <div class="custom-control custom-checkbox mr-3">
+                                    <input type="checkbox" class="custom-control-input" id="assign_modal_master_check" onchange="toggleAllModalAssignCheckboxes(this)">
+                                    <label class="custom-control-label font-weight-bold text-dark small" for="assign_modal_master_check" style="cursor: pointer;">Select All Visible Classes</label>
+                                </div>
+                            </div>
+                            <div>
+                                <span class="badge badge-primary px-2 py-1" id="assign_selected_counter" style="font-size: 11px; background-color: #002c54;">0 Selected</span>
+                            </div>
+                        </div>
+                        <div class="card-body p-0" style="max-height: 340px; overflow-y: auto;">
+                            <table class="table table-bordered table-hover table-sm mb-0" id="assign_modal_classes_table" style="font-size: 12px;">
+                                <thead style="position: sticky; top: 0; z-index: 2; background-color: #f1f5f9; color: #1e293b;">
+                                    <tr>
+                                        <th class="text-center align-middle" style="width: 45px;">#</th>
+                                        <th class="align-middle" style="width: 140px;">Course</th>
+                                        <th class="align-middle">Class / Semester</th>
+                                        <th class="align-middle" style="width: 150px;">Amount (₹) <span class="text-danger">*</span></th>
+                                        <th class="align-middle" style="width: 160px;">Due Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if(!empty($classType))
+                                        @foreach($classType as $cl)
+                                            <tr class="assign-class-row" id="assign_row_{{ $cl->id }}" data-course-id="{{ $cl->course_id ?? '' }}">
+                                                <td class="text-center align-middle">
+                                                    <div class="custom-control custom-checkbox d-inline-block">
+                                                        <input type="checkbox" name="class_type_id[]" value="{{ $cl->id }}" class="custom-control-input assign-class-checkbox" id="chk_assign_{{ $cl->id }}" onchange="onModalAssignRowCheck(this)">
+                                                        <label class="custom-control-label" for="chk_assign_{{ $cl->id }}" style="cursor: pointer;"></label>
+                                                    </div>
+                                                </td>
+                                                <td class="align-middle font-weight-bold text-secondary">
+                                                    {{ $cl->course->name ?? 'General' }}
+                                                </td>
+                                                <td class="align-middle">
+                                                    <label for="chk_assign_{{ $cl->id }}" class="mb-0 font-weight-bold text-dark pointer" style="cursor: pointer;">
+                                                        {{ $cl->name }}
+                                                    </label>
+                                                </td>
+                                                <td class="align-middle">
+                                                    <div class="input-group input-group-sm">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text px-1 text-muted" style="font-size: 10px;">₹</span>
+                                                        </div>
+                                                        <input type="number" step="0.01" min="0" name="amount[{{ $cl->id }}]" id="assign_amt_{{ $cl->id }}" class="form-control form-control-sm assign-amount-input font-weight-bold text-right" placeholder="0.00" disabled required style="background: #e9ecef;">
+                                                    </div>
+                                                </td>
+                                                <td class="align-middle">
+                                                    <input type="date" name="due_date[{{ $cl->id }}]" id="assign_due_{{ $cl->id }}" class="form-control form-control-sm assign-due-date-input" disabled style="background: #e9ecef;">
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    @endif
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer py-2 bg-light d-flex justify-content-between">
+                    <button type="button" class="btn btn-secondary btn-sm font-weight-bold" data-bs-dismiss="modal" data-dismiss="modal" style="font-size: 11.5px;">
+                        <i class="fa fa-times mr-1"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary btn-sm font-weight-bold" id="btn_save_assign_classes" style="font-size: 11.5px; background-color: #002c54; border-color: #002c54;" disabled>
+                        <i class="fa fa-save mr-1"></i> Save & Assign to Selected Classes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
 function scrollCourseFilters(offset) {
     var container = document.getElementById('course_pill_list');
@@ -1689,6 +1822,125 @@ function scrollCourseFilters(offset) {
         });
     }
 }
+
+// Global helper functions for Assign Fee Head Modal
+function filterModalAssignClasses(courseId) {
+    $('#assign_modal_classes_table tbody tr.assign-class-row').each(function() {
+        var rowCourseId = $(this).attr('data-course-id') || '';
+        if (!courseId || rowCourseId === courseId) {
+            $(this).show();
+        } else {
+            $(this).hide();
+        }
+    });
+    updateModalAssignSelectionState();
+}
+
+function onModalAssignRowCheck(checkbox) {
+    var tr = $(checkbox).closest('tr');
+    var amtInput = tr.find('.assign-amount-input');
+    var dueInput = tr.find('.assign-due-date-input');
+
+    if (checkbox.checked) {
+        tr.addClass('table-primary');
+        amtInput.prop('disabled', false).css('background', '#ffffff');
+        dueInput.prop('disabled', false).css('background', '#ffffff');
+        var commonAmt = $('#assign_modal_common_amount').val();
+        var commonDue = $('#assign_modal_common_due_date').val();
+        if (commonAmt && !amtInput.val()) {
+            amtInput.val(commonAmt);
+        }
+        if (commonDue && !dueInput.val()) {
+            dueInput.val(commonDue);
+        }
+    } else {
+        tr.removeClass('table-primary');
+        amtInput.prop('disabled', true).css('background', '#e9ecef');
+        dueInput.prop('disabled', true).css('background', '#e9ecef');
+    }
+    updateModalAssignSelectionState();
+}
+
+function toggleAllModalAssignCheckboxes(masterCheck) {
+    var isChecked = masterCheck.checked;
+    $('#assign_modal_classes_table tbody tr.assign-class-row:visible').each(function() {
+        var chk = $(this).find('.assign-class-checkbox');
+        chk.prop('checked', isChecked);
+        var amtInput = $(this).find('.assign-amount-input');
+        var dueInput = $(this).find('.assign-due-date-input');
+
+        if (isChecked) {
+            $(this).addClass('table-primary');
+            amtInput.prop('disabled', false).css('background', '#ffffff');
+            dueInput.prop('disabled', false).css('background', '#ffffff');
+            var commonAmt = $('#assign_modal_common_amount').val();
+            var commonDue = $('#assign_modal_common_due_date').val();
+            if (commonAmt && !amtInput.val()) amtInput.val(commonAmt);
+            if (commonDue && !dueInput.val()) dueInput.val(commonDue);
+        } else {
+            $(this).removeClass('table-primary');
+            amtInput.prop('disabled', true).css('background', '#e9ecef');
+            dueInput.prop('disabled', true).css('background', '#e9ecef');
+        }
+    });
+    updateModalAssignSelectionState();
+}
+
+function applyModalCommonAssignValues() {
+    var commonAmt = $('#assign_modal_common_amount').val();
+    var commonDue = $('#assign_modal_common_due_date').val();
+
+    if (!commonAmt && !commonDue) {
+        toastr.warning('Please enter a common amount or due date first.');
+        return;
+    }
+
+    var checkedCount = 0;
+    $('#assign_modal_classes_table tbody tr.assign-class-row:visible').each(function() {
+        var chk = $(this).find('.assign-class-checkbox');
+        if (chk.is(':checked')) {
+            checkedCount++;
+            if (commonAmt) $(this).find('.assign-amount-input').val(commonAmt);
+            if (commonDue) $(this).find('.assign-due-date-input').val(commonDue);
+        }
+    });
+
+    if (checkedCount === 0) {
+        toastr.info('Please select at least one class checkbox to apply values, or click "Select All".');
+    } else {
+        toastr.success('Applied to ' + checkedCount + ' selected class(es).');
+    }
+}
+
+function updateModalAssignSelectionState() {
+    var visibleRows = $('#assign_modal_classes_table tbody tr.assign-class-row:visible');
+    var totalVisible = visibleRows.length;
+
+    var totalChecked = $('#assign_modal_classes_table tbody tr.assign-class-row .assign-class-checkbox:checked').length;
+    $('#assign_selected_counter').text(totalChecked + ' Class' + (totalChecked === 1 ? '' : 'es') + ' Selected');
+
+    if (totalChecked > 0) {
+        $('#btn_save_assign_classes').prop('disabled', false);
+    } else {
+        $('#btn_save_assign_classes').prop('disabled', true);
+    }
+
+    var visibleChecked = visibleRows.find('.assign-class-checkbox:checked').length;
+    var master = $('#assign_modal_master_check');
+    if (totalVisible > 0 && visibleChecked === totalVisible) {
+        master.prop('checked', true).prop('indeterminate', false);
+    } else if (visibleChecked > 0 && visibleChecked < totalVisible) {
+        master.prop('checked', false).prop('indeterminate', true);
+    } else {
+        master.prop('checked', false).prop('indeterminate', false);
+    }
+}
+
+window.filterModalAssignClasses = filterModalAssignClasses;
+window.onModalAssignRowCheck = onModalAssignRowCheck;
+window.toggleAllModalAssignCheckboxes = toggleAllModalAssignCheckboxes;
+window.applyModalCommonAssignValues = applyModalCommonAssignValues;
+window.updateModalAssignSelectionState = updateModalAssignSelectionState;
 
 var currentMode = 'semester';
 var currentCourseClasses = [];
@@ -2534,6 +2786,81 @@ $(document).ready(function() {
                 $('body').removeClass('modal-open');
                 $('.modal-backdrop').remove();
                 var errMsg = 'An error occurred while deleting fee head.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errMsg = xhr.responseJSON.message;
+                }
+                toastr.error(errMsg);
+            }
+    // Open Assign Fee Head to Classes Modal
+    $(document).on('click', '.btn-assign-fee-head', function(e) {
+        e.preventDefault();
+        var id = $(this).data('id');
+        var name = $(this).data('name');
+
+        $('#assign_fees_group_id').val(id);
+        $('#assign_fee_head_title').text(name);
+
+        // Reset inputs and table
+        $('#assign_modal_course_filter').val('');
+        $('#assign_modal_common_amount').val('');
+        $('#assign_modal_common_due_date').val('');
+        $('#assign_modal_master_check').prop('checked', false).prop('indeterminate', false);
+
+        $('#assign_modal_classes_table tbody tr.assign-class-row').each(function() {
+            $(this).show();
+            $(this).removeClass('table-primary');
+            var chk = $(this).find('.assign-class-checkbox');
+            chk.prop('checked', false);
+            var amt = $(this).find('.assign-amount-input');
+            amt.val('').prop('disabled', true).css('background', '#e9ecef');
+            var due = $(this).find('.assign-due-date-input');
+            due.val('').prop('disabled', true).css('background', '#e9ecef');
+        });
+
+        updateModalAssignSelectionState();
+        $('#assign_fee_head_modal').modal('show');
+    });
+
+    // AJAX Form Submission for Assign Fee Head
+    $('#assign_fee_head_form').on('submit', function(e) {
+        e.preventDefault();
+        var form = $(this);
+        var checkedCheckboxes = form.find('.assign-class-checkbox:checked');
+        if (checkedCheckboxes.length === 0) {
+            toastr.error('Please select at least one class / semester to assign!');
+            return;
+        }
+
+        var submitBtn = $('#btn_save_assign_classes');
+        var originalHtml = submitBtn.html();
+        submitBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Saving...');
+
+        $.ajax({
+            url: form.attr('action'),
+            type: 'POST',
+            data: form.serialize(),
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            success: function(response) {
+                submitBtn.prop('disabled', false).html(originalHtml);
+                $('#assign_fee_head_modal').modal('hide');
+                $('body').removeClass('modal-open');
+                $('.modal-backdrop').remove();
+
+                if (response && response.status) {
+                    toastr.success(response.message || 'Fee Head successfully assigned to selected classes!');
+                    // Reload page after short delay to refresh fee structures with active tab preserved
+                    setTimeout(function() {
+                        location.reload();
+                    }, 600);
+                } else {
+                    toastr.error((response && response.message) ? response.message : 'Unable to assign fee head.');
+                }
+            },
+            error: function(xhr) {
+                submitBtn.prop('disabled', false).html(originalHtml);
+                var errMsg = 'An error occurred while assigning fee head.';
                 if (xhr.responseJSON && xhr.responseJSON.message) {
                     errMsg = xhr.responseJSON.message;
                 }
