@@ -310,7 +310,7 @@
                                         <option value="">-- Select Course --</option>
                                         @if(!empty($courses))
                                             @foreach($courses as $course)
-                                                <option value="{{ $course->id }}">{{ $course->name ?? '' }}</option>
+                                                <option value="{{ $course->id }}" {{ ($course->id == ($serach['course_id'] ?? '')) ? 'selected' : '' }}>{{ $course->name ?? '' }}</option>
                                             @endforeach
                                         @endif
                                     </select>
@@ -325,7 +325,7 @@
                                         <option value="">-- Select Batch --</option>
                                         @if(!empty($batches))
                                             @foreach($batches as $batch)
-                                                <option value="{{ $batch->name ?? '' }}">{{ $batch->name ?? '' }}</option>
+                                                <option value="{{ $batch->name ?? '' }}" {{ ($batch->name == ($serach['batch'] ?? '')) ? 'selected' : '' }}>{{ $batch->name ?? '' }}</option>
                                             @endforeach
                                         @endif
                                     </select>
@@ -337,10 +337,13 @@
                                         <span>Student ID / Name / Mobile</span>
                                     </label>
                                     <div class="input-group input-group-sm">
-                                        <input type="text" class="form-control form-control-sm" id="filter_admission_no" name="admissionNo" placeholder="Type name, admission no or mobile to filter...">
+                                        <input type="text" class="form-control form-control-sm" id="filter_admission_no" name="admissionNo" placeholder="Type name, admission no or mobile to filter..." value="{{ $serach['admissionNo'] ?? '' }}">
                                         <div class="input-group-append">
                                             <button class="btn btn-primary" type="button" id="btn_search_students" title="Search">
                                                 <i class="fa fa-search"></i>
+                                            </button>
+                                            <button class="btn btn-outline-secondary" type="button" id="btn_clear_filters" title="Reset Filters">
+                                                <i class="fa fa-refresh"></i>
                                             </button>
                                         </div>
                                     </div>
@@ -694,10 +697,26 @@ $(document).ready(function() {
         updateSelectedHeadsBadge();
     });
 
+    function syncAssignUrlParams() {
+        var params = new URLSearchParams();
+        var courseId = $('#filter_course_id').val();
+        var batch = $('#filter_batch').val();
+        var admissionNo = $('#filter_admission_no').val();
+
+        if (courseId) params.set('course_id', courseId);
+        if (batch) params.set('batch', batch);
+        if (admissionNo && admissionNo.trim()) params.set('admissionNo', admissionNo.trim());
+
+        var queryString = params.toString();
+        var newUrl = window.location.pathname + (queryString ? '?' + queryString : '');
+        window.history.replaceState({}, '', newUrl);
+    }
+
     // Course Select Handler
     $('#filter_course_id').change(function() {
         var courseId = $(this).val();
         var batch = $('#filter_batch').val();
+        syncAssignUrlParams();
         if (courseId && batch) {
             loadFeeMasterHeads(courseId, batch);
         } else {
@@ -711,6 +730,7 @@ $(document).ready(function() {
     $('#filter_batch').change(function() {
         var batch = $(this).val();
         var courseId = $('#filter_course_id').val();
+        syncAssignUrlParams();
         if (courseId && batch) {
             loadFeeMasterHeads(courseId, batch);
         } else {
@@ -722,6 +742,7 @@ $(document).ready(function() {
 
     // Fast Debounced Student Search
     $('#filter_admission_no').on('input', function() {
+        syncAssignUrlParams();
         clearTimeout(searchTimer);
         searchTimer = setTimeout(function() {
             loadStudents();
@@ -729,19 +750,48 @@ $(document).ready(function() {
     });
 
     $('#btn_search_students').click(function() {
+        syncAssignUrlParams();
         loadStudents();
     });
 
     // Reset Filters
     $('#btn_clear_filters').click(function() {
-        $('#filter_course_id').val('').trigger('change');
-        $('#filter_batch').val('').trigger('change');
+        $('#filter_course_id').val('').trigger('change.select2');
+        $('#filter_batch').val('').trigger('change.select2');
         $('#filter_admission_no').val('');
+        window.history.replaceState({}, '', window.location.pathname);
         $('#course_fee_structure_card').slideUp(200);
         $('#course_fee_structure_chips_box').empty();
         $('#tbody_students_list').html('<tr><td colspan="10" class="text-center py-5 text-muted"><i class="fa fa-filter fa-2x mb-2 text-secondary d-block"></i> Please select both <b>Course</b> and <b>Batch</b> above.</td></tr>');
         updateSelectedCount();
     });
+
+    // Auto-load if filters were present in URL or $serach
+    var urlParams = new URLSearchParams(window.location.search);
+    var urlCourseId = urlParams.get('course_id') || '{{ $serach["course_id"] ?? "" }}';
+    var urlBatch = urlParams.get('batch') || '{{ $serach["batch"] ?? "" }}';
+    var urlAdmissionNo = urlParams.get('admissionNo') || urlParams.get('admission_no') || '{{ $serach["admissionNo"] ?? "" }}';
+
+    if (urlCourseId && $('#filter_course_id').val() != urlCourseId) {
+        $('#filter_course_id').val(urlCourseId).trigger('change.select2');
+    }
+    if (urlBatch && $('#filter_batch').val() != urlBatch) {
+        $('#filter_batch').val(urlBatch).trigger('change.select2');
+    }
+    if (urlAdmissionNo && !$('#filter_admission_no').val()) {
+        $('#filter_admission_no').val(urlAdmissionNo);
+    }
+
+    var activeCourseId = $('#filter_course_id').val();
+    var activeBatch = $('#filter_batch').val();
+    var activeAdm = $('#filter_admission_no').val();
+
+    if ((activeCourseId && activeBatch) || activeAdm) {
+        if (activeCourseId && activeBatch) {
+            loadFeeMasterHeads(activeCourseId, activeBatch);
+        }
+        loadStudents();
+    }
 
     // Select All / Deselect All Students Checkbox
     $('#all_students').click(function() {

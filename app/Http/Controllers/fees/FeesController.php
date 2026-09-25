@@ -2332,12 +2332,17 @@ class FeesController extends Controller
                 $getFeesGroup = Helper::getFeesGroup();
                 $getSession = Helper::getSession();
 
+                $serach['course_id'] = $request->course_id ?? '';
+                $serach['batch'] = $request->batch ?? '';
+                $serach['admissionNo'] = $request->admissionNo ?? ($request->admission_no ?? '');
+
                 return view('fees.fees.fees_assign', [
                     'courses' => $courses,
                     'classType' => $classType,
                     'allClassType' => $allClassType,
                     'getFeesGroup' => $getFeesGroup,
-                    'getSession' => $getSession
+                    'getSession' => $getSession,
+                    'serach' => $serach
                 ]);
             }
 
