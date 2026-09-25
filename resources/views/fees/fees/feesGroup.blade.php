@@ -220,6 +220,12 @@ foreach ($collectedRows as $cr) {
     border-color: var(--brand-dark) !important;
     box-shadow: 0 2px 4px rgba(0,0,0,0.12);
 }
+.fees-unified-page .quick-preset-btn:hover i {
+    color: #ffffff !important;
+}
+.fees-unified-page .text-purple { color: #9333ea !important; }
+.fees-unified-page .text-teal { color: #0d9488 !important; }
+.fees-unified-page .text-orange { color: #ea580c !important; }
 
 /* Preview Box */
 .fees-unified-page .preview-badge {
@@ -745,11 +751,16 @@ foreach ($collectedRows as $cr) {
                                     <div id="section_semester_controls" style="display: none;">
                                         <div class="form-group mb-2">
                                             <label class="font-weight-bold text-dark mb-1" style="font-size:11.5px;">Fee Head Base Name*</label>
-                                            <div class="mb-1">
-                                                <span class="quick-preset-btn" onclick="setSemBase('Tuition Fee', 'academic')">Tuition Fee</span>
-                                                <span class="quick-preset-btn" onclick="setSemBase('Semester Exam Fee', 'examination')">Exam Fee</span>
-                                                <span class="quick-preset-btn" onclick="setSemBase('Practical / Lab Fee', 'practical')">Practical Fee</span>
-                                                <span class="quick-preset-btn" onclick="setSemBase('Development Fee', 'academic')">Development Fee</span>
+                                            <div class="mb-1 d-flex flex-wrap" style="gap: 3px;">
+                                                <span class="quick-preset-btn" onclick="setSemBase('Tuition Fee', 'academic')"><i class="fa fa-graduation-cap text-primary mr-1"></i>Tuition Fee</span>
+                                                <span class="quick-preset-btn" onclick="setSemBase('Semester Exam Fee', 'examination')"><i class="fa fa-pencil text-purple mr-1"></i>Exam Fee</span>
+                                                <span class="quick-preset-btn" onclick="setSemBase('Practical / Lab Fee', 'practical')"><i class="fa fa-flask text-teal mr-1"></i>Practical Fee</span>
+                                                <span class="quick-preset-btn" onclick="setSemBase('Library & Book Bank Fee', 'facility')"><i class="fa fa-book text-warning mr-1"></i>Library Fee</span>
+                                                <span class="quick-preset-btn" onclick="setSemBase('Campus Development Fee', 'academic')">Development Fee</span>
+                                                <span class="quick-preset-btn" onclick="setSemBase('Computer Lab & IT Fee', 'facility')">Computer / IT Fee</span>
+                                                <span class="quick-preset-btn" onclick="setSemBase('Sports & Activity Fee', 'facility')">Sports & Activity</span>
+                                                <span class="quick-preset-btn" onclick="setSemBase('Hostel & Mess Fee', 'hostel_transport')">Hostel Fee</span>
+                                                <span class="quick-preset-btn" onclick="setSemBase('Transportation / Bus Fee', 'hostel_transport')">Transport Fee</span>
                                             </div>
                                             <input type="text" class="form-control form-control-sm font-weight-bold" id="sem_base_name" value="Tuition Fee" placeholder="e.g. Tuition Fee, Exam Fee" oninput="updateSemPreview()">
                                         </div>
@@ -880,11 +891,18 @@ foreach ($collectedRows as $cr) {
 
                                     <div class="form-group mb-2">
                                         <label class="font-weight-bold text-dark mb-1" style="font-size:11.5px;">Fee Head Name*</label>
-                                        <div class="mb-1">
-                                            <span class="quick-preset-btn" onclick="setSingleClassName('Tuition Fee', 'academic')">Tuition Fee</span>
+                                        <div class="mb-1 d-flex flex-wrap" style="gap: 3px;">
+                                            <span class="quick-preset-btn" onclick="setSingleClassName('Tuition Fee', 'academic')"><i class="fa fa-graduation-cap text-primary mr-1"></i>Tuition Fee</span>
                                             <span class="quick-preset-btn" onclick="setSingleClassName('Admission Fee', 'admission')">Admission Fee</span>
-                                            <span class="quick-preset-btn" onclick="setSingleClassName('Caution Money (Refundable)', 'refundable')">Caution Money</span>
-                                            <span class="quick-preset-btn" onclick="setSingleClassName('Semester Exam Fee', 'examination')">Exam Fee</span>
+                                            <span class="quick-preset-btn" onclick="setSingleClassName('Semester Exam Fee', 'examination')"><i class="fa fa-pencil text-purple mr-1"></i>Exam Fee</span>
+                                            <span class="quick-preset-btn" onclick="setSingleClassName('University Exam Fee', 'examination')">University Exam</span>
+                                            <span class="quick-preset-btn" onclick="setSingleClassName('Practical / Lab Fee', 'practical')"><i class="fa fa-flask text-teal mr-1"></i>Practical Fee</span>
+                                            <span class="quick-preset-btn" onclick="setSingleClassName('Library Fee', 'facility')"><i class="fa fa-book text-warning mr-1"></i>Library Fee</span>
+                                            <span class="quick-preset-btn" onclick="setSingleClassName('Caution Money (Refundable)', 'refundable')"><i class="fa fa-undo text-danger mr-1"></i>Caution Money</span>
+                                            <span class="quick-preset-btn" onclick="setSingleClassName('Degree / Convocation Fee', 'examination')">Degree Fee</span>
+                                            <span class="quick-preset-btn" onclick="setSingleClassName('Hostel & Mess Fee', 'hostel_transport')">Hostel Fee</span>
+                                            <span class="quick-preset-btn" onclick="setSingleClassName('Transportation Fee', 'hostel_transport')">Transport Fee</span>
+                                            <span class="quick-preset-btn" onclick="setSingleClassName('Campus Development Fee', 'academic')">Development Fee</span>
                                         </div>
                                         <input type="text" class="form-control form-control-sm font-weight-bold" id="single_class_fee_name" name="single_class_fee_name" placeholder="e.g. Tuition Fee, Admission Fee" oninput="updateSingleClassPreview()">
                                     </div>
@@ -922,15 +940,59 @@ foreach ($collectedRows as $cr) {
                                 <!-- MODE 3: SINGLE FEE HEAD ONLY -->
                                 <div id="section_single_head" style="display: none;">
                                     <div class="form-group mb-2">
-                                        <label class="font-weight-bold text-dark mb-1" style="font-size:11.5px;">Fee Head Name*</label>
-                                        <div class="mb-1">
-                                            <span class="quick-preset-btn" onclick="setHeadOnly('Admission Fee', 'admission', 'no')">Admission Fee</span>
-                                            <span class="quick-preset-btn" onclick="setHeadOnly('Caution Money (Refundable)', 'refundable', 'yes')">Caution Money</span>
-                                            <span class="quick-preset-btn" onclick="setHeadOnly('Library Security Deposit', 'refundable', 'yes')">Library Deposit</span>
-                                            <span class="quick-preset-btn" onclick="setHeadOnly('Hostel & Mess Fee', 'hostel_transport', 'no')">Hostel Fee</span>
-                                            <span class="quick-preset-btn" onclick="setHeadOnly('Transportation Fee', 'hostel_transport', 'no')">Transport Fee</span>
+                                        <label class="font-weight-bold text-dark mb-1 d-flex justify-content-between align-items-center" style="font-size:11.5px;">
+                                            <span>Fee Head Name*</span>
+                                            <span class="text-muted" style="font-size: 10px; font-weight: normal;"><i class="fa fa-mouse-pointer"></i> Click quick tag to auto-fill</span>
+                                        </label>
+                                        
+                                        <!-- Quick Presets for College Fee Heads -->
+                                        <div class="mb-2 p-1 border rounded bg-white" style="max-height: 140px; overflow-y: auto;">
+                                            <div class="d-flex flex-wrap" style="gap: 3px;">
+                                                <!-- Admission & Registration -->
+                                                <span class="quick-preset-btn" onclick="setHeadOnly('Admission Fee', 'admission', 'no')"><i class="fa fa-tag text-success mr-1"></i>Admission Fee</span>
+                                                <span class="quick-preset-btn" onclick="setHeadOnly('Registration / Form Fee', 'admission', 'no')">Registration Fee</span>
+                                                <span class="quick-preset-btn" onclick="setHeadOnly('Enrollment & Eligibility Fee', 'admission', 'no')">Enrollment Fee</span>
+                                                <span class="quick-preset-btn" onclick="setHeadOnly('Prospectus & Application Fee', 'admission', 'no')">Prospectus Fee</span>
+                                                <span class="quick-preset-btn" onclick="setHeadOnly('ID Card & Uniform Fee', 'admission', 'no')">ID Card & Uniform</span>
+
+                                                <!-- Academic & Tuition -->
+                                                <span class="quick-preset-btn" onclick="setHeadOnly('Tuition Fee', 'academic', 'no')"><i class="fa fa-graduation-cap text-primary mr-1"></i>Tuition Fee</span>
+                                                <span class="quick-preset-btn" onclick="setHeadOnly('Campus Development Fee', 'academic', 'no')">Development Fee</span>
+                                                <span class="quick-preset-btn" onclick="setHeadOnly('Training & Placement (TPO) Fee', 'academic', 'no')">Placement & Training</span>
+
+                                                <!-- Examination & Degrees -->
+                                                <span class="quick-preset-btn" onclick="setHeadOnly('Semester Exam Fee', 'examination', 'no')"><i class="fa fa-pencil text-purple mr-1"></i>Semester Exam Fee</span>
+                                                <span class="quick-preset-btn" onclick="setHeadOnly('University / Board Exam Fee', 'examination', 'no')">University Exam</span>
+                                                <span class="quick-preset-btn" onclick="setHeadOnly('Practical Exam Fee', 'examination', 'no')">Practical Exam</span>
+                                                <span class="quick-preset-btn" onclick="setHeadOnly('Backlog / ATKT Exam Fee', 'examination', 'no')">Backlog / ATKT Fee</span>
+                                                <span class="quick-preset-btn" onclick="setHeadOnly('Degree & Convocation Fee', 'examination', 'no')">Degree & Convocation</span>
+
+                                                <!-- Labs, Library & Facilities -->
+                                                <span class="quick-preset-btn" onclick="setHeadOnly('Laboratory / Practical Fee', 'practical', 'no')"><i class="fa fa-flask text-teal mr-1"></i>Lab / Practical Fee</span>
+                                                <span class="quick-preset-btn" onclick="setHeadOnly('Library & Book Bank Fee', 'facility', 'no')"><i class="fa fa-book text-warning mr-1"></i>Library Fee</span>
+                                                <span class="quick-preset-btn" onclick="setHeadOnly('Computer Lab & IT Fee', 'facility', 'no')">Computer & IT Fee</span>
+                                                <span class="quick-preset-btn" onclick="setHeadOnly('Sports & Gymnasium Fee', 'facility', 'no')">Sports & Gym Fee</span>
+                                                <span class="quick-preset-btn" onclick="setHeadOnly('Cultural & Annual Activity Fee', 'facility', 'no')">Cultural / Fest Fee</span>
+
+                                                <!-- Hostel & Transport -->
+                                                <span class="quick-preset-btn" onclick="setHeadOnly('Hostel & Mess Fee', 'hostel_transport', 'no')"><i class="fa fa-bed text-orange mr-1"></i>Hostel & Mess Fee</span>
+                                                <span class="quick-preset-btn" onclick="setHeadOnly('Transportation / Bus Fee', 'hostel_transport', 'no')"><i class="fa fa-bus text-orange mr-1"></i>Bus / Transport Fee</span>
+
+                                                <!-- Refundable Security Deposits -->
+                                                <span class="quick-preset-btn" onclick="setHeadOnly('Caution Money (Refundable)', 'refundable', 'yes')"><i class="fa fa-undo text-danger mr-1"></i>Caution Money (Refundable)</span>
+                                                <span class="quick-preset-btn" onclick="setHeadOnly('Library Security Deposit', 'refundable', 'yes')"><i class="fa fa-undo text-danger mr-1"></i>Library Security Deposit</span>
+                                                <span class="quick-preset-btn" onclick="setHeadOnly('Hostel Security Deposit', 'refundable', 'yes')"><i class="fa fa-undo text-danger mr-1"></i>Hostel Security Deposit</span>
+                                                <span class="quick-preset-btn" onclick="setHeadOnly('Laboratory Security Deposit', 'refundable', 'yes')"><i class="fa fa-undo text-danger mr-1"></i>Lab Security Deposit</span>
+
+                                                <!-- Welfare & Misc -->
+                                                <span class="quick-preset-btn" onclick="setHeadOnly('Student Welfare & Insurance Fee', 'other', 'no')">Student Welfare / Insurance</span>
+                                                <span class="quick-preset-btn" onclick="setHeadOnly('Alumni Association Fee', 'other', 'no')">Alumni Fee</span>
+                                                <span class="quick-preset-btn" onclick="setHeadOnly('Transfer / Migration Certificate Fee', 'other', 'no')">TC & Migration</span>
+                                                <span class="quick-preset-btn" onclick="setHeadOnly('Late Payment Fine / Penalty', 'other', 'no')">Late Fine / Penalty</span>
+                                            </div>
                                         </div>
-                                        <input type="text" class="form-control form-control-sm" id="head_only_name" name="head_only_name" placeholder="e.g. Admission Fee, Caution Money" oninput="updateHeadOnlyPreview()">
+                                        
+                                        <input type="text" class="form-control form-control-sm font-weight-bold" id="head_only_name" name="head_only_name" placeholder="e.g. Admission Fee, Semester Exam Fee, Caution Money" oninput="updateHeadOnlyPreview()">
                                     </div>
 
                                     <div class="form-group mb-2">
