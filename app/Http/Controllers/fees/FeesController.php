@@ -1608,9 +1608,9 @@ class FeesController extends Controller
 
                 if($class_type_id != ''){
                     $data = $data->where('class_type_id', $class_type_id);
-                }
-                if($course_id != ''){
-                    $data = $data->where('course_id', $course_id);
+                } elseif($course_id != '') {
+                    $courseClassIds = ClassType::where('course_id', $course_id)->pluck('id')->toArray();
+                    $data = $data->whereIn('class_type_id', $courseClassIds);
                 }
                 if($request->admission_type_id != ''){
                     $data = $data->where('admission_type_id', $request->admission_type_id);
