@@ -2791,6 +2791,9 @@ $(document).ready(function() {
                 }
                 toastr.error(errMsg);
             }
+        });
+    });
+
     // Open Assign Fee Head to Classes Modal
     $(document).on('click', '.btn-assign-fee-head', function(e) {
         e.preventDefault();
