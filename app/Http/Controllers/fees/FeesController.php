@@ -1777,7 +1777,13 @@ class FeesController extends Controller
                         ->first();
                         
                     if($values){
-                        if(($values->paid_amount ?? 0) > 0){
+                        $hasPayment = FeesDetail::where('admission_id', $admission_id)
+                            ->where('fees_group_id', $values->fees_group_id)
+                            ->whereIn('status', [0, 1])
+                            ->where('paid_amount', '>', 0)
+                            ->exists();
+                            
+                        if($hasPayment){
                             return response()->json(['status' => 'error', 'message' => 'Cannot remove: Payment already exists under this fee head!']);
                         }
                         $values->delete();
@@ -1937,12 +1943,19 @@ class FeesController extends Controller
                     $admis = Admission::find($admId);
                     if(!$admis) continue;
                     
+                    // Check if student has paid fee groups
+                    $paidGroupIds = FeesDetail::where('admission_id', $admId)
+                        ->whereIn('status', [0, 1])
+                        ->where('paid_amount', '>', 0)
+                        ->pluck('fees_group_id')
+                        ->toArray();
+                    
                     // Unassign only unpaid fee heads
-                    FeesAssignDetail::where('admission_id', $admId)
-                        ->where(function($q){
-                            $q->whereNull('paid_amount')->orWhere('paid_amount', '<=', 0);
-                        })
-                        ->delete();
+                    $query = FeesAssignDetail::where('admission_id', $admId);
+                    if(!empty($paidGroupIds)){
+                        $query->whereNotIn('fees_group_id', $paidGroupIds);
+                    }
+                    $query->delete();
                         
                     $feesAssign = FeesAssign::where('admission_id', $admId)->first();
                     if($feesAssign){
