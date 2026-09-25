@@ -246,6 +246,7 @@ Route::match(['get', 'post'], 'feesGroupDelete', 'fees\FeesController@feesGroupD
 Route::match(['get', 'post'], 'createFeesInstallment', 'fees\FeesController@createFeesInstallment');
 Route::match(['get', 'post'], 'createFeesInstallmentClassWise', 'fees\FeesController@createFeesInstallmentClassWise');
 Route::match(['get', 'post'], 'assignFeesMultipleStudents', 'fees\FeesController@assignFeesMultipleStudents');
+Route::match(['get', 'post'], 'fees_assign', 'fees\FeesController@feesAssign');
 Route::match(['get', 'post'], 'getMasterData', 'fees\FeesController@getMasterData');
 Route::match(['get', 'post'], 'feesModification', 'fees\FeesController@feesModification');
 Route::match(['get', 'post'], 'deleteAssignedFees', 'fees\FeesController@deleteAssignedFees');

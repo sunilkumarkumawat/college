@@ -1693,6 +1693,22 @@ class FeesController extends Controller
                 }
             }
         
+            public function feesAssign(Request $request){
+                $courses = Helper::getCourses();
+                $classType = Helper::classType();
+                $allClassType = Helper::classType();
+                $getFeesGroup = Helper::getFeesGroup();
+                $getSession = Helper::getSession();
+
+                return view('fees.fees.fees_assign', [
+                    'courses' => $courses,
+                    'classType' => $classType,
+                    'allClassType' => $allClassType,
+                    'getFeesGroup' => $getFeesGroup,
+                    'getSession' => $getSession
+                ]);
+            }
+
             public function assignFeesMultipleStudents(Request $request){
                 if(!empty($request->admissionIds)){
                     foreach($request->admissionIds as $admission){
@@ -1765,8 +1781,9 @@ class FeesController extends Controller
                             }
                         }
                     }
-                    return redirect::to("feesMasterAdd")->with('message','Students Assigned Successfully');
+                    return redirect()->back()->with('message','Fee Structure assigned successfully to selected students');
                 }
+                return redirect()->back()->with('error', 'Please select at least one student and fee head');
             }
         
             public function getMasterData(Request $request){
