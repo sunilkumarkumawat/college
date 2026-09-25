@@ -601,17 +601,38 @@ $classType = Helper::classType();
     font-size: 11.5px !important;
 }
 
-/* Back Button in Card Header */
-.fees-unified-page .card-header .btn-back-header {
-    background: #ffffff !important;
-    color: var(--brand-dark) !important;
-    font-weight: 700 !important;
-    border: 1px solid #ffffff !important;
-    transition: all 0.15s ease;
+/* Top Action Bar Buttons */
+.fees-unified-page .top-action-bar .btn {
+    font-size: 11.5px !important;
+    font-weight: 600 !important;
+    padding: 5px 12px !important;
+    border-radius: 4px !important;
+    transition: all 0.15s ease-in-out !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
 }
-.fees-unified-page .card-header .btn-back-header:hover {
-    background: #e2e8f0 !important;
-    color: var(--brand-darker) !important;
+.fees-unified-page .top-action-bar .btn-primary {
+    background: var(--brand-dark) !important;
+    border-color: var(--brand-dark) !important;
+    color: #ffffff !important;
+}
+.fees-unified-page .top-action-bar .btn-primary:hover {
+    background: var(--brand-dark-hover) !important;
+    border-color: var(--brand-dark-hover) !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 6px rgba(0,44,84,0.3) !important;
+}
+.fees-unified-page .top-action-bar .btn-secondary {
+    background: #475569 !important;
+    border-color: #475569 !important;
+    color: #ffffff !important;
+}
+.fees-unified-page .top-action-bar .btn-secondary:hover {
+    background: #334155 !important;
+    border-color: #334155 !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 6px rgba(51,65,85,0.3) !important;
 }
 </style>
 
@@ -619,26 +640,29 @@ $classType = Helper::classType();
     <section class="content pt-2">
         <div class="container-fluid">
             <!-- Top Action Header Bar -->
-            <div class="row align-items-center mb-2">
-                <div class="col-md-4">
+            <div class="row align-items-center mb-2 top-action-bar">
+                <div class="{{($getPermission->add == 1) ? 'col-md-5' : 'col-md-4'}}">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb p-0 mb-0" style="background:none;">
-                            <li class="breadcrumb-item"><a href="{{url('/')}}">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="{{url('/')}}"><i class="fa fa-home"></i> Dashboard</a></li>
                             <li class="breadcrumb-item"><a href="{{url('fee_dashboard')}}">Fee Dashboard</a></li>
                             <li class="breadcrumb-item active" aria-current="page">Unified Fees Setup</li>
                         </ol>
                     </nav>
                 </div>
-                <div class="col-md-8 text-md-right d-flex justify-content-end align-items-center flex-wrap" style="gap: 6px;">
-                    <button type="button" class="btn btn-primary btn-sm font-weight-bold" data-toggle="modal" data-target="#students_list_modal" data-bs-toggle="modal" data-bs-target="#students_list_modal" style="font-size:11.5px;">
+                <div class="{{($getPermission->add == 1) ? 'col-md-7' : 'col-md-8'}} text-md-right d-flex justify-content-end align-items-center flex-wrap" style="gap: 6px;">
+                    <button type="button" class="btn btn-primary btn-sm font-weight-bold" data-toggle="modal" data-target="#students_list_modal" data-bs-toggle="modal" data-bs-target="#students_list_modal">
                         <i class="fa fa-users"></i> Student Fee Assign
                     </button>
-                    <button type="button" id="fees_modification_btn" class="btn btn-primary btn-sm font-weight-bold" data-toggle="modal" data-target="#fees_modification" data-bs-toggle="modal" data-bs-target="#fees_modification" style="font-size:11.5px;">
+                    <button type="button" id="fees_modification_btn" class="btn btn-primary btn-sm font-weight-bold" data-toggle="modal" data-target="#fees_modification" data-bs-toggle="modal" data-bs-target="#fees_modification">
                         <i class="fa fa-pencil-square-o"></i> Student Fee Modification
                     </button>
-                    <button type="button" class="btn btn-primary btn-sm font-weight-bold" data-toggle="modal" data-target="#special_fee_modal" data-bs-toggle="modal" data-bs-target="#special_fee_modal" style="font-size:11.5px;">
+                    <button type="button" class="btn btn-primary btn-sm font-weight-bold" data-toggle="modal" data-target="#special_fee_modal" data-bs-toggle="modal" data-bs-target="#special_fee_modal">
                         <i class="fa fa-star"></i> Registration Fee
                     </button>
+                    <a href="{{url('fee_dashboard')}}" class="btn btn-secondary btn-sm font-weight-bold text-nowrap">
+                        <i class="fa fa-arrow-left"></i> {{ __('messages.Back') }}
+                    </a>
                 </div>
             </div>
 
@@ -646,9 +670,9 @@ $classType = Helper::classType();
                 <!-- Left Side: Create Fee Heads & Assign to Fees Master -->
                 <div class="col-md-5 pr-0 {{($getPermission->add == 1) ? '' : 'd-none'}}">
                     <div class="card card-outline card-orange mr-1">
-                        <div class="card-header bg-primary py-2">
-                            <h3 class="card-title font-weight-bold" style="font-size:14px;"><i class="fa fa-money"></i> &nbsp;Fee Structure & Heads Setup</h3>
-                            <div class="card-tools">
+                        <div class="card-header bg-primary py-2 d-flex align-items-center justify-content-between">
+                            <h3 class="card-title font-weight-bold mb-0" style="font-size:14px;"><i class="fa fa-money"></i> &nbsp;Fee Structure & Heads Setup</h3>
+                            <div class="card-tools d-flex align-items-center">
                                 <span class="badge badge-light" style="font-size:10px;">Unified Setup</span>
                             </div>
                         </div>                 
@@ -963,10 +987,9 @@ $classType = Helper::classType();
                 <div class="{{($getPermission->add == 1) ? 'col-md-7 pl-0' : 'col-md-12 pl-0'}}">
                     <div class="card card-outline card-orange ml-1">
                         <div class="card-header bg-primary py-2 d-flex align-items-center justify-content-between">
-                            <h3 class="card-title font-weight-bold" style="font-size:14px;"><i class="fa fa-table"></i> &nbsp;Class-wise Fees Master</h3>
+                            <h3 class="card-title font-weight-bold mb-0" style="font-size:14px;"><i class="fa fa-table"></i> &nbsp;Class-wise Fees Master</h3>
                             <div class="card-tools d-flex align-items-center" style="gap: 6px;">
                                 <span class="badge badge-light" style="font-size:10px;">Structure & Breakdown</span>
-                                <a href="{{url('fee_dashboard')}}" class="btn btn-back-header btn-xs font-weight-bold py-1 px-2 shadow-none text-nowrap" style="font-size:11px;"><i class="fa fa-arrow-left"></i> {{ __('messages.Back') }}</a>
                             </div>
                         </div>  
                         
