@@ -116,18 +116,40 @@
     background-color: #e0f2fe;
     color: #0369a1;
     border: 1px solid #0284c7;
+    box-shadow: 0 1px 2px rgba(2, 132, 199, 0.08);
 }
 .chip-assigned:hover {
     background-color: #bae6fd;
+    border-color: #0284c7;
 }
+.chip-assigned .chip-name {
+    color: #0369a1;
+    font-weight: 600;
+}
+.chip-assigned .chip-amt {
+    color: #0284c7;
+    font-weight: 700;
+}
+
+/* Red Focused Highlight for Unassigned Fee Heads */
 .chip-unassigned {
-    background-color: #f8fafc;
-    color: #64748b;
-    border: 1px solid #cbd5e1;
+    background-color: #fff1f2;
+    color: #be123c;
+    border: 1px solid #fda4af;
+    box-shadow: 0 1px 2px rgba(225, 29, 72, 0.08);
 }
 .chip-unassigned:hover {
-    background-color: #f1f5f9;
-    border-color: #94a3b8;
+    background-color: #ffe4e6;
+    border-color: #f43f5e;
+    color: #9f1239;
+}
+.chip-unassigned .chip-name {
+    color: #9f1239;
+    font-weight: 600;
+}
+.chip-unassigned .chip-amt {
+    color: #be123c;
+    font-weight: 700;
 }
 .chip-name {
     font-weight: 600;
@@ -136,9 +158,6 @@
 .chip-amt {
     font-weight: 700;
     color: #0f172a;
-}
-.chip-assigned .chip-amt {
-    color: #0369a1;
 }
 
 /* Badges */
