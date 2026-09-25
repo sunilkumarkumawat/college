@@ -227,6 +227,25 @@ foreach ($collectedRows as $cr) {
 .fees-unified-page .text-teal { color: #0d9488 !important; }
 .fees-unified-page .text-orange { color: #ea580c !important; }
 
+/* Custom Centered Modals */
+.fees-unified-page.modal .modal-dialog-centered {
+    display: flex !important;
+    align-items: center !important;
+    min-height: calc(100% - 3.5rem) !important;
+}
+.fees-unified-page.modal .modal-content {
+    border-radius: 8px !important;
+    overflow: hidden !important;
+}
+.fees-unified-page.modal .modal-header .close {
+    opacity: 0.9 !important;
+    text-shadow: none !important;
+    outline: none !important;
+}
+.fees-unified-page.modal .modal-header .close:hover {
+    opacity: 1 !important;
+}
+
 /* Preview Box */
 .fees-unified-page .preview-badge {
     display: inline-block;
@@ -1459,17 +1478,14 @@ foreach ($collectedRows as $cr) {
                                                                         $isNhCollected = !empty($collectedMap[$nh->id]);
                                                                     @endphp
                                                                     @if(!$isNhAssigned && !$isNhCollected)
-                                                                        <a href="javascript:void(0)" 
-                                                                           class="btn btn-xs btn-outline-danger deleteData" 
+                                                                        <button type="button" 
+                                                                           class="btn btn-xs btn-outline-danger btn-delete-fee-head" 
                                                                            data-id="{{ $nh->id }}" 
-                                                                           data-toggle="modal" 
-                                                                           data-target="#Modal_id" 
-                                                                           data-bs-toggle="modal" 
-                                                                           data-bs-target="#Modal_id" 
+                                                                           data-name="{{ addslashes($nh->name) }}"
                                                                            title="Delete Fee Head" 
                                                                            style="font-size: 11px; padding: 2px 7px;">
                                                                             <i class="fa fa-trash"></i>
-                                                                        </a>
+                                                                        </button>
                                                                     @else
                                                                         <span class="badge badge-light border text-muted ml-1" style="font-size: 10px; padding: 3px 5px;" title="{{ $isNhCollected ? 'Fees Collected (Locked)' : 'Assigned to Students (Locked)' }}">
                                                                             <i class="fa fa-lock text-secondary"></i>
@@ -1496,25 +1512,35 @@ foreach ($collectedRows as $cr) {
     </section>
 </div>
 
-<!-- Delete Fees Group Modal -->
-<div class="modal fade" id="Modal_id" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
+<!-- Delete Fees Group Modal (Theme-Based Custom Centered Modal) -->
+<div class="modal fade fees-unified-page" id="Modal_id" tabindex="-1" role="dialog" aria-labelledby="deleteFeesGroupLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+        <div class="modal-content border-0 shadow">
             <div class="modal-header bg-danger py-2 text-white">
-                <h5 class="modal-title text-white font-weight-bold" id="exampleModalLabel" style="font-size: 14px;"><i class="fa fa-trash"></i> {{ __('common.Delete Confirmation') }}</h5>
-                <button type="button" class="close text-white" data-bs-dismiss="modal" aria-label="Close" style="opacity: 0.9;">
+                <h5 class="modal-title text-white font-weight-bold" id="deleteFeesGroupLabel" style="font-size: 13.5px;">
+                    <i class="fa fa-trash"></i> Delete Fee Head
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close" style="opacity: 0.9;">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <form id="delete_fees_group_form" action="{{ url('feesGroupDelete') }}" method="post">
                 @csrf
-                <div class="modal-body">
-                    {{ __('common.Are you sure you want to delete') }}?
+                <div class="modal-body text-center p-3">
+                    <i class="fa fa-exclamation-triangle text-danger mb-2" style="font-size: 32px;"></i>
+                    <h6 class="font-weight-bold text-dark mb-1" id="delete_fg_title">Delete Fee Head?</h6>
+                    <p class="text-muted mb-0" id="delete_fg_desc" style="font-size: 11.5px;">
+                        Are you sure you want to delete this fee head? This action cannot be undone.
+                    </p>
                     <input type="hidden" name="delete_id" id="delete_id">
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('common.Close') }}</button>
-                    <button type="submit" class="btn btn-danger">{{ __('common.Delete') }}</button>
+                <div class="modal-footer py-2 justify-content-center bg-light">
+                    <button type="button" class="btn btn-secondary btn-sm font-weight-bold" data-dismiss="modal" data-bs-dismiss="modal" style="font-size: 11.5px;">
+                        <i class="fa fa-times"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn btn-danger btn-sm font-weight-bold" style="font-size: 11.5px;">
+                        <i class="fa fa-trash"></i> Yes, Delete
+                    </button>
                 </div>
             </form>
         </div>
@@ -2354,9 +2380,15 @@ $(document).ready(function() {
         checkFormHasData();
     });
     
-    $(document).on('click', '.deleteData', function() {
+    // Delete Fee Head Modal Trigger for No-Class Heads
+    $(document).on('click', '.btn-delete-fee-head, .deleteData', function(e) {
+        e.preventDefault();
         var delete_id = $(this).data('id');
+        var headName = $(this).data('name') || 'this fee head';
         $('#delete_id').val(delete_id);
+        $('#delete_fg_title').text('Delete "' + headName + '"?');
+        $('#delete_fg_desc').text('Are you sure you want to permanently delete "' + headName + '"? This action cannot be undone.');
+        $('#Modal_id').modal('show');
     });
 
     // In-place Edit Fee Head Modal Handler
@@ -2510,9 +2542,19 @@ $(document).ready(function() {
         });
     });
 
-    // Close handlers for modal
-    $(document).on('click', '[data-dismiss="modal"], [data-bs-dismiss="modal"]', function() {
-        $(this).closest('.modal').modal('hide');
+    // Global Modal Backdrop and Dismiss Handlers
+    $('.modal').on('hidden.bs.modal', function() {
+        $('body').removeClass('modal-open');
+        $('.modal-backdrop').remove();
+    });
+
+    $(document).on('click', '[data-dismiss="modal"], [data-bs-dismiss="modal"]', function(e) {
+        var modal = $(this).closest('.modal');
+        modal.modal('hide');
+        setTimeout(function() {
+            $('body').removeClass('modal-open');
+            $('.modal-backdrop').remove();
+        }, 150);
     });
 });
 </script>
