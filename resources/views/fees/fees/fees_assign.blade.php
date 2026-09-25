@@ -328,12 +328,12 @@
                                 </div>
                             </div>
 
-                            <!-- Interactive Course Fee Structure & Master Heads Toolbar (Visible when Course is selected) -->
+                            <!-- Interactive Course Fee Structure & Master Heads Toolbar (Visible only when both Course & Batch are selected) -->
                             <div class="course-fee-structure-card" id="course_fee_structure_card" style="display: none;">
                                 <div class="d-flex flex-wrap justify-content-between align-items-center mb-2 pb-1" style="border-bottom: 1px dashed #cbd5e1;">
                                     <div class="d-flex align-items-center flex-wrap" style="gap: 8px;">
                                         <span class="font-weight-bold text-dark" style="font-size: 13px;">
-                                            <i class="fa fa-cubes text-primary mr-1"></i> Course Fee Structure (<span id="structure_head_count" class="text-primary font-weight-bold">0</span> Heads)
+                                            <i class="fa fa-cubes text-primary mr-1"></i> Fee Structure: <span id="structure_course_batch_label" class="text-primary font-weight-bold">Course - Batch</span> (<span id="structure_head_count" class="text-dark font-weight-bold">0</span> Heads)
                                         </span>
                                         <span class="badge badge-light border text-muted px-2 py-1" style="font-size: 11.5px;">
                                             Total Structure Fee: <strong class="text-dark ml-1" id="structure_total_fee">₹0</strong>
@@ -593,18 +593,24 @@ function loadStudents() {
     });
 }
 
-function loadFeeMasterHeads(course_id) {
-    if (!course_id) {
+function loadFeeMasterHeads(course_id, batch) {
+    if (!course_id || !batch) {
         $('#course_fee_structure_card').slideUp(200);
         $('#course_fee_structure_chips_box').empty();
         return;
     }
 
+    var courseName = $('#filter_course_id option:selected').text().trim() || 'Course';
+    $('#structure_course_batch_label').text(courseName + ' - ' + batch);
+
     $.ajax({
         headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
         url: "{{ url('getMasterData') }}",
         method: 'POST',
-        data: { course_id: course_id },
+        data: { 
+            course_id: course_id,
+            batch: batch 
+        },
         success: function(response) {
             if (response && response.length > 0) {
                 var totalStructureAmt = 0;
@@ -672,12 +678,26 @@ $(document).ready(function() {
     // Course Select Handler
     $('#filter_course_id').change(function() {
         var courseId = $(this).val();
-        loadFeeMasterHeads(courseId);
+        var batch = $('#filter_batch').val();
+        if (courseId && batch) {
+            loadFeeMasterHeads(courseId, batch);
+        } else {
+            $('#course_fee_structure_card').slideUp(200);
+            $('#course_fee_structure_chips_box').empty();
+        }
         loadStudents();
     });
 
     // Batch Select Handler
     $('#filter_batch').change(function() {
+        var batch = $(this).val();
+        var courseId = $('#filter_course_id').val();
+        if (courseId && batch) {
+            loadFeeMasterHeads(courseId, batch);
+        } else {
+            $('#course_fee_structure_card').slideUp(200);
+            $('#course_fee_structure_chips_box').empty();
+        }
         loadStudents();
     });
 
