@@ -75,46 +75,54 @@ if (!empty($dataview)) {
     font-weight: 700;
 }
 
-/* Category Badges */
+/* Clean Category Badges with High Contrast */
 .fees-unified-page .badge-academic {
     background-color: #e0f2fe !important;
     color: #0369a1 !important;
-    border: 1px solid #7dd3fc !important;
+    border: 1px solid #bae6fd !important;
+    font-weight: 600 !important;
 }
 .fees-unified-page .badge-admission {
     background-color: #dcfce7 !important;
     color: #15803d !important;
-    border: 1px solid #86efac !important;
+    border: 1px solid #bbf7d0 !important;
+    font-weight: 600 !important;
 }
 .fees-unified-page .badge-refundable {
-    background-color: #ffe4e6 !important;
-    color: #be123c !important;
-    border: 1px solid #fda4af !important;
+    background-color: #fee2e2 !important;
+    color: #b91c1c !important;
+    border: 1px solid #fca5a5 !important;
+    font-weight: 600 !important;
 }
 .fees-unified-page .badge-examination {
-    background-color: #ede9fe !important;
-    color: #6d28d9 !important;
-    border: 1px solid #c4b5fd !important;
+    background-color: #f3e8ff !important;
+    color: #7e22ce !important;
+    border: 1px solid #e9d5ff !important;
+    font-weight: 600 !important;
 }
 .fees-unified-page .badge-practical {
     background-color: #ccfbf1 !important;
     color: #0f766e !important;
-    border: 1px solid #5eead4 !important;
+    border: 1px solid #99f6e4 !important;
+    font-weight: 600 !important;
 }
 .fees-unified-page .badge-facility {
     background-color: #fef3c7 !important;
     color: #b45309 !important;
-    border: 1px solid #fcd34d !important;
+    border: 1px solid #fde68a !important;
+    font-weight: 600 !important;
 }
 .fees-unified-page .badge-hostel_transport {
     background-color: #ffedd5 !important;
     color: #c2410c !important;
-    border: 1px solid #fdba74 !important;
+    border: 1px solid #fed7aa !important;
+    font-weight: 600 !important;
 }
 .fees-unified-page .badge-other {
     background-color: #f1f5f9 !important;
-    color: #475569 !important;
+    color: #334155 !important;
     border: 1px solid #cbd5e1 !important;
+    font-weight: 600 !important;
 }
 
 /* Course Selector Container */
@@ -232,17 +240,9 @@ if (!empty($dataview)) {
     margin-bottom: 8px;
 }
 
-/* Category Badges */
-.fees-unified-page .badge-academic { background-color: #007bff !important; color: #ffffff !important; }
-.fees-unified-page .badge-examination { background-color: #e65100 !important; color: #ffffff !important; }
-.fees-unified-page .badge-practical { background-color: #00838f !important; color: #ffffff !important; }
-.fees-unified-page .badge-admission { background-color: #512da8 !important; color: #ffffff !important; }
-.fees-unified-page .badge-facility { background-color: #00796b !important; color: #ffffff !important; }
-.fees-unified-page .badge-refundable { background-color: #2e7d32 !important; color: #ffffff !important; }
-.fees-unified-page .badge-hostel_transport { background-color: #c2185b !important; color: #ffffff !important; }
-.fees-unified-page .badge-other { background-color: #455a64 !important; color: #ffffff !important; }
-
-/* Table Headers (High-Contrast White on Dark) */
+/* Table Headers (Strict High-Contrast White Font on Dark Background) */
+.fees-unified-page table thead tr th,
+.fees-unified-page .table thead tr th,
 .fees-unified-page .padding_table thead tr th,
 .fees-unified-page #example1 thead tr th {
     background: var(--brand-dark) !important;
@@ -253,10 +253,9 @@ if (!empty($dataview)) {
     border-color: var(--brand-darker) !important;
     vertical-align: middle !important;
 }
-.fees-unified-page .padding_table thead tr th a,
-.fees-unified-page .padding_table thead tr th i,
-.fees-unified-page #example1 thead tr th a,
-.fees-unified-page #example1 thead tr th i {
+.fees-unified-page table thead tr th *,
+.fees-unified-page .padding_table thead tr th *,
+.fees-unified-page #example1 thead tr th * {
     color: #ffffff !important;
 }
 
@@ -1265,107 +1264,116 @@ if (!empty($dataview)) {
 
                                     <!-- TAB 2: STANDALONE / NO-CLASS FEE HEADS TABULAR LIST -->
                                     <div id="container_no_class_heads" style="display: none;">
-                                        <div class="card card-outline card-secondary shadow-none border mb-0">
-                                            <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center">
-                                                <h6 class="card-title font-weight-bold mb-0 text-dark" style="font-size:13px;">
-                                                    <i class="fa fa-list text-primary mr-1"></i> Standalone Fee Heads (No Class Assigned)
-                                                </h6>
-                                                <span class="badge badge-primary px-2" style="font-size: 11px;">{{ count($noClassHeads) }} Fee Heads</span>
+                                        <div class="d-flex justify-content-between align-items-center p-2 mb-2 rounded border" style="background: #f8fafc;">
+                                            <div class="d-flex align-items-center">
+                                                <span class="badge badge-primary mr-2" style="font-size: 11px; padding: 4px 7px;">
+                                                    <i class="fa fa-tag"></i> {{ count($noClassHeads) }}
+                                                </span>
+                                                <div>
+                                                    <span class="font-weight-bold text-dark" style="font-size: 12.5px;">
+                                                        Standalone Fee Heads (No Class Assigned)
+                                                    </span>
+                                                    <span class="text-muted d-block" style="font-size: 10.5px;">These heads are created without any class/semester mapping.</span>
+                                                </div>
                                             </div>
-                                            <div class="card-body p-0">
-                                                @if(count($noClassHeads) > 0)
-                                                    <div class="table-responsive">
-                                                        <table class="table table-bordered table-striped table-hover mb-0 text-dark padding_table" style="font-size: 11.5px;">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th width="40px" class="text-center">#</th>
-                                                                    <th>Fee Head Name</th>
-                                                                    <th width="160px" class="text-center">Category</th>
-                                                                    <th width="130px" class="text-center">Properties</th>
-                                                                    <th width="80px" class="text-center">Action</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                @foreach($noClassHeads as $idx => $nh)
-                                                                    @php
-                                                                        $nhCat = strtolower(trim($nh->group_type ?? 'other'));
-                                                                        if ($nhCat === 'registration') $nhCat = 'admission';
-                                                                        $nhCatClass = 'badge-other';
-                                                                        if ($nhCat === 'academic') $nhCatClass = 'badge-academic';
-                                                                        elseif ($nhCat === 'admission') $nhCatClass = 'badge-admission';
-                                                                        elseif ($nhCat === 'examination') $nhCatClass = 'badge-examination';
-                                                                        elseif ($nhCat === 'practical') $nhCatClass = 'badge-practical';
-                                                                        elseif ($nhCat === 'facility') $nhCatClass = 'badge-facility';
-                                                                        elseif ($nhCat === 'refundable') $nhCatClass = 'badge-refundable';
-                                                                        elseif ($nhCat === 'hostel_transport') $nhCatClass = 'badge-hostel_transport';
-
-                                                                        $isRef = strtolower(trim($nh->fees_refund ?? '')) === 'yes';
-                                                                        $isPart = ($nh->fees_partial ?? 0) == 1;
-                                                                    @endphp
-                                                                    <tr>
-                                                                        <td class="text-center align-middle font-weight-bold text-muted">{{ $idx + 1 }}</td>
-                                                                        <td class="align-middle font-weight-bold text-dark">
-                                                                            {{ $nh->name }}
-                                                                            @if($isRef)
-                                                                                <span class="badge badge-refundable ml-1" style="font-size: 9px; padding: 2px 5px;" title="Refundable Deposit">
-                                                                                    Refundable
-                                                                                </span>
-                                                                            @endif
-                                                                            @if($isPart)
-                                                                                <span class="badge badge-info ml-1" style="font-size: 9px; padding: 2px 5px;" title="Partial Payment (50%) Allowed">
-                                                                                    50% Partial
-                                                                                </span>
-                                                                            @endif
-                                                                        </td>
-                                                                        <td class="text-center align-middle">
-                                                                            <span class="badge {{ $nhCatClass }}" style="font-size: 10px; padding: 3px 7px;">{{ ucfirst(str_replace('_', ' & ', $nhCat)) }}</span>
-                                                                        </td>
-                                                                        <td class="text-center align-middle">
-                                                                            @if($isRef)
-                                                                                <span class="badge badge-success" style="font-size: 10px;">Refundable</span>
-                                                                            @elseif($isPart)
-                                                                                <span class="badge badge-info" style="font-size: 10px;">50% Partial</span>
-                                                                            @else
-                                                                                <span class="badge badge-light border text-muted" style="font-size: 10px;">Standard</span>
-                                                                            @endif
-                                                                        </td>
-                                                                        <td class="text-center align-middle text-nowrap">
-                                                                            <button type="button" 
-                                                                                    class="btn btn-xs btn-outline-primary btn-edit-fee-head" 
-                                                                                    data-id="{{ $nh->id }}" 
-                                                                                    data-name="{{ $nh->name }}" 
-                                                                                    data-category="{{ $nhCat }}" 
-                                                                                    data-refund="{{ $nh->fees_refund ?? 'no' }}" 
-                                                                                    data-partial="{{ $nh->fees_partial ?? 0 }}"
-                                                                                    title="Edit Fee Head" 
-                                                                                    style="font-size: 11px; padding: 2px 7px;">
-                                                                                <i class="fa fa-pencil"></i>
-                                                                            </button>
-                                                                            <a href="javascript:void(0)" 
-                                                                               class="btn btn-xs btn-outline-danger deleteData" 
-                                                                               data-id="{{ $nh->id }}" 
-                                                                               data-toggle="modal" 
-                                                                               data-target="#Modal_id" 
-                                                                               data-bs-toggle="modal" 
-                                                                               data-bs-target="#Modal_id" 
-                                                                               title="Delete Fee Head" 
-                                                                               style="font-size: 11px; padding: 2px 7px;">
-                                                                                <i class="fa fa-trash"></i>
-                                                                            </a>
-                                                                        </td>
-                                                                    </tr>
-                                                                @endforeach
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                @else
-                                                    <div class="p-4 text-center text-muted" style="font-size: 12px;">
-                                                        <i class="fa fa-info-circle text-info fa-2x mb-2 d-block"></i>
-                                                        No standalone / no-class fee heads found.
-                                                    </div>
-                                                @endif
+                                            <div>
+                                                <button type="button" class="btn btn-xs btn-primary font-weight-bold" onclick="switchMode('single_head')" style="font-size: 11px; padding: 3px 8px;">
+                                                    <i class="fa fa-plus-circle mr-1"></i> Add Fee Head
+                                                </button>
                                             </div>
                                         </div>
+
+                                        @if(count($noClassHeads) > 0)
+                                            <div class="table-responsive border rounded" style="background: #ffffff;">
+                                                <table class="table table-bordered table-striped table-hover mb-0 padding_table" style="font-size: 11.5px;">
+                                                    <thead>
+                                                        <tr>
+                                                            <th width="40px" class="text-center">#</th>
+                                                            <th>Fee Head Name</th>
+                                                            <th width="160px" class="text-center">Category</th>
+                                                            <th width="130px" class="text-center">Properties</th>
+                                                            <th width="80px" class="text-center">Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach($noClassHeads as $idx => $nh)
+                                                            @php
+                                                                $nhCat = strtolower(trim($nh->group_type ?? 'other'));
+                                                                if ($nhCat === 'registration') $nhCat = 'admission';
+                                                                $nhCatClass = 'badge-other';
+                                                                if ($nhCat === 'academic') $nhCatClass = 'badge-academic';
+                                                                elseif ($nhCat === 'admission') $nhCatClass = 'badge-admission';
+                                                                elseif ($nhCat === 'examination') $nhCatClass = 'badge-examination';
+                                                                elseif ($nhCat === 'practical') $nhCatClass = 'badge-practical';
+                                                                elseif ($nhCat === 'facility') $nhCatClass = 'badge-facility';
+                                                                elseif ($nhCat === 'refundable') $nhCatClass = 'badge-refundable';
+                                                                elseif ($nhCat === 'hostel_transport') $nhCatClass = 'badge-hostel_transport';
+
+                                                                $isRef = strtolower(trim($nh->fees_refund ?? '')) === 'yes';
+                                                                $isPart = ($nh->fees_partial ?? 0) == 1;
+                                                            @endphp
+                                                            <tr>
+                                                                <td class="text-center align-middle font-weight-bold text-muted">{{ $idx + 1 }}</td>
+                                                                <td class="align-middle font-weight-bold text-dark">
+                                                                    {{ $nh->name }}
+                                                                    @if($isRef)
+                                                                        <span class="badge badge-refundable ml-1" style="font-size: 9px; padding: 2px 5px;" title="Refundable Deposit">
+                                                                            <i class="fa fa-undo"></i> Refundable
+                                                                        </span>
+                                                                    @endif
+                                                                    @if($isPart)
+                                                                        <span class="badge badge-academic ml-1" style="font-size: 9px; padding: 2px 5px;" title="Partial Payment (50%) Allowed">
+                                                                            <i class="fa fa-adjust"></i> 50% Partial
+                                                                        </span>
+                                                                    @endif
+                                                                </td>
+                                                                <td class="text-center align-middle">
+                                                                    <span class="badge {{ $nhCatClass }}" style="font-size: 10.5px; padding: 3px 8px;">{{ ucfirst(str_replace('_', ' & ', $nhCat)) }}</span>
+                                                                </td>
+                                                                <td class="text-center align-middle">
+                                                                    @if($isRef)
+                                                                        <span class="badge badge-refundable" style="font-size: 10px; padding: 3px 6px;"><i class="fa fa-undo mr-1"></i> Refundable</span>
+                                                                    @elseif($isPart)
+                                                                        <span class="badge badge-academic" style="font-size: 10px; padding: 3px 6px;"><i class="fa fa-adjust mr-1"></i> 50% Partial</span>
+                                                                    @else
+                                                                        <span class="badge badge-other" style="font-size: 10px; padding: 3px 6px;">Standard</span>
+                                                                    @endif
+                                                                </td>
+                                                                <td class="text-center align-middle text-nowrap">
+                                                                    <button type="button" 
+                                                                            class="btn btn-xs btn-outline-primary btn-edit-fee-head" 
+                                                                            data-id="{{ $nh->id }}" 
+                                                                            data-name="{{ $nh->name }}" 
+                                                                            data-category="{{ $nhCat }}" 
+                                                                            data-refund="{{ $nh->fees_refund ?? 'no' }}" 
+                                                                            data-partial="{{ $nh->fees_partial ?? 0 }}"
+                                                                            title="Edit Fee Head" 
+                                                                            style="font-size: 11px; padding: 2px 7px;">
+                                                                        <i class="fa fa-pencil"></i>
+                                                                    </button>
+                                                                    <a href="javascript:void(0)" 
+                                                                       class="btn btn-xs btn-outline-danger deleteData" 
+                                                                       data-id="{{ $nh->id }}" 
+                                                                       data-toggle="modal" 
+                                                                       data-target="#Modal_id" 
+                                                                       data-bs-toggle="modal" 
+                                                                       data-bs-target="#Modal_id" 
+                                                                       title="Delete Fee Head" 
+                                                                       style="font-size: 11px; padding: 2px 7px;">
+                                                                        <i class="fa fa-trash"></i>
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        @else
+                                            <div class="p-4 text-center text-muted border rounded" style="font-size: 12px; background: #ffffff;">
+                                                <i class="fa fa-info-circle text-info fa-2x mb-2 d-block"></i>
+                                                No standalone / no-class fee heads found.
+                                            </div>
+                                        @endif
                                     </div>
                         </div>
                     </div>          
