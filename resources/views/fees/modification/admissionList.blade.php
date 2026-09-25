@@ -1,7 +1,7 @@
 @if(!empty($data) && count($data) > 0)
     @php
         $studentIds = $data->pluck('id')->toArray();
-        $feesAssigns = DB::table('fees_assign')->whereIn('admission_id', $studentIds)->pluck('total_amount', 'admission_id')->toArray();
+        $feesAssigns = DB::table('fees_assigns')->whereNull('deleted_at')->whereIn('admission_id', $studentIds)->pluck('total_amount', 'admission_id')->toArray();
     @endphp
 
     @foreach($data as $key => $item)
