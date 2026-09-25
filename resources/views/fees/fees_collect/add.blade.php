@@ -72,6 +72,9 @@ $array = [];
         background-color: #002c54 !important;
         color: #fff !important;
     }
+    .padding_table tbody tr.active-student td a {
+        color: #fff !important;
+    }
     .student-preview-card {
         background: #ffffff;
         border: 1px solid #e2e8f0;
@@ -171,7 +174,7 @@ $array = [];
                                             </select>                           
                                         </div>
 
-                                        <!-- Admission No -->
+                                        <!-- Admission No / Student ID -->
                                         <div class="col-xl-2 col-lg-2 col-md-4 col-sm-6 col-12 mb-1">
                                             <label class="form-label-compact"><i class="fa fa-id-card text-primary mr-1"></i>{{ __('student.Admission No.') }}</label>
                                             <input type="text" class="form-control form-control-compact filter-field" id="admission_no" name="admission_no" placeholder="Adm No." value="{{ $serach['admission_no'] ?? '' }}" autocomplete="off">
@@ -272,9 +275,11 @@ $array = [];
 </div>
 
 <script>
+var selectedSystemId = '{{ $serach["unique_system_id"] ?? "" }}';
+
 $(document).ready(function() {
-    // Function to sync filter inputs into the URL parameters
-    function syncUrlParams() {
+    // Function to sync filter inputs & selected student into the URL parameters
+    function syncUrlParams(extraSystemId) {
         var params = new URLSearchParams();
         var sessionId = $('#session_id').val();
         var courseId = $('#course_id').val();
@@ -282,6 +287,7 @@ $(document).ready(function() {
         var batch = $('#batch').val();
         var admissionNo = $('#admission_no').val();
         var name = $('#name').val();
+        var systemId = (extraSystemId !== undefined) ? extraSystemId : ($('#trColor tbody tr.active-student').data('system-id') || selectedSystemId);
 
         if (sessionId) params.set('session_id', sessionId);
         if (courseId) params.set('course_id', courseId);
@@ -289,6 +295,7 @@ $(document).ready(function() {
         if (batch) params.set('batch', batch);
         if (admissionNo) params.set('admission_no', admissionNo.trim());
         if (name) params.set('name', name.trim());
+        if (systemId) params.set('unique_system_id', systemId);
 
         var queryString = params.toString();
         var newUrl = window.location.pathname + (queryString ? '?' + queryString : '');
@@ -302,12 +309,6 @@ $(document).ready(function() {
 
     $(document).on('input', '#admission_no, #name', function() {
         syncUrlParams();
-    });
-
-    // Row selection highlight
-    $('#trColor tbody tr').click(function() {
-        $('#trColor tbody tr').removeClass('active-student');
-        $(this).addClass('active-student');
     });
 
     function updateClassDropdown(classSelect, data, selectedId) {
@@ -358,7 +359,16 @@ $(document).ready(function() {
         }
     });
 
-    $(".quickCollect").on("click", function(){
+    // Handle student row selection
+    $(document).on("click", ".quickCollect", function(){
+        var sysId = $(this).data('system-id');
+        selectedSystemId = sysId;
+        
+        $('#trColor tbody tr').removeClass('active-student');
+        $(this).addClass('active-student');
+
+        syncUrlParams(sysId);
+
         @if(!empty($array))
             var array = @json($array);
             var id = $(this).data('id');
@@ -382,10 +392,23 @@ $(document).ready(function() {
         @endif
     });
 
-    // Auto-click first student if exactly 1 result returned
-    @if(!empty($data) && count($data) === 1)
-        $(".quickCollect").first().trigger('click');
-    @endif
+    // Auto-open student if unique_system_id is present in URL or $serach
+    var urlParams = new URLSearchParams(window.location.search);
+    var targetSysId = urlParams.get('unique_system_id') || '{{ $serach["unique_system_id"] ?? "" }}';
+
+    if (targetSysId) {
+        var targetRow = $('.quickCollect[data-system-id="' + targetSysId + '"]');
+        if (targetRow.length > 0) {
+            targetRow.trigger('click');
+        } else {
+            showData(targetSysId, $('#session_id').val() || '{{ Session::get("session_id") }}');
+        }
+    } else {
+        // Auto-click first student if exactly 1 result returned
+        @if(!empty($data) && count($data) === 1)
+            $(".quickCollect").first().trigger('click');
+        @endif
+    }
 });
 
 function showData(unique_system_id, session_id) {

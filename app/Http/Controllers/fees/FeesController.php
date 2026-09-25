@@ -115,6 +115,7 @@ class FeesController extends Controller
                 $serach['session_id'] = $request->has('session_id') ? $request->session_id : Session::get('session_id');
                 $serach['admission_type_id'] = $request->admission_type_id ?? '';
                 $serach['class_type_id'] = !empty($request->class_type_id) ? $request->class_type_id : 0;
+                $serach['unique_system_id'] = $request->unique_system_id ?? '';
                 
                 $hasFilter = !empty($request->class_type_id) 
                     || !empty($request->name) 
@@ -122,11 +123,12 @@ class FeesController extends Controller
                     || !empty($request->batch) 
                     || !empty($request->course_id) 
                     || !empty($request->admission_type_id)
+                    || !empty($request->unique_system_id)
                     || ($request->isMethod('post') && $request->has('session_id'));
 
                 if ($request->isMethod('post') || $hasFilter) {
                     $value = $request->name;
-                    if ($request->class_type_id > 0 || !empty($request->name) || !empty($request->admission_no) || !empty($request->batch) || !empty($request->course_id) || !empty($serach['session_id'])) {
+                    if ($request->class_type_id > 0 || !empty($request->name) || !empty($request->admission_no) || !empty($request->batch) || !empty($request->course_id) || !empty($serach['session_id']) || !empty($request->unique_system_id)) {
                         $data =  Admission::with('ClassTypes')->where('status', 1)->where('school','=',1);
                         $data = $data->where('branch_id', Session::get('branch_id'));
 
@@ -173,6 +175,14 @@ class FeesController extends Controller
                             $data = $data->where("admissions.admissionNo", $request->admission_no);
                         }
                         $allstudents = $data->orderBy('id', 'ASC')->get();
+
+                        if (!empty($request->unique_system_id) && $allstudents->where('unique_system_id', $request->unique_system_id)->isEmpty()) {
+                            $directStd = Admission::with('ClassTypes')->where('status', 1)->where('unique_system_id', $request->unique_system_id)->first();
+                            if ($directStd) {
+                                $allstudents->prepend($directStd);
+                            }
+                        }
+
                         return  view('fees.fees_collect.add', ['data' => $allstudents, 'serach' => $serach]);
                     } 
                     else {
