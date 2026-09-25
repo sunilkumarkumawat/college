@@ -8,6 +8,5 @@ class FeesAssignDetail extends Model
 {
         use SoftDeletes;
 	protected $table = "fees_assign_details"; //table name
-
-    
+	protected $guarded = [];
 }

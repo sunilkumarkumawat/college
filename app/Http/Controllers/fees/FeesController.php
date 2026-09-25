@@ -1749,11 +1749,9 @@ class FeesController extends Controller
                     }
                     
                     $total_assign_detail = FeesAssignDetail::where('admission_id', $admission_id)->whereNull('deleted_at')->sum('fees_group_amount');
-                    $discount_assign_detail = FeesAssignDetail::where('admission_id', $admission_id)->whereNull('deleted_at')->sum('discount');
-                    $feesAssign->update([
-                        'total_amount' => $total_assign_detail,
-                        'net_amount' => ($total_assign_detail - $discount_assign_detail)
-                    ]);
+                    $feesAssign->total_amount = $total_assign_detail;
+                    $feesAssign->net_amount = ($total_assign_detail - $discount_assign_detail);
+                    $feesAssign->save();
                     
                     return response()->json([
                         'status' => 'success',
@@ -1780,10 +1778,9 @@ class FeesController extends Controller
                     if($feesAssign){
                         $total_assign_detail = FeesAssignDetail::where('admission_id', $admission_id)->whereNull('deleted_at')->sum('fees_group_amount');
                         $discount_assign_detail = FeesAssignDetail::where('admission_id', $admission_id)->whereNull('deleted_at')->sum('discount');
-                        $feesAssign->update([
-                            'total_amount' => $total_assign_detail,
-                            'net_amount' => ($total_assign_detail - $discount_assign_detail)
-                        ]);
+                        $feesAssign->total_amount = $total_assign_detail;
+                        $feesAssign->net_amount = ($total_assign_detail - $discount_assign_detail);
+                        $feesAssign->save();
                         $newTotal = $total_assign_detail;
                         $newNet = ($total_assign_detail - $discount_assign_detail);
                     } else {
@@ -1894,10 +1891,9 @@ class FeesController extends Controller
                         
                         $total_assign_detail = FeesAssignDetail::where('admission_id', $admission)->whereNull('deleted_at')->sum('fees_group_amount');
                         $discount_assign_detail = FeesAssignDetail::where('admission_id', $admission)->whereNull('deleted_at')->sum('discount');
-                        $feesAssign->update([
-                            'total_amount' => $total_assign_detail,
-                            'net_amount' => ($total_assign_detail - $discount_assign_detail)
-                        ]);
+                        $feesAssign->total_amount = $total_assign_detail;
+                        $feesAssign->net_amount = ($total_assign_detail - $discount_assign_detail);
+                        $feesAssign->save();
                     }
                 }
                 
