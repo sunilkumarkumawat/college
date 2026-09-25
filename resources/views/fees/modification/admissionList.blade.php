@@ -47,9 +47,24 @@
             <td class="text-center align-middle text-nowrap" style="font-size: 12px; width: 100px;">
                 {{ $item->mobile ?? '-' }}
             </td>
-            <td class="align-middle text-left" style="min-width: 250px;">
-                <div class="d-flex flex-wrap align-items-center" style="gap: 4px;">
-                    @if(!empty($studentMasters) && count($studentMasters) > 0)
+            <td class="align-middle text-left" style="min-width: 270px;">
+                @if(!empty($studentMasters) && count($studentMasters) > 0)
+                    <!-- Student Row Mini Action Header -->
+                    <div class="d-flex justify-content-between align-items-center mb-1 pb-1" style="border-bottom: 1px dashed #cbd5e1;">
+                        <span class="text-muted" style="font-size: 11px; font-weight: 600;">
+                            <i class="fa fa-list-ul mr-1"></i> Course Heads ({{ count($studentMasters) }})
+                        </span>
+                        <div>
+                            <button type="button" class="btn btn-xs btn-outline-success font-weight-bold px-1 py-0 mr-1 btn-student-assign-all-heads" data-admission-id="{{ $item->id }}" title="Assign all course fee heads to this student" style="font-size: 10.5px;">
+                                <i class="fa fa-check-square-o"></i> Check All
+                            </button>
+                            <button type="button" class="btn btn-xs btn-outline-secondary font-weight-bold px-1 py-0 btn-student-unassign-all-heads" data-admission-id="{{ $item->id }}" title="Clear all fee heads for this student" style="font-size: 10.5px;">
+                                <i class="fa fa-square-o"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-wrap align-items-center" style="gap: 4px;">
                         @foreach($studentMasters as $fm)
                             @php
                                 $mapKey = $item->id . '_' . $fm->id;
@@ -85,10 +100,10 @@
                                 </span>
                             </label>
                         @endforeach
-                    @else
-                        <span class="text-muted small font-italic">No Fee Heads Configured for this Class</span>
-                    @endif
-                </div>
+                    </div>
+                @else
+                    <span class="text-muted small font-italic">No Fee Heads Configured for this Course</span>
+                @endif
             </td>
             <td class="text-center align-middle text-nowrap" style="width: 110px;">
                 <span class="badge badge-success px-2 py-1 font-weight-bold" style="font-size: 12.5px;" id="student_total_{{ $item->id }}">

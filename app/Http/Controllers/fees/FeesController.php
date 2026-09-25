@@ -1720,7 +1720,8 @@ class FeesController extends Controller
                         $amount = $fees_master->amount;
                     }
                     
-                    $values = FeesAssignDetail::where('fees_assign_id', $feesAssign->id)
+                    $values = FeesAssignDetail::withTrashed()
+                        ->where('fees_assign_id', $feesAssign->id)
                         ->where('fees_master_id', $fees_master->id)
                         ->where('admission_id', $admission_id)
                         ->first();
@@ -1740,6 +1741,10 @@ class FeesController extends Controller
                         $values->installment_month = $fees_master->installment_month;
                         $values->installment_fine = $fees_master->installment_fine;
                         $values->installment_due_date = $fees_master->installment_due_date;
+                        $values->save();
+                    } elseif($values->trashed()){
+                        $values->restore();
+                        $values->fees_group_amount = $amount;
                         $values->save();
                     }
                     
@@ -1856,7 +1861,8 @@ class FeesController extends Controller
                                 $amount = $fees_master->amount;
                             }
                             
-                            $values = FeesAssignDetail::where('fees_assign_id', $feesAssign->id)
+                            $values = FeesAssignDetail::withTrashed()
+                                ->where('fees_assign_id', $feesAssign->id)
                                 ->where('fees_master_id', $fees_master->id)
                                 ->where('admission_id', $admission)
                                 ->first();
@@ -1876,6 +1882,11 @@ class FeesController extends Controller
                                 $values->installment_month = $fees_master->installment_month;
                                 $values->installment_fine = $fees_master->installment_fine;
                                 $values->installment_due_date = $fees_master->installment_due_date;
+                                $values->save();
+                                $assignedCount++;
+                            } elseif($values->trashed()){
+                                $values->restore();
+                                $values->fees_group_amount = $amount;
                                 $values->save();
                                 $assignedCount++;
                             }

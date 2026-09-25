@@ -64,7 +64,9 @@
     font-weight: 700;
     margin-bottom: 4px;
     color: #1e293b;
-    display: block;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 /* Table Header - Solid Dark with Pure White Font */
@@ -236,7 +238,9 @@
                             <div class="row mb-2">
                                 <!-- 1. Course Select -->
                                 <div class="col-md-3 col-sm-6 mb-2">
-                                    <label class="filter-label">Course <span class="text-danger">*</span></label>
+                                    <label class="filter-label">
+                                        <span>Course <span class="text-danger">*</span></span>
+                                    </label>
                                     <select class="form-control form-control-sm select2" id="filter_course_id" name="course_id" style="width: 100%;">
                                         <option value="">-- Select Course --</option>
                                         @if(!empty($courses))
@@ -249,7 +253,9 @@
 
                                 <!-- 2. Batch Select -->
                                 <div class="col-md-3 col-sm-6 mb-2">
-                                    <label class="filter-label">Batch</label>
+                                    <label class="filter-label">
+                                        <span>Batch</span>
+                                    </label>
                                     <select class="form-control form-control-sm select2" id="filter_batch" name="batch" style="width: 100%;">
                                         <option value="">-- All Batches --</option>
                                         @if(!empty($batches))
@@ -262,7 +268,9 @@
 
                                 <!-- 3. Admission No / Student ID / Name Search -->
                                 <div class="col-md-3 col-sm-6 mb-2">
-                                    <label class="filter-label">Student ID / Name / Mobile</label>
+                                    <label class="filter-label">
+                                        <span>Student ID / Name / Mobile</span>
+                                    </label>
                                     <div class="input-group input-group-sm">
                                         <input type="text" class="form-control form-control-sm" id="filter_admission_no" name="admissionNo" placeholder="Type to filter instantly...">
                                         <div class="input-group-append">
@@ -276,7 +284,11 @@
                                 <!-- 4. Fees Master Heads Multi-Select for Quick Bulk Assign -->
                                 <div class="col-md-3 col-sm-6 mb-2">
                                     <label class="filter-label">
-                                        Fee Heads (For 1-Click Multi-Assign)
+                                        <span>Fee Heads Multi-Select</span>
+                                        <span class="small font-weight-normal">
+                                            <a href="javascript:void(0)" id="btn_select_all_filter_heads" class="text-primary mr-1">All</a>
+                                            <a href="javascript:void(0)" id="btn_deselect_all_filter_heads" class="text-muted">Clear</a>
+                                        </span>
                                     </label>
                                     <select class="form-control form-control-sm select2" multiple="multiple" id="filter_fees_master_ids" name="fees_master_ids[]" data-placeholder="-- All Course Fee Heads --" style="width: 100%;">
                                     </select>
@@ -287,13 +299,13 @@
                             <div class="mid-action-strip d-flex flex-wrap justify-content-between align-items-center mb-2">
                                 <div class="mb-1 mb-md-0 d-flex align-items-center flex-wrap" style="gap: 6px;">
                                     <button type="button" class="btn btn-warning btn-xs font-weight-bold shadow-xs text-dark" id="btn_quick_apply_all_loaded" style="font-size: 11.5px; padding: 4px 10px;">
-                                        <i class="fa fa-bolt text-dark mr-1"></i> Quick Apply to ALL Loaded (<span class="total_students_count_text">0</span>)
+                                        <i class="fa fa-bolt text-dark mr-1"></i> Quick Apply All Heads to ALL Loaded (<span class="total_students_count_text">0</span>)
                                     </button>
                                     <button type="button" class="btn btn-success btn-xs font-weight-bold shadow-xs" id="btn_bulk_assign_realtime" style="font-size: 11.5px; padding: 4px 10px;">
-                                        <i class="fa fa-check-circle mr-1"></i> Assign Selected Heads to Checked (<span class="selected_students_count_text">0</span>)
+                                        <i class="fa fa-check-circle mr-1"></i> Assign to Selected Students (<span class="selected_students_count_text">0</span>)
                                     </button>
                                     <span class="badge badge-light border text-muted py-1 px-2" style="font-size: 11px;">
-                                        <i class="fa fa-info-circle text-primary mr-1"></i> Clicking any checkbox auto-saves immediately
+                                        <i class="fa fa-info-circle text-primary mr-1"></i> Click any head or Check All button to assign in real-time
                                     </span>
                                 </div>
                                 <div class="d-flex align-items-center" style="gap: 4px;">
@@ -325,7 +337,7 @@
                                             <th style="width: 120px; text-align: center; vertical-align: middle;">Class / Sem</th>
                                             <th style="text-align: left; vertical-align: middle; min-width: 120px;">Father's Name</th>
                                             <th style="width: 100px; text-align: center; vertical-align: middle;">Mobile No.</th>
-                                            <th style="text-align: left; vertical-align: middle; min-width: 250px;">Course Fee Heads (Click to Toggle / Auto-Save)</th>
+                                            <th style="text-align: left; vertical-align: middle; min-width: 270px;">Course Fee Heads (Click to Toggle / Auto-Save)</th>
                                             <th style="width: 110px; text-align: center; vertical-align: middle;">Total Fee</th>
                                             <th style="width: 80px; text-align: center; vertical-align: middle;">Action</th>
                                         </tr>
@@ -462,6 +474,18 @@ function loadFeeMasterHeads(course_id) {
 $(document).ready(function() {
     $('.select2').select2();
 
+    // Select All / Clear in Filter Heads Select2
+    $('#btn_select_all_filter_heads').click(function(e) {
+        e.preventDefault();
+        $('#filter_fees_master_ids > option').prop('selected', true);
+        $('#filter_fees_master_ids').trigger('change');
+    });
+
+    $('#btn_deselect_all_filter_heads').click(function(e) {
+        e.preventDefault();
+        $('#filter_fees_master_ids').val(null).trigger('change');
+    });
+
     // Course Select Handler
     $('#filter_course_id').change(function() {
         var courseId = $(this).val();
@@ -496,7 +520,7 @@ $(document).ready(function() {
         updateSelectedCount();
     });
 
-    // Select All / Deselect All
+    // Select All / Deselect All Students Checkbox
     $('#all_students').click(function() {
         var isChecked = $(this).prop('checked');
         $('.student_select_checkbox').prop('checked', isChecked);
@@ -520,7 +544,7 @@ $(document).ready(function() {
     });
 
     // REAL-TIME INDIVIDUAL FEE HEAD TOGGLE
-    $(document).on('change', '.toggle-fee-head-checkbox', function() {
+    $(document).on('change', '.toggle-fee-head-checkbox', function(e) {
         var $checkbox = $(this);
         var admissionId = $checkbox.data('admission-id');
         var masterId = $checkbox.data('master-id');
@@ -528,7 +552,7 @@ $(document).ready(function() {
         var $chip = $('#chip_' + admissionId + '_' + masterId);
         var $icon = $('#icon_' + admissionId + '_' + masterId);
 
-        $checkbox.prop('disabled', true);
+        $chip.css('opacity', '0.6');
 
         $.ajax({
             headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
@@ -540,7 +564,7 @@ $(document).ready(function() {
                 state: isChecked
             },
             success: function(res) {
-                $checkbox.prop('disabled', false);
+                $chip.css('opacity', '1');
                 if (res.status === 'success') {
                     if (res.action === 'assigned') {
                         $chip.removeClass('chip-unassigned').addClass('chip-assigned');
@@ -562,10 +586,82 @@ $(document).ready(function() {
                 }
             },
             error: function(xhr) {
-                $checkbox.prop('disabled', false);
+                $chip.css('opacity', '1');
                 $checkbox.prop('checked', !isChecked);
                 showFeeToast('Server error while updating fee head', 'error');
             }
+        });
+    });
+
+    // ASSIGN ALL COURSE HEADS TO SINGLE STUDENT
+    $(document).on('click', '.btn-student-assign-all-heads', function(e) {
+        e.preventDefault();
+        var admissionId = $(this).data('admission-id');
+        var $btn = $(this);
+        $btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
+
+        $.ajax({
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            url: "{{ url('bulkAssignCourseFees') }}",
+            method: 'POST',
+            data: {
+                admissionIds: [admissionId],
+                fees_master_ids: []
+            },
+            success: function(res) {
+                $btn.prop('disabled', false).html('<i class="fa fa-check-square-o"></i> Check All');
+                if (res.status === 'success') {
+                    showFeeToast(res.message || 'All course fee heads assigned successfully', 'success');
+                    loadStudents();
+                } else {
+                    showFeeToast(res.message || 'Error assigning heads', 'error');
+                }
+            },
+            error: function() {
+                $btn.prop('disabled', false).html('<i class="fa fa-check-square-o"></i> Check All');
+                showFeeToast('Server error while assigning fee heads', 'error');
+            }
+        });
+    });
+
+    // CLEAR ALL UNPAID HEADS FOR SINGLE STUDENT
+    $(document).on('click', '.btn-student-unassign-all-heads', function(e) {
+        e.preventDefault();
+        var admissionId = $(this).data('admission-id');
+        var $row = $('#student_row_' + admissionId);
+        var assignedCheckboxes = $row.find('.toggle-fee-head-checkbox:checked');
+        
+        if (assignedCheckboxes.length === 0) {
+            showFeeToast('No fee heads currently assigned to clear', 'error');
+            return;
+        }
+
+        if (!confirm('Are you sure you want to unassign all fee heads for this student?')) {
+            return;
+        }
+
+        var $btn = $(this);
+        $btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
+
+        var ajaxCalls = [];
+        assignedCheckboxes.each(function() {
+            var masterId = $(this).data('master-id');
+            ajaxCalls.push($.ajax({
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                url: "{{ url('toggleStudentFeeHead') }}",
+                method: 'POST',
+                data: {
+                    admission_id: admissionId,
+                    fees_master_id: masterId,
+                    state: 0
+                }
+            }));
+        });
+
+        $.when.apply($, ajaxCalls).always(function() {
+            $btn.prop('disabled', false).html('<i class="fa fa-square-o"></i> Clear');
+            showFeeToast('Fee heads cleared', 'success');
+            loadStudents();
         });
     });
 
@@ -599,7 +695,7 @@ $(document).ready(function() {
                 fees_master_ids: feeMasterIds
             },
             success: function(res) {
-                $btn.prop('disabled', false).html('<i class="fa fa-bolt text-dark mr-1"></i> Quick Apply to ALL Loaded (<span class="total_students_count_text">' + allStudentIds.length + '</span>)');
+                $btn.prop('disabled', false).html('<i class="fa fa-bolt text-dark mr-1"></i> Quick Apply All Heads to ALL Loaded (<span class="total_students_count_text">' + allStudentIds.length + '</span>)');
                 if (res.status === 'success') {
                     showFeeToast(res.message, 'success');
                     loadStudents();
@@ -608,7 +704,7 @@ $(document).ready(function() {
                 }
             },
             error: function() {
-                $btn.prop('disabled', false).html('<i class="fa fa-bolt text-dark mr-1"></i> Quick Apply to ALL Loaded (<span class="total_students_count_text">' + allStudentIds.length + '</span>)');
+                $btn.prop('disabled', false).html('<i class="fa fa-bolt text-dark mr-1"></i> Quick Apply All Heads to ALL Loaded (<span class="total_students_count_text">' + allStudentIds.length + '</span>)');
                 showFeeToast('Server error during fee assignment', 'error');
             }
         });
@@ -644,7 +740,7 @@ $(document).ready(function() {
                 fees_master_ids: feeMasterIds
             },
             success: function(res) {
-                $btn.prop('disabled', false).html('<i class="fa fa-check-circle mr-1"></i> Assign Selected Heads to Checked (<span class="selected_students_count_text">' + selectedStudents.length + '</span>)');
+                $btn.prop('disabled', false).html('<i class="fa fa-check-circle mr-1"></i> Assign to Selected Students (<span class="selected_students_count_text">' + selectedStudents.length + '</span>)');
                 if (res.status === 'success') {
                     showFeeToast(res.message, 'success');
                     loadStudents();
@@ -653,7 +749,7 @@ $(document).ready(function() {
                 }
             },
             error: function() {
-                $btn.prop('disabled', false).html('<i class="fa fa-check-circle mr-1"></i> Assign Selected Heads to Checked (<span class="selected_students_count_text">' + selectedStudents.length + '</span>)');
+                $btn.prop('disabled', false).html('<i class="fa fa-check-circle mr-1"></i> Assign to Selected Students (<span class="selected_students_count_text">' + selectedStudents.length + '</span>)');
                 showFeeToast('Server error during bulk fee assignment', 'error');
             }
         });
