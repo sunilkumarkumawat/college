@@ -451,78 +451,6 @@ $classType = Helper::classType();
     color: #ffffff !important;
 }
 
-/* Dual View Switch Buttons */
-.fees-unified-page .view-switch-btn {
-    font-size: 11px;
-    font-weight: 600;
-    padding: 3px 10px;
-    border: 1px solid var(--brand-border);
-    background: #ffffff;
-    color: #334155;
-    cursor: pointer;
-    transition: all 0.15s ease;
-}
-.fees-unified-page .view-switch-btn:hover {
-    background: #e2e8f0;
-    color: var(--brand-dark);
-    border-color: #94a3b8;
-}
-.fees-unified-page .view-switch-btn.active {
-    background: var(--brand-dark) !important;
-    color: #ffffff !important;
-    border-color: var(--brand-dark) !important;
-}
-.fees-unified-page .view-switch-btn.active:hover {
-    background: var(--brand-dark-hover) !important;
-    color: #ffffff !important;
-}
-.fees-unified-page .view-switch-btn:first-child {
-    border-top-left-radius: 4px;
-    border-bottom-left-radius: 4px;
-}
-.fees-unified-page .view-switch-btn:last-child {
-    border-top-right-radius: 4px;
-    border-bottom-right-radius: 4px;
-}
-
-/* Quick Export Toolbar Buttons */
-.fees-unified-page .quick-export-btn {
-    font-size: 10.5px;
-    font-weight: 600;
-    padding: 3px 8px;
-    border-radius: 4px;
-    border: 1px solid var(--brand-border);
-    background: #ffffff;
-    color: #334155;
-    cursor: pointer;
-    transition: all 0.15s ease;
-}
-.fees-unified-page .quick-export-btn:hover {
-    background: var(--brand-dark) !important;
-    color: #ffffff !important;
-    border-color: var(--brand-dark) !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.12);
-}
-.fees-unified-page .quick-export-btn:hover i {
-    color: #ffffff !important;
-}
-
-/* DataTables Buttons */
-.fees-unified-page .dt-buttons .btn {
-    background: #ffffff !important;
-    color: #1e293b !important;
-    border: 1px solid var(--brand-border) !important;
-    font-weight: 600 !important;
-    font-size: 11px !important;
-    padding: 3px 8px !important;
-    transition: all 0.15s ease !important;
-}
-.fees-unified-page .dt-buttons .btn:hover {
-    background: var(--brand-dark) !important;
-    color: #ffffff !important;
-    border-color: var(--brand-dark) !important;
-}
-
 /* Empty Course State */
 .fees-unified-page .empty-course-box {
     background: #f8fafc !important;
@@ -1119,51 +1047,8 @@ $classType = Helper::classType();
                                         </div>
                                     </div>
 
-                                    <!-- Filter Toolbar (Live Search + Category Filter + View Switcher + Export Suite) -->
-                                    <div class="d-flex justify-content-between align-items-center flex-wrap mb-2" style="gap: 6px;">
-                                        <!-- Live Search Input -->
-                                        <div class="d-flex align-items-center flex-grow-1" style="max-width: 280px;">
-                                            <div class="input-group input-group-sm">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text bg-white border-right-0" style="height: 28px;"><i class="fa fa-search text-muted" style="font-size:11px;"></i></span>
-                                                </div>
-                                                <input type="text" id="fees_live_search" class="form-control form-control-sm border-left-0" placeholder="Live filter course, sem, head..." oninput="liveFilterFees(this.value)" style="height: 28px; font-size:11px;">
-                                                <div class="input-group-append" id="clear_search_btn_container" style="display:none;">
-                                                    <button class="btn btn-outline-secondary btn-sm" type="button" onclick="clearLiveFilter()" style="height: 28px; font-size:10px;"><i class="fa fa-times"></i></button>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- View Mode Switcher -->
-                                        <div class="d-inline-flex align-items-center" role="group">
-                                            <button type="button" id="btn_view_cards" class="view-switch-btn active" onclick="switchRightView('cards')" title="Course-wise structured cards view">
-                                                <i class="fa fa-th-large"></i> Course Cards
-                                            </button>
-                                            <button type="button" id="btn_view_table" class="view-switch-btn" onclick="switchRightView('table')" title="Flat exportable data table view">
-                                                <i class="fa fa-table"></i> Master Table
-                                            </button>
-                                        </div>
-
-                                        <!-- Quick Export Toolbar -->
-                                        <div class="d-inline-flex align-items-center" style="gap: 4px;">
-                                            <span class="text-muted font-weight-bold mr-1" style="font-size: 10.5px;">Export:</span>
-                                            <button type="button" class="quick-export-btn text-success" onclick="triggerDataExport('excel')" title="Export to Excel">
-                                                <i class="fa fa-file-excel-o"></i> Excel
-                                            </button>
-                                            <button type="button" class="quick-export-btn text-info" onclick="triggerDataExport('csv')" title="Export to CSV">
-                                                <i class="fa fa-file-text-o"></i> CSV
-                                            </button>
-                                            <button type="button" class="quick-export-btn text-danger" onclick="triggerDataExport('pdf')" title="Export to PDF">
-                                                <i class="fa fa-file-pdf-o"></i> PDF
-                                            </button>
-                                            <button type="button" class="quick-export-btn text-primary" onclick="triggerDataExport('print')" title="Print Fee Structure">
-                                                <i class="fa fa-print"></i> Print
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <!-- VIEW MODE 1: COURSE-WISE EXECUTIVE CARDS (DEFAULT) -->
-                                    <div id="course_cards_container">
+                                    <!-- Course-wise Cards Layout -->
+                                    <div id="course_cards_container" class="mt-2">
                                         @if(!empty($courses))
                                             @php $renderedCourses = 0; @endphp
                                             @foreach($courses as $c)
@@ -1298,55 +1183,10 @@ $classType = Helper::classType();
                                         @endif
 
                                         <div id="no_course_search_results" class="p-4 text-center border rounded bg-white mt-2" style="display:none; border: 1.5px dashed #cbd5e1 !important;">
-                                            <i class="fa fa-search text-muted mb-2" style="font-size:24px;"></i>
-                                            <h6 class="font-weight-bold text-dark mb-1" style="font-size:13px;">No Matching Fee Structures Found</h6>
-                                            <p class="text-muted mb-2" style="font-size:11px;">Try clearing search keywords or selecting "All Courses".</p>
-                                            <button type="button" class="btn btn-xs btn-primary font-weight-bold" onclick="clearLiveFilter()">Reset Filter</button>
-                                        </div>
-                                    </div>
-
-                                    <!-- VIEW MODE 2: MASTER FLAT DATA TABLE (DATATABLES EXPORTABLE) -->
-                                    <div id="master_table_container" style="display: none;">
-                                        <div class="table-responsive">
-                                            <table id="example1" class="table table-bordered table-striped dataTable dtr-inline padding_table w-100">
-                                                <thead>
-                                                    <tr role="row">
-                                                        <th width="30px">#</th>
-                                                        <th>Course</th>
-                                                        <th>Semester / Class</th>
-                                                        <th>Fee Head Name</th>
-                                                        <th>Category</th>
-                                                        <th class="text-right">Amount (₹)</th>
-                                                        <th>Due Date</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @if(!empty($allFeesMasterRows))
-                                                        @php $mCount = 1; @endphp
-                                                        @foreach($allFeesMasterRows as $row)
-                                                            @php
-                                                                $fgType = $row->feesGroup->group_type ?? 'academic';
-                                                                $badgeClass = 'badge-academic';
-                                                                if ($fgType === 'examination') $badgeClass = 'badge-examination';
-                                                                elseif ($fgType === 'practical') $badgeClass = 'badge-practical';
-                                                                elseif ($fgType === 'admission') $badgeClass = 'badge-admission';
-                                                                elseif ($fgType === 'facility') $badgeClass = 'badge-facility';
-                                                                elseif ($fgType === 'refundable') $badgeClass = 'badge-refundable';
-                                                                elseif ($fgType === 'hostel_transport') $badgeClass = 'badge-hostel_transport';
-                                                            @endphp
-                                                            <tr>
-                                                                <td class="text-center">{{ $mCount++ }}</td>
-                                                                <td><strong>{{ $row->ClassTypes->course->name ?? 'Course' }}</strong></td>
-                                                                <td><span class="text-primary font-weight-bold">{{ $row->ClassTypes->name ?? '' }}</span></td>
-                                                                <td><strong class="text-dark">{{ $row->feesGroup->name ?? 'N/A' }}</strong></td>
-                                                                <td><span class="badge {{ $badgeClass }}">{{ ucfirst($fgType) }}</span></td>
-                                                                <td class="text-right font-weight-bold text-success">₹{{ number_format((float)($row->amount ?? 0)) }}</td>
-                                                                <td>
-                                                                    {{ !empty($row->installment_due_date) ? date('d-M-Y', strtotime($row->installment_due_date)) : 'No Due Date' }}
-                                                                </td>
-                                                            </tr>
-                                                        @endforeach
-                                                    @endif
+                                            <i class="fa fa-graduation-cap text-muted mb-2" style="font-size:24px;"></i>
+                                            <h6 class="font-weight-bold text-dark mb-1" style="font-size:13px;">No Fee Structures Found</h6>
+                                            <p class="text-muted mb-2" style="font-size:11px;">Try selecting "All Courses" from the filter bar above.</p>
+                                            <button type="button" class="btn btn-xs btn-primary font-weight-bold" onclick="$('.course-pill-btn[data-course-id=\'all\']').click()">Show All Courses</button>
                                         </div>
                                     </div>
 
@@ -2037,62 +1877,11 @@ function filterByCourse(courseId, btnElement) {
 
     if (courseId === 'all') {
         $('.course-group-item').show();
-        if ($.fn.DataTable.isDataTable('#example1')) {
-            $('#example1').DataTable().column(1).search('').draw();
-        }
     } else {
         $('.course-group-item').hide();
         $('#course_card_' + courseId).show();
-
-        var courseNameText = $(btnElement).text().trim().replace(/₹[0-9,]+/g, '').trim();
-        if ($.fn.DataTable.isDataTable('#example1')) {
-            $('#example1').DataTable().column(1).search(courseNameText).draw();
-        }
     }
     checkVisibleCourseCards();
-}
-
-// Live Search Filter across Course Cards and Flat Table
-function liveFilterFees(query) {
-    query = (query || '').toLowerCase().trim();
-    if (query.length > 0) {
-        $('#clear_search_btn_container').show();
-    } else {
-        $('#clear_search_btn_container').hide();
-    }
-
-    var visibleCount = 0;
-    $('.course-group-item').each(function() {
-        var card = $(this);
-        var courseText = (card.data('course-name') || '').toLowerCase();
-        var cardContent = card.text().toLowerCase();
-
-        if (query === '' || courseText.indexOf(query) > -1 || cardContent.indexOf(query) > -1) {
-            card.show();
-            visibleCount++;
-        } else {
-            card.hide();
-        }
-    });
-
-    if (visibleCount === 0) {
-        $('#no_course_search_results').show();
-    } else {
-        $('#no_course_search_results').hide();
-    }
-
-    // Also search DataTable in table view
-    if ($.fn.DataTable.isDataTable('#example1')) {
-        $('#example1').DataTable().search(query).draw();
-    }
-}
-
-// Clear Live Search Filter
-function clearLiveFilter() {
-    $('#fees_live_search').val('');
-    $('#clear_search_btn_container').hide();
-    $('.course-pill-btn[data-course-id="all"]').click();
-    liveFilterFees('');
 }
 
 function checkVisibleCourseCards() {
@@ -2102,31 +1891,6 @@ function checkVisibleCourseCards() {
     } else {
         $('#no_course_search_results').hide();
     }
-}
-
-// Direct Trigger for DataTables Export Suite
-function triggerDataExport(type) {
-    // Switch to table view first so DataTable is active and visible
-    switchRightView('table');
-    
-    setTimeout(function() {
-        if (!$.fn.DataTable.isDataTable('#example1')) {
-            alert('DataTable is initializing, please try again.');
-            return;
-        }
-        var dt = $('#example1').DataTable();
-        if (type === 'excel') {
-            $('.buttons-excel').trigger('click');
-        } else if (type === 'csv') {
-            $('.buttons-csv').trigger('click');
-        } else if (type === 'pdf') {
-            $('.buttons-pdf').trigger('click');
-        } else if (type === 'print') {
-            $('.buttons-print').trigger('click');
-        } else if (type === 'copy') {
-            $('.buttons-copy').trigger('click');
-        }
-    }, 150);
 }
 
 // Auto-select course in left unified setup form
