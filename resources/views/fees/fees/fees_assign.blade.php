@@ -383,7 +383,7 @@
                     <i class="fa fa-question-circle mr-2 text-warning" id="feeConfirmIcon"></i>
                     <span id="feeConfirmTitle">Confirm Action</span>
                 </h5>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close" style="opacity: 0.9; text-shadow: none; outline: none;">
+                <button type="button" class="close text-white btn-close-modal" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close" style="opacity: 0.9; text-shadow: none; outline: none; cursor: pointer;">
                     <span aria-hidden="true" style="font-size: 22px;">&times;</span>
                 </button>
             </div>
@@ -429,7 +429,7 @@
 
             <!-- Modal Footer -->
             <div class="modal-footer py-2 px-4 bg-light d-flex justify-content-between border-top">
-                <button type="button" class="btn btn-sm btn-outline-secondary font-weight-bold px-3 py-1" data-dismiss="modal" style="border-radius: 6px;">
+                <button type="button" class="btn btn-sm btn-outline-secondary font-weight-bold px-3 py-1 btn-close-modal" data-dismiss="modal" data-bs-dismiss="modal" style="border-radius: 6px;">
                     <i class="fa fa-times mr-1"></i> Cancel
                 </button>
                 <button type="button" class="btn btn-sm btn-success font-weight-bold px-4 py-1" id="btn_confirm_fee_modal_action" style="border-radius: 6px;">
@@ -1075,6 +1075,14 @@ $(document).ready(function() {
                 showFeeToast('Server error while saving fee detail', 'error');
             }
         });
+    });
+
+    // ROBUST GLOBAL MODAL DISMISS / CANCEL / CLOSE HANDLER
+    $(document).on('click', '[data-dismiss="modal"], [data-bs-dismiss="modal"], .btn-close-modal, .close', function(e) {
+        var $modal = $(this).closest('.modal');
+        if ($modal.length > 0) {
+            $modal.modal('hide');
+        }
     });
 });
 </script>

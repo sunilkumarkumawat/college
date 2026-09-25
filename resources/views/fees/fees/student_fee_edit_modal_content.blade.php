@@ -2,8 +2,8 @@
     <h5 class="modal-title font-weight-bold" style="font-size: 15px; color: #ffffff !important;">
         <i class="fa fa-user-circle mr-1"></i> Fee Modification: {{ $student->first_name ?? '' }} {{ $student->last_name ?? '' }} ({{ $student->admissionNo ?? '-' }})
     </h5>
-    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close" style="opacity: 0.9; color: #fff;">
-        <span aria-hidden="true">&times;</span>
+    <button type="button" class="close text-white btn-close-modal" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close" style="opacity: 0.9; color: #fff; outline: none;">
+        <span aria-hidden="true" style="font-size: 22px;">&times;</span>
     </button>
 </div>
 
@@ -138,7 +138,7 @@
     <span class="text-muted small">
         <i class="fa fa-info-circle mr-1"></i> Changes will update the student's fee ledger instantly.
     </span>
-    <button type="button" class="btn btn-secondary btn-sm px-3" data-dismiss="modal">
+    <button type="button" class="btn btn-secondary btn-sm px-3 btn-close-modal" data-dismiss="modal" data-bs-dismiss="modal">
         <i class="fa fa-times mr-1"></i> Close
     </button>
 </div>
