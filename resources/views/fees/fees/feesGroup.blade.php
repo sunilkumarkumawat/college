@@ -184,8 +184,7 @@ $classType = Helper::classType();
 
 /* Table Headers (High-Contrast White on Dark) */
 .fees-unified-page .padding_table thead tr th,
-.fees-unified-page #example1 thead tr th,
-.fees-unified-page #example2 thead tr th {
+.fees-unified-page #example1 thead tr th {
     background: var(--brand-dark) !important;
     color: #ffffff !important;
     font-size: 11.5px !important;
@@ -197,77 +196,8 @@ $classType = Helper::classType();
 .fees-unified-page .padding_table thead tr th a,
 .fees-unified-page .padding_table thead tr th i,
 .fees-unified-page #example1 thead tr th a,
-.fees-unified-page #example1 thead tr th i,
-.fees-unified-page #example2 thead tr th a,
-.fees-unified-page #example2 thead tr th i {
+.fees-unified-page #example1 thead tr th i {
     color: #ffffff !important;
-}
-.fees-unified-page .padding_table td {
-    padding: 5px 8px !important;
-    font-size: 11.5px !important;
-    vertical-align: middle !important;
-    color: #1e293b !important;
-}
-
-/* DataTables Sorting Arrows in Dark Header */
-.fees-unified-page table.dataTable thead .sorting:before, 
-.fees-unified-page table.dataTable thead .sorting_asc:before, 
-.fees-unified-page table.dataTable thead .sorting_desc:before,
-.fees-unified-page table.dataTable thead .sorting:after, 
-.fees-unified-page table.dataTable thead .sorting_asc:after, 
-.fees-unified-page table.dataTable thead .sorting_desc:after {
-    color: #ffffff !important;
-    opacity: 0.8 !important;
-}
-
-/* Header & Tab alignment */
-.fees-unified-page .card-header::after {
-    display: none !important;
-}
-.fees-unified-page .card-header {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    min-height: 40px !important;
-    padding: 5px 10px !important;
-}
-.fees-unified-page .card-header .nav-pills {
-    margin: 0 !important;
-}
-.fees-unified-page .card-header .nav-pills .nav-link {
-    margin: 0 !important;
-}
-
-/* Top Tab Link Hover & Active States */
-.fees-unified-page #feesTab a.nav-link {
-    background: rgba(255, 255, 255, 0.15) !important;
-    color: #ffffff !important;
-    border-radius: 4px;
-    font-size: 11.5px;
-    border: 1px solid rgba(255, 255, 255, 0.35) !important;
-    cursor: pointer;
-    transition: all 0.15s ease-in-out;
-}
-.fees-unified-page #feesTab a.nav-link i {
-    color: #ffffff !important;
-}
-.fees-unified-page #feesTab a.nav-link:hover:not(.active) {
-    background: #ffffff !important;
-    color: var(--brand-dark) !important;
-    border-color: #ffffff !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-}
-.fees-unified-page #feesTab a.nav-link:hover:not(.active) i {
-    color: var(--brand-dark) !important;
-}
-.fees-unified-page #feesTab a.nav-link.active {
-    background: #ffffff !important;
-    color: var(--brand-dark) !important;
-    border-color: #ffffff !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.18) !important;
-}
-.fees-unified-page #feesTab a.nav-link.active i {
-    color: var(--brand-dark) !important;
 }
 
 /* Executive Course Cards, KPI Chips & Quick Filters */
@@ -1029,32 +959,18 @@ $classType = Helper::classType();
                     </div>          
                 </div>
                 
-                <!-- Right Side: Unified Tabs for Fees Master & Fee Heads List -->
+                <!-- Right Side: Class-wise Fees Master Structure -->
                 <div class="{{($getPermission->add == 1) ? 'col-md-7 pl-0' : 'col-md-12 pl-0'}}">
                     <div class="card card-outline card-orange ml-1">
-                        <!-- Compact Single-Line Tab & Action Header -->
-                        <div class="card-header bg-primary px-2 py-1 d-flex align-items-center justify-content-between flex-nowrap" style="min-height: 40px !important;">
-                            <ul class="nav nav-pills d-inline-flex m-0 p-0 align-items-center flex-nowrap" id="feesTab" role="tablist" style="gap: 6px;">
-                                <li class="nav-item m-0">
-                                    <a class="nav-link active font-weight-bold py-1 px-3 shadow-none text-nowrap" id="fees-master-tab" data-toggle="pill" href="#tab_fees_master" role="tab">
-                                        <i class="fa fa-table"></i> Class-wise Fees Master
-                                    </a>
-                                </li>
-                                <li class="nav-item m-0">
-                                    <a class="nav-link font-weight-bold py-1 px-3 shadow-none text-nowrap" id="fees-group-tab" data-toggle="pill" href="#tab_fees_group" role="tab">
-                                        <i class="fa fa-list"></i> All Fee Heads
-                                    </a>
-                                </li>
-                            </ul>
-                            <div class="m-0 p-0 ml-auto" style="flex-shrink: 0;">
+                        <div class="card-header bg-primary py-2 d-flex align-items-center justify-content-between">
+                            <h3 class="card-title font-weight-bold" style="font-size:14px;"><i class="fa fa-table"></i> &nbsp;Class-wise Fees Master</h3>
+                            <div class="card-tools d-flex align-items-center" style="gap: 6px;">
+                                <span class="badge badge-light" style="font-size:10px;">Structure & Breakdown</span>
                                 <a href="{{url('fee_dashboard')}}" class="btn btn-back-header btn-xs font-weight-bold py-1 px-2 shadow-none text-nowrap" style="font-size:11px;"><i class="fa fa-arrow-left"></i> {{ __('messages.Back') }}</a>
                             </div>
                         </div>  
                         
                         <div class="card-body p-2">
-                            <div class="tab-content" id="feesTabContent">
-                                <!-- TAB 1: FEES MASTER (COURSE-WISE & MASTER FEES STRUCTURE) -->
-                                <div class="tab-pane fade show active" id="tab_fees_master" role="tabpanel">
                                     @php
                                         $activeSessionId = $search['session_id'] ?? Session::get('session_id');
                                         if ($activeSessionId === 'all') {
@@ -1431,97 +1347,17 @@ $classType = Helper::classType();
                                                             </tr>
                                                         @endforeach
                                                     @endif
-                                                </tbody>
-                                            </table>
                                         </div>
                                     </div>
-                                </div>
 
-                                <!-- TAB 2: ALL FEE HEADS (FEES GROUPS) -->
-                                <div class="tab-pane fade" id="tab_fees_group" role="tabpanel">
-                                    <div class="table-responsive">
-                                        <table id="example2" class="table table-bordered table-striped dataTable dtr-inline padding_table">
-                                            <thead>
-                                                <tr role="row">
-                                                    <th width="30px">#</th>
-                                                    <th>Fee Head Name</th>
-                                                    <th>Category</th>
-                                                    <th width="80px" class="text-center">Refundable</th>
-                                                    <th width="70px" class="text-center">Partial (50%)</th>
-                                                    @if($getPermission->edit == 1 || $getPermission->deletes == 1)
-                                                    <th width="50px" class="text-center">{{ __('messages.Action') }}</th>
-                                                    @endif
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @if(!empty($dataview))
-                                                    @php $j = 1; @endphp
-                                                    @foreach ($dataview->where('fees_type', 'full') as $item)
-                                                        @php
-                                                            $groupTypeClass = 'badge-other';
-                                                            $groupTypeLabel = !empty($item->group_type) ? ucfirst(str_replace('_', ' & ', $item->group_type)) : 'General';
-                                                            if ($item->group_type === 'academic') { $groupTypeClass = 'badge-academic'; }
-                                                            elseif ($item->group_type === 'examination') { $groupTypeClass = 'badge-examination'; }
-                                                            elseif ($item->group_type === 'practical') { $groupTypeClass = 'badge-practical'; }
-                                                            elseif ($item->group_type === 'admission' || $item->group_type === 'registration') { $groupTypeClass = 'badge-admission'; }
-                                                            elseif ($item->group_type === 'facility') { $groupTypeClass = 'badge-facility'; }
-                                                            elseif ($item->group_type === 'refundable') { $groupTypeClass = 'badge-refundable'; }
-                                                            elseif ($item->group_type === 'hostel_transport') { $groupTypeClass = 'badge-hostel_transport'; }
-                                                        @endphp
-                                                        <tr>
-                                                            <td class="text-center">{{ $j++ }}</td>
-                                                            <td><strong class="text-dark">{{ $item['name'] ?? '' }}</strong></td>
-                                                            <td><span class="badge {{ $groupTypeClass }}">{{ $groupTypeLabel }}</span></td>
-                                                            <td class="text-center">
-                                                                @if(strtolower($item['fees_refund'] ?? '') === 'yes')
-                                                                    <span class="badge badge-success"><i class="fa fa-check"></i> Yes</span>
-                                                                @else
-                                                                    <span class="badge badge-light border">No</span>
-                                                                @endif
-                                                            </td>
-                                                            <td class="text-center">
-                                                                @if($item->fees_partial == 1)
-                                                                    <span class="badge badge-primary">Yes</span>
-                                                                @else
-                                                                    <span class="badge badge-light border">No</span>
-                                                                @endif
-                                                            </td>
-                                                            @if($getPermission->edit == 1 || $getPermission->deletes == 1)
-                                                            <td class="text-center">
-                                                                @if($getPermission->edit == 1)
-                                                                    <a href="{{ url('feesGroupEdit') }}/{{ $item['id'] ?? '' }}" class="btn btn-primary btn-xs" title="Edit"><i class="fa fa-edit"></i></a> 
-                                                                @endif
-                                                                @if($getPermission->deletes == 1)
-                                                                    @php
-                                                                        $rowSessionId = $item->session_id ?? Session::get('session_id');
-                                                                        $isDeleteAllowed1 = DB::table('fees_detail')->where('fees_group_id', $item->id)->where('session_id', $rowSessionId)->where('branch_id', Session::get('branch_id'))->whereNull('deleted_at')->count();
-                                                                        $isDeleteAllowed2 = DB::table('fees_assign_details')->where('fees_group_id', $item->id)->where('session_id', $rowSessionId)->where('branch_id', Session::get('branch_id'))->whereNull('deleted_at')->count();
-                                                                    @endphp
-                                                                    @if(($isDeleteAllowed1 + $isDeleteAllowed2) == 0)
-                                                                        <a href="javascript:;" data-id='{{$item['id'] }}' data-bs-toggle="modal" data-bs-target="#Modal_id" class="deleteData btn btn-danger btn-xs" title="Delete"><i class="fa fa-trash-o"></i></a>
-                                                                    @else
-                                                                        <span class="text-muted" title="In Use (Locked)"><i class="fa fa-lock"></i></span>
-                                                                    @endif
-                                                                @endif
-                                                            </td>
-                                                            @endif
-                                                        </tr>
-                                                    @endforeach
-                                                @endif
-                                            </tbody>
-                                        </table>
+                                    <div class="col-md-12 mt-2">
+                                        <p class="text-muted mb-0" style="font-size:11px;">
+                                            <i class="fa fa-info-circle text-info"></i> <b>Tip:</b> Creating fee heads here with Amount & Due Date automatically configures Fees Master for student admissions & collection.
+                                        </p>
                                     </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-12 mt-2">
-                                <p class="text-muted mb-0" style="font-size:11px;">
-                                    <i class="fa fa-info-circle text-info"></i> <b>Tip:</b> Creating fee heads here with Amount & Due Date automatically configures Fees Master for student admissions & collection.
-                                </p>
-                            </div>
-                        </div> 
-                    </div>          
-                </div>
+                                </div> 
+                            </div>          
+                        </div>
             </div>  
         </div>
     </section>
@@ -2356,27 +2192,6 @@ $(document).ready(function() {
     $(document).on('click', '.deleteData', function() {
         var delete_id = $(this).data('id');
         $('#delete_id').val(delete_id);
-    });
-
-    // Dynamic Tab Switching
-    $(document).on('click', '#feesTab a', function(e) {
-        e.preventDefault();
-        var target = $(this).attr('href');
-        
-        $('#feesTab a').css({
-            'background': 'rgba(255,255,255,0.2)',
-            'color': '#ffffff',
-            'border-color': 'rgba(255,255,255,0.4)'
-        }).removeClass('active');
-        
-        $(this).css({
-            'background': '#ffffff',
-            'color': '#002c54',
-            'border-color': '#ffffff'
-        }).addClass('active');
-
-        $('#feesTabContent .tab-pane').removeClass('show active');
-        $(target).addClass('show active');
     });
 
     // Select All Checkbox for Student Assignment
