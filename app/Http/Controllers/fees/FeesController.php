@@ -1606,8 +1606,10 @@ class FeesController extends Controller
                     ->where('status', 1)
                     ->where('branch_id', Session::get('branch_id'));
 
+                $courseClassIds = [];
                 if($class_type_id != ''){
                     $data = $data->where('class_type_id', $class_type_id);
+                    $courseClassIds = [$class_type_id];
                 } elseif($course_id != '') {
                     $courseClassIds = ClassType::where('course_id', $course_id)->pluck('id')->toArray();
                     $data = $data->whereIn('class_type_id', $courseClassIds);
@@ -1625,7 +1627,311 @@ class FeesController extends Controller
                     });
                 }
                 $data = $data->orderBy('first_name', 'ASC')->get();
-                return view('fees.modification.admissionList', ['data' => $data]);
+                
+                // Fetch Fee Masters for these classes
+                $courseFeesMasters = [];
+                if(!empty($courseClassIds)){
+                    $courseFeesMasters = FeesMaster::with(['feesGroup', 'ClassTypes'])
+                        ->whereIn('class_type_id', $courseClassIds)
+                        ->where('session_id', Session::get('session_id'))
+                        ->where('branch_id', Session::get('branch_id'))
+                        ->orderBy('class_type_id')
+                        ->orderBy('id')
+                        ->get();
+                } else {
+                    $courseFeesMasters = FeesMaster::with(['feesGroup', 'ClassTypes'])
+                        ->where('session_id', Session::get('session_id'))
+                        ->where('branch_id', Session::get('branch_id'))
+                        ->orderBy('class_type_id')
+                        ->orderBy('id')
+                        ->get();
+                }
+
+                $studentIds = $data->pluck('id')->toArray();
+                $assignedDetails = FeesAssignDetail::whereIn('admission_id', $studentIds)
+                    ->where('session_id', Session::get('session_id'))
+                    ->where('branch_id', Session::get('branch_id'))
+                    ->whereNull('deleted_at')
+                    ->get();
+
+                $assignedDetailMap = [];
+                foreach($assignedDetails as $ad){
+                    $assignedDetailMap[$ad->admission_id . '_' . $ad->fees_master_id] = $ad;
+                }
+
+                return view('fees.modification.admissionList', [
+                    'data' => $data,
+                    'courseFeesMasters' => $courseFeesMasters,
+                    'assignedDetailMap' => $assignedDetailMap
+                ]);
+            }
+
+            public function toggleStudentFeeHead(Request $request){
+                $admission_id = $request->admission_id;
+                $master_id = $request->fees_master_id;
+                $state = $request->state; // 1 = assign, 0 = unassign
+                
+                $admis = Admission::select('id', 'student_type', 'class_type_id')->find($admission_id);
+                if(!$admis){
+                    return response()->json(['status' => 'error', 'message' => 'Student not found']);
+                }
+                
+                $fees_master = FeesMaster::find($master_id);
+                if(!$fees_master){
+                    return response()->json(['status' => 'error', 'message' => 'Fee Master not found']);
+                }
+                
+                $fees_groups = FeesGroup::find($fees_master->fees_group_id);
+                
+                if($state == 1){
+                    $feesAssign = FeesAssign::where('admission_id', $admission_id)->first();
+                    if(!$feesAssign){
+                        $feesAssign = new FeesAssign();
+                        $feesAssign->user_id = Session::get('id');
+                        $feesAssign->session_id = Session::get('session_id');
+                        $feesAssign->branch_id = Session::get('branch_id');
+                        $feesAssign->admission_id = $admission_id;
+                        $feesAssign->total_amount = 0;
+                        $feesAssign->net_amount = 0;
+                        $feesAssign->save();
+                    }
+                    
+                    if($admis->student_type == "NRI"){
+                        $amount = $fees_master->nri;
+                    } elseif($admis->student_type == "Management"){
+                        $amount = $fees_master->management;
+                    } elseif($admis->student_type == "Govt"){
+                        $amount = $fees_master->govt;
+                    } else {
+                        $amount = $fees_master->amount;
+                    }
+                    
+                    $values = FeesAssignDetail::where('fees_assign_id', $feesAssign->id)
+                        ->where('fees_master_id', $fees_master->id)
+                        ->where('admission_id', $admission_id)
+                        ->first();
+                        
+                    if(!$values){
+                        $values = new FeesAssignDetail;
+                        $values->user_id = Session::get('id');
+                        $values->branch_id = Session::get('branch_id');
+                        $values->session_id = Session::get('session_id');
+                        $values->fees_group_amount = $amount;
+                        $values->admission_id = $admission_id;
+                        $values->fees_assign_id = $feesAssign->id;
+                        $values->class_type_id = $fees_master->class_type_id;
+                        $values->fees_master_id = $fees_master->id;
+                        $values->fees_group_id = $fees_master->fees_group_id;
+                        $values->fees_refund = isset($fees_groups->fees_refund) ? $fees_groups->fees_refund : 'no';
+                        $values->installment_month = $fees_master->installment_month;
+                        $values->installment_fine = $fees_master->installment_fine;
+                        $values->installment_due_date = $fees_master->installment_due_date;
+                        $values->save();
+                    }
+                    
+                    $total_assign_detail = FeesAssignDetail::where('admission_id', $admission_id)->whereNull('deleted_at')->sum('fees_group_amount');
+                    $discount_assign_detail = FeesAssignDetail::where('admission_id', $admission_id)->whereNull('deleted_at')->sum('discount');
+                    $feesAssign->update([
+                        'total_amount' => $total_assign_detail,
+                        'net_amount' => ($total_assign_detail - $discount_assign_detail)
+                    ]);
+                    
+                    return response()->json([
+                        'status' => 'success',
+                        'action' => 'assigned',
+                        'head_name' => $fees_groups->name ?? 'Fee Head',
+                        'amount' => $amount,
+                        'total_amount' => $total_assign_detail,
+                        'net_amount' => ($total_assign_detail - $discount_assign_detail),
+                        'message' => ($fees_groups->name ?? 'Fee Head') . ' assigned successfully'
+                    ]);
+                } else {
+                    $values = FeesAssignDetail::where('fees_master_id', $master_id)
+                        ->where('admission_id', $admission_id)
+                        ->first();
+                        
+                    if($values){
+                        if(($values->paid_amount ?? 0) > 0){
+                            return response()->json(['status' => 'error', 'message' => 'Cannot remove: Payment already exists under this fee head!']);
+                        }
+                        $values->delete();
+                    }
+                    
+                    $feesAssign = FeesAssign::where('admission_id', $admission_id)->first();
+                    if($feesAssign){
+                        $total_assign_detail = FeesAssignDetail::where('admission_id', $admission_id)->whereNull('deleted_at')->sum('fees_group_amount');
+                        $discount_assign_detail = FeesAssignDetail::where('admission_id', $admission_id)->whereNull('deleted_at')->sum('discount');
+                        $feesAssign->update([
+                            'total_amount' => $total_assign_detail,
+                            'net_amount' => ($total_assign_detail - $discount_assign_detail)
+                        ]);
+                        $newTotal = $total_assign_detail;
+                        $newNet = ($total_assign_detail - $discount_assign_detail);
+                    } else {
+                        $newTotal = 0;
+                        $newNet = 0;
+                    }
+                    
+                    return response()->json([
+                        'status' => 'success',
+                        'action' => 'unassigned',
+                        'head_name' => $fees_groups->name ?? 'Fee Head',
+                        'total_amount' => $newTotal,
+                        'net_amount' => $newNet,
+                        'message' => ($fees_groups->name ?? 'Fee Head') . ' unassigned successfully'
+                    ]);
+                }
+            }
+
+            public function bulkAssignCourseFees(Request $request){
+                $admissionIds = $request->admissionIds ?? [];
+                $feesMasterIds = $request->fees_master_ids ?? [];
+                
+                if(empty($admissionIds)){
+                    return response()->json(['status' => 'error', 'message' => 'Please select at least one student!']);
+                }
+                
+                $assignedCount = 0;
+                foreach($admissionIds as $admission){
+                    $admis = Admission::select('id', 'student_type', 'class_type_id')->find($admission);
+                    if(!$admis) continue;
+                    
+                    $targetMasters = $feesMasterIds;
+                    if(empty($targetMasters)){
+                        $targetMasters = FeesMaster::where('class_type_id', $admis->class_type_id)
+                            ->where('session_id', Session::get('session_id'))
+                            ->where('branch_id', Session::get('branch_id'))
+                            ->pluck('id')->toArray();
+                    }
+                    
+                    if(!empty($targetMasters)){
+                        $feesAssign = FeesAssign::firstOrCreate(
+                            ['admission_id' => $admission],
+                            [
+                                'user_id' => Session::get('id'),
+                                'session_id' => Session::get('session_id'),
+                                'branch_id' => Session::get('branch_id'),
+                                'total_amount' => 0,
+                                'net_amount' => 0
+                            ]
+                        );
+                        
+                        foreach($targetMasters as $master_id){
+                            $fees_master = FeesMaster::find($master_id);
+                            if(!$fees_master) continue;
+                            
+                            $fees_groups = FeesGroup::find($fees_master->fees_group_id);
+                            
+                            if($admis->student_type == "NRI"){
+                                $amount = $fees_master->nri;
+                            } elseif($admis->student_type == "Management"){
+                                $amount = $fees_master->management;
+                            } elseif($admis->student_type == "Govt"){
+                                $amount = $fees_master->govt;
+                            } else {
+                                $amount = $fees_master->amount;
+                            }
+                            
+                            $values = FeesAssignDetail::where('fees_assign_id', $feesAssign->id)
+                                ->where('fees_master_id', $fees_master->id)
+                                ->where('admission_id', $admission)
+                                ->first();
+                                
+                            if(!$values){
+                                $values = new FeesAssignDetail;
+                                $values->user_id = Session::get('id');
+                                $values->branch_id = Session::get('branch_id');
+                                $values->session_id = Session::get('session_id');
+                                $values->fees_group_amount = $amount;
+                                $values->admission_id = $admission;
+                                $values->fees_assign_id = $feesAssign->id;
+                                $values->class_type_id = $fees_master->class_type_id;
+                                $values->fees_master_id = $fees_master->id;
+                                $values->fees_group_id = $fees_master->fees_group_id;
+                                $values->fees_refund = isset($fees_groups->fees_refund) ? $fees_groups->fees_refund : 'no';
+                                $values->installment_month = $fees_master->installment_month;
+                                $values->installment_fine = $fees_master->installment_fine;
+                                $values->installment_due_date = $fees_master->installment_due_date;
+                                $values->save();
+                                $assignedCount++;
+                            }
+                        }
+                        
+                        $total_assign_detail = FeesAssignDetail::where('admission_id', $admission)->whereNull('deleted_at')->sum('fees_group_amount');
+                        $discount_assign_detail = FeesAssignDetail::where('admission_id', $admission)->whereNull('deleted_at')->sum('discount');
+                        $feesAssign->update([
+                            'total_amount' => $total_assign_detail,
+                            'net_amount' => ($total_assign_detail - $discount_assign_detail)
+                        ]);
+                    }
+                }
+                
+                return response()->json([
+                    'status' => 'success',
+                    'count' => $assignedCount,
+                    'message' => 'Fees Structure assigned successfully in real-time!'
+                ]);
+            }
+
+            public function getStudentFeeDetailsModal(Request $request){
+                $admission_id = $request->admission_id;
+                $student = Admission::with('ClassTypes')->find($admission_id);
+                if(!$student){
+                    return '<div class="alert alert-danger p-2 m-2">Student record not found</div>';
+                }
+                
+                $assignedDetails = FeesAssignDetail::where('admission_id', $admission_id)
+                    ->leftJoin('fees_group', 'fees_group.id', 'fees_assign_details.fees_group_id')
+                    ->select('fees_assign_details.*', 'fees_group.name as fees_group_name')
+                    ->whereNull('fees_assign_details.deleted_at')
+                    ->get();
+                    
+                $feesAssign = FeesAssign::where('admission_id', $admission_id)->first();
+                
+                return view('fees.fees.student_fee_edit_modal_content', compact('student', 'assignedDetails', 'feesAssign'));
+            }
+
+            public function updateStudentFeeDetailInline(Request $request){
+                $detail_id = $request->detail_id;
+                $detail = FeesAssignDetail::find($detail_id);
+                if(!$detail){
+                    return response()->json(['status' => 'error', 'message' => 'Fee record not found']);
+                }
+                
+                if($request->has('amount')){
+                    $detail->fees_group_amount = floatval($request->amount);
+                }
+                if($request->has('discount')){
+                    $detail->discount = floatval($request->discount);
+                }
+                if($request->has('due_date')){
+                    $detail->installment_due_date = $request->due_date;
+                }
+                if($request->has('fine')){
+                    $detail->installment_fine = floatval($request->fine);
+                }
+                $detail->save();
+                
+                $feesAssign = FeesAssign::where('admission_id', $detail->admission_id)->first();
+                if($feesAssign){
+                    $total = FeesAssignDetail::where('admission_id', $detail->admission_id)->whereNull('deleted_at')->sum('fees_group_amount');
+                    $discount = FeesAssignDetail::where('admission_id', $detail->admission_id)->whereNull('deleted_at')->sum('discount');
+                    $feesAssign->update([
+                        'total_amount' => $total,
+                        'net_amount' => ($total - $discount)
+                    ]);
+                    $net = $total - $discount;
+                } else {
+                    $total = $detail->fees_group_amount;
+                    $net = $detail->fees_group_amount;
+                }
+                
+                return response()->json([
+                    'status' => 'success',
+                    'total_amount' => $total,
+                    'net_amount' => $net,
+                    'message' => 'Fee detail updated successfully'
+                ]);
             }
             public function createFeesInstallment(Request $request){
                 if(!empty($request->installment_name)){
@@ -1794,12 +2100,19 @@ class FeesController extends Controller
             }
         
             public function getMasterData(Request $request){
-                $masterData = FeesMaster::select('fees_master.*','fees_group.name as fees_group_name')
-                ->leftJoin('fees_group','fees_group.id','fees_master.fees_group_id')
-                ->where('fees_master.class_type_id',$request->class_type_id)
-                ->where('fees_master.session_id',Session::get('session_id'))
-                ->where('fees_master.branch_id',Session::get('branch_id'))
-                ->get();
+                $query = FeesMaster::select('fees_master.*','fees_group.name as fees_group_name', 'class_types.name as class_name')
+                    ->leftJoin('fees_group','fees_group.id','fees_master.fees_group_id')
+                    ->leftJoin('class_types','class_types.id','fees_master.class_type_id')
+                    ->where('fees_master.session_id',Session::get('session_id'))
+                    ->where('fees_master.branch_id',Session::get('branch_id'));
+
+                if(!empty($request->class_type_id)){
+                    $query->where('fees_master.class_type_id', $request->class_type_id);
+                } elseif(!empty($request->course_id)){
+                    $classIds = ClassType::where('course_id', $request->course_id)->pluck('id')->toArray();
+                    $query->whereIn('fees_master.class_type_id', $classIds);
+                }
+                $masterData = $query->orderBy('fees_master.class_type_id')->orderBy('fees_master.id')->get();
                 return $masterData; 
             }
         

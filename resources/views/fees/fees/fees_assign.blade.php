@@ -98,21 +98,49 @@
     background-color: #f1f5f9 !important;
 }
 
-/* Badges for Assigned Fee Heads */
-.badge-head-tag {
-    background-color: #0284c7 !important;
-    color: #ffffff !important;
-    border: 1px solid #0369a1 !important;
-    font-weight: 600 !important;
-    font-size: 11.5px !important;
-    padding: 3px 8px !important;
-    border-radius: 4px !important;
-    display: inline-block !important;
-    margin: 2px !important;
+/* Interactive Real-Time Fee Head Chips */
+.fee-head-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+    margin: 2px 2px;
+    transition: all 0.2s ease;
+    user-select: none;
 }
-.badge-head-tag i {
-    color: #ffffff !important;
+.chip-assigned {
+    background-color: #e0f2fe;
+    color: #0369a1;
+    border: 1px solid #0284c7;
 }
+.chip-assigned:hover {
+    background-color: #bae6fd;
+}
+.chip-unassigned {
+    background-color: #f8fafc;
+    color: #64748b;
+    border: 1px solid #cbd5e1;
+}
+.chip-unassigned:hover {
+    background-color: #f1f5f9;
+    border-color: #94a3b8;
+}
+.chip-name {
+    font-weight: 600;
+    margin-right: 4px;
+}
+.chip-amt {
+    font-weight: 700;
+    color: #0f172a;
+}
+.chip-assigned .chip-amt {
+    color: #0369a1;
+}
+
+/* Badges */
 .badge-secondary {
     background-color: #475569 !important;
     color: #ffffff !important;
@@ -167,7 +195,18 @@
     border-radius: 6px;
     padding: 6px 12px;
 }
+
+/* Toast Notifications */
+#fee_toast_box {
+    position: fixed;
+    top: 20px;
+    right: 25px;
+    z-index: 9999;
+    min-width: 280px;
+}
 </style>
+
+<div id="fee_toast_box"></div>
 
 <div class="content-wrapper">
     <section class="content pt-3">
@@ -191,126 +230,116 @@
                             </div>
                         </div>
 
-                        <form id="assignFeesMultipleForm" action="{{ url('assignFeesMultipleStudents') }}" method="POST">
-                            @csrf
-                            <div class="card-body p-3">
-                                @include('layout.message')
+                        <div class="card-body p-3">
+                            @include('layout.message')
 
-                                <!-- Filter Inputs Row -->
-                                <div class="row mb-2">
-                                    <!-- Course Select -->
-                                    <div class="col-md-3 col-sm-6 mb-2">
-                                        <label class="filter-label">Course <span class="text-danger">*</span></label>
-                                        <select class="form-control form-control-sm select2" id="filter_course_id" name="course_id" style="width: 100%;">
-                                            <option value="">-- Select Course --</option>
-                                            @if(!empty($courses))
-                                                @foreach($courses as $course)
-                                                    <option value="{{ $course->id }}">{{ $course->name ?? '' }}</option>
-                                                @endforeach
-                                            @endif
-                                        </select>
-                                    </div>
+                            <!-- Filter Inputs Row -->
+                            <div class="row mb-2">
+                                <!-- Course Select -->
+                                <div class="col-md-3 col-sm-6 mb-2">
+                                    <label class="filter-label">Course <span class="text-danger">*</span></label>
+                                    <select class="form-control form-control-sm select2" id="filter_course_id" name="course_id" style="width: 100%;">
+                                        <option value="">-- Select Course --</option>
+                                        @if(!empty($courses))
+                                            @foreach($courses as $course)
+                                                <option value="{{ $course->id }}">{{ $course->name ?? '' }}</option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                </div>
 
-                                    <!-- Class / Semester Select -->
-                                    <div class="col-md-3 col-sm-6 mb-2">
-                                        <label class="filter-label">Class / Semester <span class="text-danger">*</span></label>
-                                        <select class="form-control form-control-sm select2" id="filter_class_type_id" name="class_type_id" style="width: 100%;">
-                                            <option value="">-- Select Class --</option>
-                                            @if(!empty($classType))
-                                                @foreach($classType as $type)
-                                                    <option value="{{ $type->id }}">{{ $type->name ?? '' }}</option>
-                                                @endforeach
-                                            @endif
-                                        </select>
-                                    </div>
+                                <!-- Class / Semester Select -->
+                                <div class="col-md-3 col-sm-6 mb-2">
+                                    <label class="filter-label">Class / Semester</label>
+                                    <select class="form-control form-control-sm select2" id="filter_class_type_id" name="class_type_id" style="width: 100%;">
+                                        <option value="">-- All Classes in Course --</option>
+                                        @if(!empty($classType))
+                                            @foreach($classType as $type)
+                                                <option value="{{ $type->id }}">{{ $type->name ?? '' }}</option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                </div>
 
-                                    <!-- Admission No / Search -->
-                                    <div class="col-md-2 col-sm-6 mb-2">
-                                        <label class="filter-label">Student ID / Name</label>
-                                        <div class="input-group input-group-sm">
-                                            <input type="text" class="form-control form-control-sm" id="filter_admission_no" name="admissionNo" placeholder="Adm No. / Name">
-                                            <div class="input-group-append">
-                                                <button class="btn btn-primary" type="button" id="btn_search_students" title="Search">
-                                                    <i class="fa fa-search"></i>
-                                                </button>
-                                            </div>
+                                <!-- Admission No / Search -->
+                                <div class="col-md-2 col-sm-6 mb-2">
+                                    <label class="filter-label">Student ID / Name</label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="text" class="form-control form-control-sm" id="filter_admission_no" name="admissionNo" placeholder="Adm No. / Name / Mob">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary" type="button" id="btn_search_students" title="Search">
+                                                <i class="fa fa-search"></i>
+                                            </button>
                                         </div>
                                     </div>
-
-                                    <!-- Fees Master Heads Multi-Select -->
-                                    <div class="col-md-4 col-sm-6 mb-2">
-                                        <label class="filter-label">
-                                            Fees Master Heads to Assign <span class="text-danger">*</span>
-                                        </label>
-                                        <select class="form-control form-control-sm select2" multiple="multiple" id="filter_fees_master_ids" name="fees_master_ids[]" data-placeholder="-- Select Fee Heads to Assign --" style="width: 100%;">
-                                        </select>
-                                    </div>
                                 </div>
 
-                                <!-- Action Toolbar & Counter Strip -->
-                                <div class="mid-action-strip d-flex flex-wrap justify-content-between align-items-center mb-2">
-                                    <div class="mb-1 mb-md-0">
-                                        <span style="font-size: 12.5px; color: #334155;">
-                                            <i class="fa fa-info-circle text-primary mr-1"></i> 
-                                            Select <b>Class</b> & <b>Fee Heads</b>, choose students, and click <b>Assign Fees Structure</b>.
-                                        </span>
-                                    </div>
-                                    <div class="d-flex align-items-center">
-                                        <span class="badge px-2 py-1 mr-1" id="total_students_badge" style="background-color: #334155; color: #ffffff; font-size: 12px; font-weight: 500;">Total: 0</span>
-                                        <span class="badge px-2 py-1 mr-2" id="selected_students_badge" style="background-color: #16a34a; color: #ffffff; font-size: 12px; font-weight: 600;">Selected: 0</span>
-                                        <button type="button" class="btn btn-default btn-xs border mr-1" id="btn_quick_select_all" style="font-size: 11.5px; padding: 3px 8px;">
-                                            <i class="fa fa-check-square text-primary mr-1"></i>Select All
-                                        </button>
-                                        <button type="button" class="btn btn-default btn-xs border mr-1" id="btn_quick_deselect_all" style="font-size: 11.5px; padding: 3px 8px;">
-                                            <i class="fa fa-square-o text-danger mr-1"></i>Deselect
-                                        </button>
-                                        <button type="button" class="btn btn-default btn-xs border" id="btn_clear_filters" style="font-size: 11.5px; padding: 3px 8px;" title="Reset">
-                                            <i class="fa fa-refresh text-secondary mr-1"></i>Reset
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- High Density Students Table Container -->
-                                <div class="table-responsive border rounded" style="max-height: 520px; overflow-y: auto;">
-                                    <table class="table table-bordered table-striped table-hover table-sm mb-0 table-assign" id="students_assign_table">
-                                        <thead style="position: sticky; top: 0; z-index: 10;">
-                                            <tr>
-                                                <th style="width: 40px; text-align: center; vertical-align: middle;">
-                                                    <input type="checkbox" id="all_students" style="cursor: pointer;" title="Select All">
-                                                </th>
-                                                <th style="width: 45px; text-align: center; vertical-align: middle;">#</th>
-                                                <th style="text-align: left; vertical-align: middle;">Student Name</th>
-                                                <th style="width: 120px; text-align: center; vertical-align: middle;">Admission No.</th>
-                                                <th style="width: 130px; text-align: center; vertical-align: middle;">Class / Semester</th>
-                                                <th style="text-align: left; vertical-align: middle;">Father's Name</th>
-                                                <th style="width: 110px; text-align: center; vertical-align: middle;">Mobile No.</th>
-                                                <th style="text-align: left; vertical-align: middle;">Currently Assigned Fee Heads</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="tbody_students_list">
-                                            <tr>
-                                                <td colspan="8" class="text-center py-5 text-muted">
-                                                    <i class="fa fa-filter fa-2x mb-2 text-secondary d-block"></i>
-                                                    Please select a <b>Course</b> and <b>Class / Semester</b> above to view and assign students.
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                <!-- Fees Master Heads Multi-Select for Bulk Action -->
+                                <div class="col-md-4 col-sm-6 mb-2">
+                                    <label class="filter-label">
+                                        Specific Fee Heads (Optional for Bulk Assign)
+                                    </label>
+                                    <select class="form-control form-control-sm select2" multiple="multiple" id="filter_fees_master_ids" name="fees_master_ids[]" data-placeholder="-- All Course Fee Heads (Default) --" style="width: 100%;">
+                                    </select>
                                 </div>
                             </div>
 
-                            <!-- Card Footer Sticky Action Bar -->
-                            <div class="card-footer d-flex justify-content-between align-items-center py-2 px-3" style="background-color: #f8fafc; border-top: 1px solid #e2e8f0;">
-                                <div style="font-size: 12px; color: #64748b;">
-                                    <i class="fa fa-check-circle text-success mr-1"></i> Selected fee heads will be assigned. Existing fee heads will not be duplicated.
+                            <!-- Action Toolbar & Counter Strip -->
+                            <div class="mid-action-strip d-flex flex-wrap justify-content-between align-items-center mb-2">
+                                <div class="mb-1 mb-md-0 d-flex align-items-center flex-wrap">
+                                    <button type="button" class="btn btn-success btn-xs font-weight-bold mr-2" id="btn_bulk_assign_realtime" style="font-size: 12px; padding: 4px 12px;">
+                                        <i class="fa fa-check-circle mr-1"></i> Real-time Bulk Assign to Selected (<span class="selected_students_count_text">0</span>)
+                                    </button>
+                                    <span style="font-size: 12px; color: #475569;">
+                                        <i class="fa fa-info-circle text-primary mr-1"></i> Checkbox clicks <b>auto-save</b> instantly.
+                                    </span>
                                 </div>
-                                <div>
-                                    <button type="submit" class="btn btn-success btn-sm font-weight-bold px-4" id="btn_submit_assign" style="font-size: 13px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                                        <i class="fa fa-check mr-1"></i> Assign Fees to (<span id="btn_selected_count">0</span>) Students
+                                <div class="d-flex align-items-center">
+                                    <span class="badge px-2 py-1 mr-1" id="total_students_badge" style="background-color: #334155; color: #ffffff; font-size: 12px; font-weight: 500;">Total: 0</span>
+                                    <span class="badge px-2 py-1 mr-2" id="selected_students_badge" style="background-color: #16a34a; color: #ffffff; font-size: 12px; font-weight: 600;">Selected: 0</span>
+                                    <button type="button" class="btn btn-default btn-xs border mr-1" id="btn_quick_select_all" style="font-size: 11.5px; padding: 3px 8px;">
+                                        <i class="fa fa-check-square text-primary mr-1"></i>Select All
+                                    </button>
+                                    <button type="button" class="btn btn-default btn-xs border mr-1" id="btn_quick_deselect_all" style="font-size: 11.5px; padding: 3px 8px;">
+                                        <i class="fa fa-square-o text-danger mr-1"></i>Deselect
+                                    </button>
+                                    <button type="button" class="btn btn-default btn-xs border" id="btn_clear_filters" style="font-size: 11.5px; padding: 3px 8px;" title="Reset">
+                                        <i class="fa fa-refresh text-secondary mr-1"></i>Reset
                                     </button>
                                 </div>
                             </div>
-                        </form>
+
+                            <!-- High Density Students Table Container -->
+                            <div class="table-responsive border rounded" style="max-height: 540px; overflow-y: auto;">
+                                <table class="table table-bordered table-striped table-hover table-sm mb-0 table-assign" id="students_assign_table">
+                                    <thead style="position: sticky; top: 0; z-index: 10;">
+                                        <tr>
+                                            <th style="width: 40px; text-align: center; vertical-align: middle;">
+                                                <input type="checkbox" id="all_students" style="cursor: pointer;" title="Select All">
+                                            </th>
+                                            <th style="width: 40px; text-align: center; vertical-align: middle;">#</th>
+                                            <th style="text-align: left; vertical-align: middle; min-width: 140px;">Student Name</th>
+                                            <th style="width: 110px; text-align: center; vertical-align: middle;">Admission No.</th>
+                                            <th style="width: 120px; text-align: center; vertical-align: middle;">Class / Sem</th>
+                                            <th style="text-align: left; vertical-align: middle; min-width: 120px;">Father's Name</th>
+                                            <th style="width: 100px; text-align: center; vertical-align: middle;">Mobile No.</th>
+                                            <th style="text-align: left; vertical-align: middle; min-width: 250px;">Course Fee Heads (Click to Toggle / Auto-Save)</th>
+                                            <th style="width: 110px; text-align: center; vertical-align: middle;">Total Fee</th>
+                                            <th style="width: 80px; text-align: center; vertical-align: middle;">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbody_students_list">
+                                        <tr>
+                                            <td colspan="10" class="text-center py-5 text-muted">
+                                                <i class="fa fa-filter fa-2x mb-2 text-secondary d-block"></i>
+                                                Please select a <b>Course</b> above to view and assign students.
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -318,15 +347,41 @@
     </section>
 </div>
 
+<!-- Student Fee Details & Modification Modal -->
+<div class="modal fade" id="studentFeeEditModal" tabindex="-1" role="dialog" aria-labelledby="studentFeeEditModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content shadow-lg" id="studentFeeEditModalBody">
+            <div class="text-center py-5">
+                <i class="fa fa-spinner fa-spin fa-2x text-primary"></i>
+                <p class="mt-2 text-muted font-weight-bold">Loading Student Fee Details...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 var defaultClasses = @json($allClassType ?? []);
+
+function showFeeToast(msg, type = 'success') {
+    var bgClass = type === 'success' ? 'alert-success' : 'alert-danger';
+    var icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
+    var toastHtml = '<div class="alert ' + bgClass + ' alert-dismissible shadow-sm py-2 px-3 mb-2" style="font-size: 12.5px; border-radius: 6px;">' +
+        '<button type="button" class="close" data-dismiss="alert" style="font-size: 16px;">&times;</button>' +
+        '<i class="fa ' + icon + ' mr-1"></i> ' + msg +
+        '</div>';
+    
+    var $toast = $(toastHtml).appendTo('#fee_toast_box');
+    setTimeout(function() {
+        $toast.fadeOut(400, function() { $(this).remove(); });
+    }, 3500);
+}
 
 function updateSelectedCount() {
     var checked = $('.student_select_checkbox:checked').length;
     var total = $('.student_select_checkbox').length;
     
     $('#selected_students_badge').text('Selected: ' + checked);
-    $('#btn_selected_count').text(checked);
+    $('.selected_students_count_text').text(checked);
     $('#total_students_badge').text('Total: ' + total);
     
     if (total > 0 && checked === total) {
@@ -337,13 +392,13 @@ function updateSelectedCount() {
 }
 
 function loadStudents(class_type_id, admissionNo, course_id) {
-    if (!class_type_id && !course_id) {
-        $('#tbody_students_list').html('<tr><td colspan="8" class="text-center py-5 text-muted"><i class="fa fa-info-circle mr-1"></i> Please select a Course or Class / Semester</td></tr>');
+    if (!class_type_id && !course_id && !admissionNo) {
+        $('#tbody_students_list').html('<tr><td colspan="10" class="text-center py-5 text-muted"><i class="fa fa-info-circle mr-1"></i> Please select a Course or Class / Semester</td></tr>');
         updateSelectedCount();
         return;
     }
     
-    $('#tbody_students_list').html('<tr><td colspan="8" class="text-center py-5 text-primary"><i class="fa fa-spinner fa-spin fa-2x"></i><br><span class="mt-2 d-block font-weight-bold" style="font-size: 12.5px;">Loading students...</span></td></tr>');
+    $('#tbody_students_list').html('<tr><td colspan="10" class="text-center py-5 text-primary"><i class="fa fa-spinner fa-spin fa-2x"></i><br><span class="mt-2 d-block font-weight-bold" style="font-size: 12.5px;">Loading students and course fee structure...</span></td></tr>');
     
     $.ajax({
         headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
@@ -359,31 +414,30 @@ function loadStudents(class_type_id, admissionNo, course_id) {
             updateSelectedCount();
         },
         error: function(xhr) {
-            $('#tbody_students_list').html('<tr><td colspan="8" class="text-center text-danger py-5"><i class="fa fa-exclamation-triangle mr-1"></i> Error loading students list.</td></tr>');
+            $('#tbody_students_list').html('<tr><td colspan="10" class="text-center text-danger py-5"><i class="fa fa-exclamation-triangle mr-1"></i> Error loading students list.</td></tr>');
             updateSelectedCount();
         }
     });
 }
 
-function loadFeeMasterHeads(class_type_id) {
-    if (!class_type_id) {
-        $('#filter_fees_master_ids').empty().trigger('change');
-        return;
-    }
-    
+function loadFeeMasterHeads(class_type_id, course_id) {
     $.ajax({
         headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
         url: "{{ url('getMasterData') }}",
         method: 'POST',
-        data: { class_type_id: class_type_id },
+        data: { 
+            class_type_id: class_type_id,
+            course_id: course_id
+        },
         success: function(response) {
             var options = [];
             if (response && response.length > 0) {
                 for (var i = 0; i < response.length; i++) {
                     var item = response[i];
                     var amt = item.amount ? parseFloat(item.amount).toLocaleString('en-IN') : '0';
-                    var label = item.fees_group_name + ' (₹' + amt + ')';
-                    options.push('<option value="' + item.id + '" selected>' + label + '</option>');
+                    var className = item.class_name ? ' [' + item.class_name + ']' : '';
+                    var label = item.fees_group_name + className + ' (₹' + amt + ')';
+                    options.push('<option value="' + item.id + '">' + label + '</option>');
                 }
                 $('#filter_fees_master_ids').html(options.join('')).trigger('change');
             } else {
@@ -412,25 +466,27 @@ $(document).ready(function() {
                 data: { _token: "{{ csrf_token() }}", course_id: courseId },
                 dataType: "json",
                 success: function(data) {
-                    classSelect.empty().append('<option value="">-- Select Class --</option>');
+                    classSelect.empty().append('<option value="">-- All Classes in Course --</option>');
                     if (data && data.length > 0) {
                         $.each(data, function(key, val) {
                             classSelect.append('<option value="' + val.id + '">' + val.name + '</option>');
                         });
                     }
-                    classSelect.val('').trigger('change');
+                    classSelect.val('').trigger('change.select2');
                 }
             });
+            loadFeeMasterHeads('', courseId);
             loadStudents('', admissionNo, courseId);
         } else {
-            classSelect.empty().append('<option value="">-- Select Class --</option>');
+            classSelect.empty().append('<option value="">-- All Classes in Course --</option>');
             if (defaultClasses && defaultClasses.length > 0) {
                 $.each(defaultClasses, function(key, val) {
                     classSelect.append('<option value="' + val.id + '">' + val.name + '</option>');
                 });
             }
-            classSelect.val('').trigger('change');
-            $('#tbody_students_list').html('<tr><td colspan="8" class="text-center py-5 text-muted"><i class="fa fa-filter fa-2x mb-2 text-secondary d-block"></i> Please select a <b>Course</b> and <b>Class / Semester</b> above.</td></tr>');
+            classSelect.val('').trigger('change.select2');
+            $('#filter_fees_master_ids').empty().trigger('change');
+            $('#tbody_students_list').html('<tr><td colspan="10" class="text-center py-5 text-muted"><i class="fa fa-filter fa-2x mb-2 text-secondary d-block"></i> Please select a <b>Course</b> above.</td></tr>');
             updateSelectedCount();
         }
     });
@@ -441,7 +497,7 @@ $(document).ready(function() {
         var course_id = $('#filter_course_id').val();
         var admissionNo = $('#filter_admission_no').val();
         
-        loadFeeMasterHeads(class_type_id);
+        loadFeeMasterHeads(class_type_id, course_id);
         if (class_type_id || course_id) {
             loadStudents(class_type_id, admissionNo, course_id);
         }
@@ -467,18 +523,17 @@ $(document).ready(function() {
         $('#filter_course_id').val('').trigger('change');
         $('#filter_admission_no').val('');
         $('#filter_fees_master_ids').empty().trigger('change');
-        $('#tbody_students_list').html('<tr><td colspan="8" class="text-center py-5 text-muted"><i class="fa fa-filter fa-2x mb-2 text-secondary d-block"></i> Please select a <b>Course</b> and <b>Class / Semester</b> above.</td></tr>');
+        $('#tbody_students_list').html('<tr><td colspan="10" class="text-center py-5 text-muted"><i class="fa fa-filter fa-2x mb-2 text-secondary d-block"></i> Please select a <b>Course</b> above.</td></tr>');
         updateSelectedCount();
     });
 
-    // Select All Checkbox
+    // Select All / Deselect All
     $('#all_students').click(function() {
         var isChecked = $(this).prop('checked');
         $('.student_select_checkbox').prop('checked', isChecked);
         updateSelectedCount();
     });
 
-    // Quick Select Buttons
     $('#btn_quick_select_all').click(function() {
         $('.student_select_checkbox').prop('checked', true);
         $('#all_students').prop('checked', true);
@@ -495,25 +550,183 @@ $(document).ready(function() {
         updateSelectedCount();
     });
 
-    // Form Submission Confirmation & Validation
-    $('#assignFeesMultipleForm').on('submit', function(event) {
-        var checkedStudents = $('.student_select_checkbox:checked').length;
-        var selectedFeeHeads = $('#filter_fees_master_ids').val();
+    // REAL-TIME INDIVIDUAL FEE HEAD TOGGLE
+    $(document).on('change', '.toggle-fee-head-checkbox', function() {
+        var $checkbox = $(this);
+        var admissionId = $checkbox.data('admission-id');
+        var masterId = $checkbox.data('master-id');
+        var isChecked = $checkbox.is(':checked') ? 1 : 0;
+        var $chip = $('#chip_' + admissionId + '_' + masterId);
+        var $icon = $('#icon_' + admissionId + '_' + masterId);
 
-        if (!selectedFeeHeads || selectedFeeHeads.length === 0) {
-            event.preventDefault();
-            alert("Please select at least one Fee Head to assign!");
-            $('#filter_fees_master_ids').focus();
-            return false;
+        $checkbox.prop('disabled', true);
+
+        $.ajax({
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            url: "{{ url('toggleStudentFeeHead') }}",
+            method: 'POST',
+            data: {
+                admission_id: admissionId,
+                fees_master_id: masterId,
+                state: isChecked
+            },
+            success: function(res) {
+                $checkbox.prop('disabled', false);
+                if (res.status === 'success') {
+                    if (res.action === 'assigned') {
+                        $chip.removeClass('chip-unassigned').addClass('chip-assigned');
+                        $icon.removeClass('d-none');
+                        $checkbox.prop('checked', true);
+                    } else {
+                        $chip.removeClass('chip-assigned').addClass('chip-unassigned');
+                        $icon.addClass('d-none');
+                        $checkbox.prop('checked', false);
+                    }
+                    
+                    if (res.total_amount !== undefined) {
+                        $('#student_total_' + admissionId).text('₹' + parseFloat(res.total_amount).toLocaleString('en-IN'));
+                    }
+                    showFeeToast(res.message, 'success');
+                } else {
+                    $checkbox.prop('checked', !isChecked);
+                    showFeeToast(res.message || 'Error updating fee head', 'error');
+                }
+            },
+            error: function(xhr) {
+                $checkbox.prop('disabled', false);
+                $checkbox.prop('checked', !isChecked);
+                showFeeToast('Server error while updating fee head', 'error');
+            }
+        });
+    });
+
+    // REAL-TIME BULK ASSIGN TO SELECTED STUDENTS
+    $('#btn_bulk_assign_realtime').click(function() {
+        var selectedStudents = [];
+        $('.student_select_checkbox:checked').each(function() {
+            selectedStudents.push($(this).val());
+        });
+
+        if (selectedStudents.length === 0) {
+            alert('Please select at least one student from the table.');
+            return;
         }
 
-        if (checkedStudents === 0) {
-            event.preventDefault();
-            alert("Please select at least one student from the table!");
-            return false;
+        var feeMasterIds = $('#filter_fees_master_ids').val() || [];
+        var confirmMsg = 'Are you sure you want to assign fees in real-time to ' + selectedStudents.length + ' selected student(s)?';
+        if (!confirm(confirmMsg)) {
+            return;
         }
 
-        return confirm("Are you sure you want to assign the selected fee structure to " + checkedStudents + " student(s)?");
+        var $btn = $(this);
+        $btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin mr-1"></i> Assigning...');
+
+        $.ajax({
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            url: "{{ url('bulkAssignCourseFees') }}",
+            method: 'POST',
+            data: {
+                admissionIds: selectedStudents,
+                fees_master_ids: feeMasterIds
+            },
+            success: function(res) {
+                $btn.prop('disabled', false).html('<i class="fa fa-check-circle mr-1"></i> Real-time Bulk Assign to Selected (<span class="selected_students_count_text">' + selectedStudents.length + '</span>)');
+                if (res.status === 'success') {
+                    showFeeToast(res.message, 'success');
+                    var class_type_id = $('#filter_class_type_id').val();
+                    var course_id = $('#filter_course_id').val();
+                    var admissionNo = $('#filter_admission_no').val();
+                    loadStudents(class_type_id, admissionNo, course_id);
+                } else {
+                    showFeeToast(res.message || 'Error assigning fees', 'error');
+                }
+            },
+            error: function() {
+                $btn.prop('disabled', false).html('<i class="fa fa-check-circle mr-1"></i> Real-time Bulk Assign to Selected (<span class="selected_students_count_text">' + selectedStudents.length + '</span>)');
+                showFeeToast('Server error during bulk fee assignment', 'error');
+            }
+        });
+    });
+
+    // OPEN STUDENT FEE EDIT / MODIFICATION MODAL
+    $(document).on('click', '.btn-edit-student-fees', function() {
+        var admissionId = $(this).data('admission-id');
+        $('#studentFeeEditModal').modal('show');
+        $('#studentFeeEditModalBody').html('<div class="text-center py-5"><i class="fa fa-spinner fa-spin fa-2x text-primary"></i><p class="mt-2 text-muted font-weight-bold">Loading Student Fee Details...</p></div>');
+
+        $.ajax({
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            url: "{{ url('getStudentFeeDetailsModal') }}",
+            method: 'POST',
+            data: { admission_id: admissionId },
+            success: function(html) {
+                $('#studentFeeEditModalBody').html(html);
+            },
+            error: function() {
+                $('#studentFeeEditModalBody').html('<div class="alert alert-danger m-3"><i class="fa fa-exclamation-triangle mr-1"></i> Failed to load fee details.</div>');
+            }
+        });
+    });
+
+    // MODAL: LIVE CALCULATION ON INPUT CHANGE
+    $(document).on('input', '.input-amount, .input-discount', function() {
+        var detailId = $(this).data('detail-id');
+        var $row = $('#row_detail_' + detailId);
+        var amt = parseFloat($row.find('.input-amount').val()) || 0;
+        var disc = parseFloat($row.find('.input-discount').val()) || 0;
+        var net = amt - disc;
+        $row.find('.net-display').text('₹' + net.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+    });
+
+    // MODAL: SAVE INDIVIDUAL ROW VIA AJAX
+    $(document).on('click', '.btn-save-detail-row', function() {
+        var detailId = $(this).data('detail-id');
+        var admissionId = $(this).data('admission-id');
+        var $row = $('#row_detail_' + detailId);
+        var $btn = $(this);
+
+        var amount = $row.find('.input-amount').val();
+        var discount = $row.find('.input-discount').val();
+        var dueDate = $row.find('.input-due-date').val();
+        var fine = $row.find('.input-fine').val();
+
+        $btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
+
+        $.ajax({
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            url: "{{ url('updateStudentFeeDetailInline') }}",
+            method: 'POST',
+            data: {
+                detail_id: detailId,
+                amount: amount,
+                discount: discount,
+                due_date: dueDate,
+                fine: fine
+            },
+            success: function(res) {
+                $btn.prop('disabled', false).html('<i class="fa fa-check text-success"></i> Saved');
+                setTimeout(function() {
+                    $btn.html('<i class="fa fa-save"></i> Save');
+                }, 2000);
+
+                if (res.status === 'success') {
+                    if (res.total_amount !== undefined) {
+                        $('#modal_summary_total').text('₹' + parseFloat(res.total_amount).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+                        $('#student_total_' + admissionId).text('₹' + parseFloat(res.total_amount).toLocaleString('en-IN'));
+                    }
+                    if (res.net_amount !== undefined) {
+                        $('#modal_summary_net').text('₹' + parseFloat(res.net_amount).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+                    }
+                    showFeeToast(res.message || 'Fee updated successfully', 'success');
+                } else {
+                    showFeeToast(res.message || 'Error updating fee', 'error');
+                }
+            },
+            error: function() {
+                $btn.prop('disabled', false).html('<i class="fa fa-save"></i> Save');
+                showFeeToast('Server error while saving fee detail', 'error');
+            }
+        });
     });
 });
 </script>
