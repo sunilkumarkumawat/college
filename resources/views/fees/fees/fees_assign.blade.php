@@ -189,6 +189,52 @@
     color: #ffffff !important;
 }
 
+/* Top Course Fee Structure Panel */
+.course-fee-structure-card {
+    background-color: #f8fafc;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.top-structure-head-chip {
+    display: inline-flex;
+    align-items: center;
+    background: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 4px 10px;
+    margin: 2px 3px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+    user-select: none;
+}
+.top-structure-head-chip:hover {
+    border-color: #002c54;
+    background: #f1f5f9;
+}
+.top-structure-head-chip.selected-top-chip {
+    background-color: #e0f2fe !important;
+    border-color: #0284c7 !important;
+    color: #0369a1 !important;
+    font-weight: 600;
+    box-shadow: 0 0 0 1px #0284c7;
+}
+.top-structure-head-chip .badge-amt {
+    background: #002c54;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 4px;
+    margin-left: 6px;
+}
+.top-structure-head-chip.selected-top-chip .badge-amt {
+    background: #0284c7;
+}
+
 /* Mid-bar Strip */
 .mid-action-strip {
     background-color: #f8fafc;
@@ -234,10 +280,10 @@
                         <div class="card-body p-3">
                             @include('layout.message')
 
-                            <!-- Filter Inputs Row in Perfect Sequence: Course -> Batch -> Search Student -> Fee Heads -->
+                            <!-- Filter Inputs Row (3 Clean Columns: Course -> Batch -> Search Student) -->
                             <div class="row mb-2">
                                 <!-- 1. Course Select -->
-                                <div class="col-md-3 col-sm-6 mb-2">
+                                <div class="col-md-4 col-sm-6 mb-2">
                                     <label class="filter-label">
                                         <span>Course <span class="text-danger">*</span></span>
                                     </label>
@@ -252,7 +298,7 @@
                                 </div>
 
                                 <!-- 2. Batch Select -->
-                                <div class="col-md-3 col-sm-6 mb-2">
+                                <div class="col-md-4 col-sm-6 mb-2">
                                     <label class="filter-label">
                                         <span>Batch <span class="text-danger">*</span></span>
                                     </label>
@@ -267,12 +313,12 @@
                                 </div>
 
                                 <!-- 3. Admission No / Student ID / Name Search -->
-                                <div class="col-md-3 col-sm-6 mb-2">
+                                <div class="col-md-4 col-sm-12 mb-2">
                                     <label class="filter-label">
                                         <span>Student ID / Name / Mobile</span>
                                     </label>
                                     <div class="input-group input-group-sm">
-                                        <input type="text" class="form-control form-control-sm" id="filter_admission_no" name="admissionNo" placeholder="Type to filter instantly...">
+                                        <input type="text" class="form-control form-control-sm" id="filter_admission_no" name="admissionNo" placeholder="Type name, admission no or mobile to filter...">
                                         <div class="input-group-append">
                                             <button class="btn btn-primary" type="button" id="btn_search_students" title="Search">
                                                 <i class="fa fa-search"></i>
@@ -280,18 +326,35 @@
                                         </div>
                                     </div>
                                 </div>
+                            </div>
 
-                                <!-- 4. Fees Master Heads Multi-Select for Quick Bulk Assign -->
-                                <div class="col-md-3 col-sm-6 mb-2">
-                                    <label class="filter-label">
-                                        <span>Fee Heads Multi-Select</span>
-                                        <span class="small font-weight-normal">
-                                            <a href="javascript:void(0)" id="btn_select_all_filter_heads" class="text-primary mr-1">All</a>
-                                            <a href="javascript:void(0)" id="btn_deselect_all_filter_heads" class="text-muted">Clear</a>
+                            <!-- Interactive Course Fee Structure & Master Heads Toolbar (Visible when Course is selected) -->
+                            <div class="course-fee-structure-card" id="course_fee_structure_card" style="display: none;">
+                                <div class="d-flex flex-wrap justify-content-between align-items-center mb-2 pb-1" style="border-bottom: 1px dashed #cbd5e1;">
+                                    <div class="d-flex align-items-center flex-wrap" style="gap: 8px;">
+                                        <span class="font-weight-bold text-dark" style="font-size: 13px;">
+                                            <i class="fa fa-cubes text-primary mr-1"></i> Course Fee Structure (<span id="structure_head_count" class="text-primary font-weight-bold">0</span> Heads)
                                         </span>
-                                    </label>
-                                    <select class="form-control form-control-sm select2" multiple="multiple" id="filter_fees_master_ids" name="fees_master_ids[]" data-placeholder="-- All Course Fee Heads --" style="width: 100%;">
-                                    </select>
+                                        <span class="badge badge-light border text-muted px-2 py-1" style="font-size: 11.5px;">
+                                            Total Structure Fee: <strong class="text-dark ml-1" id="structure_total_fee">₹0</strong>
+                                        </span>
+                                        <span class="badge badge-info px-2 py-1" id="selected_heads_badge" style="font-size: 11.5px; display: none;">
+                                            <i class="fa fa-check-circle mr-1"></i><span id="selected_heads_count">0</span> Head(s) Selected
+                                        </span>
+                                    </div>
+                                    <div class="d-flex align-items-center flex-wrap" style="gap: 6px;">
+                                        <button type="button" class="btn btn-xs btn-outline-primary font-weight-bold px-2 py-1" id="btn_top_select_all_heads" style="font-size: 11px;">
+                                            <i class="fa fa-check-square-o mr-1"></i> Select All Heads
+                                        </button>
+                                        <button type="button" class="btn btn-xs btn-outline-secondary font-weight-bold px-2 py-1" id="btn_top_deselect_all_heads" style="font-size: 11px;">
+                                            <i class="fa fa-square-o mr-1"></i> Deselect Heads
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Dynamic Fee Heads Chips Container -->
+                                <div class="d-flex flex-wrap align-items-center" id="course_fee_structure_chips_box" style="gap: 4px; min-height: 32px;">
+                                    <!-- Loaded via AJAX -->
                                 </div>
                             </div>
 
@@ -457,6 +520,20 @@ function showFeeToast(msg, type = 'success') {
     }, 3500);
 }
 
+function updateSelectedHeadsBadge() {
+    var selectedCount = $('.top-head-checkbox:checked').length;
+    var checkedStudentsCount = $('.student_select_checkbox:checked').length;
+
+    if (selectedCount > 0) {
+        $('#selected_heads_count').text(selectedCount);
+        $('#selected_heads_badge').show();
+        $('#btn_bulk_assign_realtime').html('<i class="fa fa-check-circle mr-1"></i> Assign (' + selectedCount + ') Selected Head(s) to Checked (<span class="selected_students_count_text">' + checkedStudentsCount + '</span>)');
+    } else {
+        $('#selected_heads_badge').hide();
+        $('#btn_bulk_assign_realtime').html('<i class="fa fa-check-circle mr-1"></i> Assign to Selected Students (<span class="selected_students_count_text">' + checkedStudentsCount + '</span>)');
+    }
+}
+
 function updateSelectedCount() {
     var checked = $('.student_select_checkbox:checked').length;
     var total = $('.student_select_checkbox').length;
@@ -471,6 +548,8 @@ function updateSelectedCount() {
     } else {
         $('#all_students').prop('checked', false);
     }
+
+    updateSelectedHeadsBadge();
 }
 
 function loadStudents() {
@@ -516,7 +595,8 @@ function loadStudents() {
 
 function loadFeeMasterHeads(course_id) {
     if (!course_id) {
-        $('#filter_fees_master_ids').empty().trigger('change');
+        $('#course_fee_structure_card').slideUp(200);
+        $('#course_fee_structure_chips_box').empty();
         return;
     }
 
@@ -526,22 +606,35 @@ function loadFeeMasterHeads(course_id) {
         method: 'POST',
         data: { course_id: course_id },
         success: function(response) {
-            var options = [];
             if (response && response.length > 0) {
+                var totalStructureAmt = 0;
+                var html = [];
                 for (var i = 0; i < response.length; i++) {
                     var item = response[i];
-                    var amt = item.amount ? parseFloat(item.amount).toLocaleString('en-IN') : '0';
-                    var className = item.class_name ? ' [' + item.class_name + ']' : '';
-                    var label = item.fees_group_name + className + ' (₹' + amt + ')';
-                    options.push('<option value="' + item.id + '">' + label + '</option>');
+                    var amt = parseFloat(item.amount || 0);
+                    totalStructureAmt += amt;
+                    var className = item.class_name ? ' <small class="text-muted font-weight-normal">(' + item.class_name + ')</small>' : '';
+                    html.push(
+                        '<label class="top-structure-head-chip" id="top_head_chip_' + item.id + '" data-master-id="' + item.id + '" title="Click checkbox to select this fee head for custom assignment">' +
+                            '<input type="checkbox" class="top-head-checkbox" value="' + item.id + '" data-name="' + item.fees_group_name + '" style="cursor: pointer; margin-right: 5px;">' +
+                            '<span class="head-title font-weight-bold text-dark">' + item.fees_group_name + className + '</span>' +
+                            '<span class="badge-amt">₹' + amt.toLocaleString('en-IN') + '</span>' +
+                        '</label>'
+                    );
                 }
-                $('#filter_fees_master_ids').html(options.join('')).trigger('change');
+                $('#course_fee_structure_chips_box').html(html.join(''));
+                $('#structure_head_count').text(response.length);
+                $('#structure_total_fee').text('₹' + totalStructureAmt.toLocaleString('en-IN'));
+                $('#course_fee_structure_card').slideDown(200);
+                updateSelectedHeadsBadge();
             } else {
-                $('#filter_fees_master_ids').empty().trigger('change');
+                $('#course_fee_structure_card').slideUp(200);
+                $('#course_fee_structure_chips_box').empty();
             }
         },
         error: function() {
-            $('#filter_fees_master_ids').empty().trigger('change');
+            $('#course_fee_structure_card').slideUp(200);
+            $('#course_fee_structure_chips_box').empty();
         }
     });
 }
@@ -549,16 +642,31 @@ function loadFeeMasterHeads(course_id) {
 $(document).ready(function() {
     $('.select2').select2();
 
-    // Select All / Clear in Filter Heads Select2
-    $('#btn_select_all_filter_heads').click(function(e) {
-        e.preventDefault();
-        $('#filter_fees_master_ids > option').prop('selected', true);
-        $('#filter_fees_master_ids').trigger('change');
+    // Top structure head checkbox change
+    $(document).on('change', '.top-head-checkbox', function() {
+        var isChecked = $(this).is(':checked');
+        if (isChecked) {
+            $(this).closest('.top-structure-head-chip').addClass('selected-top-chip');
+        } else {
+            $(this).closest('.top-structure-head-chip').removeClass('selected-top-chip');
+        }
+        updateSelectedHeadsBadge();
     });
 
-    $('#btn_deselect_all_filter_heads').click(function(e) {
+    // Select All Heads in top structure toolbar
+    $('#btn_top_select_all_heads').click(function(e) {
         e.preventDefault();
-        $('#filter_fees_master_ids').val(null).trigger('change');
+        $('.top-head-checkbox').prop('checked', true);
+        $('.top-structure-head-chip').addClass('selected-top-chip');
+        updateSelectedHeadsBadge();
+    });
+
+    // Deselect All Heads in top structure toolbar
+    $('#btn_top_deselect_all_heads').click(function(e) {
+        e.preventDefault();
+        $('.top-head-checkbox').prop('checked', false);
+        $('.top-structure-head-chip').removeClass('selected-top-chip');
+        updateSelectedHeadsBadge();
     });
 
     // Course Select Handler
@@ -590,7 +698,8 @@ $(document).ready(function() {
         $('#filter_course_id').val('').trigger('change');
         $('#filter_batch').val('').trigger('change');
         $('#filter_admission_no').val('');
-        $('#filter_fees_master_ids').empty().trigger('change');
+        $('#course_fee_structure_card').slideUp(200);
+        $('#course_fee_structure_chips_box').empty();
         $('#tbody_students_list').html('<tr><td colspan="10" class="text-center py-5 text-muted"><i class="fa fa-filter fa-2x mb-2 text-secondary d-block"></i> Please select both <b>Course</b> and <b>Batch</b> above.</td></tr>');
         updateSelectedCount();
     });
@@ -788,7 +897,6 @@ $(document).ready(function() {
             return;
         }
 
-        var feeMasterIds = $('#filter_fees_master_ids').val() || [];
         var count = allStudentIds.length;
 
         pendingFeeAction = {
@@ -798,7 +906,7 @@ $(document).ready(function() {
             studentName: '',
             admissionNo: '',
             totalHeads: 0,
-            masterIds: feeMasterIds
+            masterIds: []
         };
 
         // Configure Modal for Quick Apply
@@ -812,7 +920,10 @@ $(document).ready(function() {
         $('#feeConfirmStudentInfoBox').show();
         $('#feeConfirmStudentNameRow').hide();
         $('#feeConfirmStudentAdmRow').hide();
-        $('#feeConfirmExtraDetails').html('<span class="badge badge-primary px-2 py-1" style="font-size: 13px;">' + count + ' Students Loaded</span>');
+        $('#feeConfirmExtraDetails').html(
+            '<span class="badge badge-primary px-2 py-1 mr-1" style="font-size: 12.5px;">' + count + ' Students Loaded</span>' +
+            '<span class="badge badge-warning text-dark px-2 py-1" style="font-size: 12.5px;">ALL Course Fee Heads</span>'
+        );
         
         $('#feeConfirmMessage').text('Are you sure you want to assign all course fee structure heads to ALL ' + count + ' students loaded in this batch? This will be applied live in real-time.');
         $('#feeConfirmPaidWarning').addClass('d-none');
@@ -839,7 +950,13 @@ $(document).ready(function() {
             return;
         }
 
-        var feeMasterIds = $('#filter_fees_master_ids').val() || [];
+        var feeMasterIds = [];
+        var feeMasterNames = [];
+        $('.top-head-checkbox:checked').each(function() {
+            feeMasterIds.push($(this).val());
+            feeMasterNames.push($(this).data('name'));
+        });
+
         var count = selectedStudents.length;
 
         pendingFeeAction = {
@@ -848,24 +965,39 @@ $(document).ready(function() {
             admissionIds: selectedStudents,
             studentName: '',
             admissionNo: '',
-            totalHeads: 0,
+            totalHeads: feeMasterIds.length,
             masterIds: feeMasterIds
         };
 
         // Configure Modal for Selected Bulk Assign
         $('#feeConfirmModalHeader').css('border-bottom', '2px solid #002c54');
         $('#feeConfirmIcon').attr('class', 'fa fa-users mr-2 text-info');
-        $('#feeConfirmTitle').text('Assign Fee Heads to Selected Students');
         $('#feeConfirmBigIcon').attr('class', 'fa fa-users fa-2x text-primary');
         $('#feeConfirmIconWrapper').css('background', 'rgba(0, 44, 84, 0.12)');
-        $('#feeConfirmHeadline').text('Assign Heads to ' + count + ' Selected Student(s)?');
         
         $('#feeConfirmStudentInfoBox').show();
         $('#feeConfirmStudentNameRow').hide();
         $('#feeConfirmStudentAdmRow').hide();
-        $('#feeConfirmExtraDetails').html('<span class="badge badge-success px-2 py-1" style="font-size: 13px;">' + count + ' Students Selected</span>');
+
+        if (feeMasterIds.length > 0) {
+            var headsPreview = feeMasterNames.slice(0, 3).join(', ') + (feeMasterNames.length > 3 ? ' +' + (feeMasterNames.length - 3) + ' more' : '');
+            $('#feeConfirmTitle').text('Assign Selected Fee Heads (' + feeMasterIds.length + ')');
+            $('#feeConfirmHeadline').text('Assign ' + feeMasterIds.length + ' Selected Head(s) to ' + count + ' Student(s)?');
+            $('#feeConfirmExtraDetails').html(
+                '<span class="badge badge-success px-2 py-1 mr-1" style="font-size: 12.5px;">' + count + ' Students Selected</span>' +
+                '<span class="badge badge-info px-2 py-1" style="font-size: 12.5px;">' + feeMasterIds.length + ' Head(s): ' + headsPreview + '</span>'
+            );
+            $('#feeConfirmMessage').text('Are you sure you want to assign the selected (' + feeMasterIds.length + ') fee head(s) to the ' + count + ' checked student(s) in real-time?');
+        } else {
+            $('#feeConfirmTitle').text('Assign All Course Fee Heads');
+            $('#feeConfirmHeadline').text('Assign ALL Course Heads to ' + count + ' Student(s)?');
+            $('#feeConfirmExtraDetails').html(
+                '<span class="badge badge-success px-2 py-1 mr-1" style="font-size: 12.5px;">' + count + ' Students Selected</span>' +
+                '<span class="badge badge-primary px-2 py-1" style="font-size: 12.5px;">All Course Heads</span>'
+            );
+            $('#feeConfirmMessage').text('Are you sure you want to assign ALL course fee structure heads to the ' + count + ' checked student(s) in real-time?');
+        }
         
-        $('#feeConfirmMessage').text('Are you sure you want to assign fee structure heads to the ' + count + ' checked student(s) in real-time?');
         $('#feeConfirmPaidWarning').addClass('d-none');
         
         $('#btn_confirm_fee_modal_action')
