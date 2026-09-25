@@ -1757,6 +1757,7 @@ class FeesController extends Controller
                     }
                     
                     $total_assign_detail = FeesAssignDetail::where('admission_id', $admission_id)->whereNull('deleted_at')->sum('fees_group_amount');
+                    $discount_assign_detail = FeesAssignDetail::where('admission_id', $admission_id)->whereNull('deleted_at')->sum('discount');
                     $feesAssign->total_amount = $total_assign_detail;
                     $feesAssign->net_amount = ($total_assign_detail - $discount_assign_detail);
                     $feesAssign->save();
