@@ -1769,6 +1769,7 @@ function onCourseSelected(selectElem) {
 
 function switchMode(mode) {
     currentMode = mode;
+    sessionStorage.setItem('fees_group_mode', mode);
     document.getElementById('form_mode').value = mode;
 
     document.getElementById('btn_mode_semester').classList.remove('active');
@@ -1839,6 +1840,7 @@ function switchMode(mode) {
 
 // Right Panel Tab Switcher (Class-wise Fees Master vs No-Class Fee Heads)
 function switchRightTab(tab) {
+    sessionStorage.setItem('fees_group_right_tab', tab);
     if (tab === 'no_class_heads') {
         $('#btn_tab_no_class').removeClass('btn-light text-dark').addClass('btn-primary active');
         $('#btn_tab_structures').removeClass('btn-primary active').addClass('btn-light text-dark');
@@ -2093,6 +2095,7 @@ function updateHeadOnlyPreview() {
 
 // Right Panel View Mode Switcher (Cards vs Table)
 function switchRightView(mode) {
+    sessionStorage.setItem('fees_group_right_view', mode);
     if (mode === 'cards') {
         $('#btn_view_cards').addClass('active');
         $('#btn_view_table').removeClass('active');
@@ -2111,9 +2114,12 @@ function switchRightView(mode) {
 
 // Course Quick Filter Pills Handler
 function filterByCourse(courseId, btnElement) {
+    sessionStorage.setItem('fees_group_course_filter', courseId);
     $('.course-pill-btn').removeClass('active');
     if (btnElement) {
         $(btnElement).addClass('active');
+    } else {
+        $('.course-pill-btn[data-course-id="' + courseId + '"]').addClass('active');
     }
 
     if (courseId === 'all') {
@@ -2136,6 +2142,8 @@ function checkVisibleCourseCards() {
 
 // Auto-select course in left unified setup form
 function selectCourseForSetup(courseId) {
+    sessionStorage.setItem('fees_group_mode', 'semester');
+    sessionStorage.setItem('fees_group_right_tab', 'structures');
     var sel = document.getElementById('course_selector');
     if (!sel) return;
     sel.value = courseId;
@@ -2182,6 +2190,10 @@ function checkFormHasData() {
 
 // Reset Entire Left Unified Form with complete state clearance
 function executeFormReset() {
+    sessionStorage.removeItem('fees_group_mode');
+    sessionStorage.removeItem('fees_group_right_tab');
+    sessionStorage.removeItem('fees_group_course_filter');
+
     // 1. Reset Course Selector & Select2
     var courseSel = $('#course_selector');
     courseSel.val('').trigger('change.select2');
@@ -2277,14 +2289,62 @@ function confirmDeleteFeesMaster(id, name, className) {
 }
 
 $(document).ready(function() {
-    // Initial check: if course was selected, trigger auto-detect
-    var initCourse = document.getElementById('course_selector');
-    if (initCourse && initCourse.value) {
-        onCourseSelected(initCourse);
-    } else {
-        switchMode('semester');
+    var savedMode = sessionStorage.getItem('fees_group_mode') || 'semester';
+    var savedRightTab = sessionStorage.getItem('fees_group_right_tab');
+    var savedRightView = sessionStorage.getItem('fees_group_right_view');
+    var savedCourseFilter = sessionStorage.getItem('fees_group_course_filter');
+
+    // 1. Restore Right View Mode (Cards vs Table)
+    if (savedRightView) {
+        switchRightView(savedRightView);
     }
+
+    // 2. Restore Course Filter if present
+    if (savedCourseFilter && savedCourseFilter !== 'all') {
+        var filterBtn = $('.course-pill-btn[data-course-id="' + savedCourseFilter + '"]');
+        if (filterBtn.length) {
+            filterByCourse(savedCourseFilter, filterBtn[0]);
+        }
+    }
+
+    // 3. Restore Left Form Mode & Auto-detect course
+    var initCourse = document.getElementById('course_selector');
+    if (savedMode === 'single_head') {
+        switchMode('single_head');
+    } else if (savedMode === 'single_class') {
+        switchMode('single_class');
+        if (initCourse && initCourse.value) {
+            onCourseSelected(initCourse);
+        }
+    } else {
+        // semester mode
+        switchMode('semester');
+        if (initCourse && initCourse.value) {
+            onCourseSelected(initCourse);
+        }
+    }
+
+    // 4. Restore Right Tab if saved
+    if (savedRightTab) {
+        switchRightTab(savedRightTab);
+    }
+
     checkFormHasData();
+
+    // Preserve active tab & mode on form submissions
+    $('#quickForm').on('submit', function() {
+        sessionStorage.setItem('fees_group_mode', currentMode);
+        if (currentMode === 'single_head') {
+            sessionStorage.setItem('fees_group_right_tab', 'no_class_heads');
+        } else {
+            sessionStorage.setItem('fees_group_right_tab', 'structures');
+        }
+    });
+
+    $('#edit_fee_head_form').on('submit', function() {
+        sessionStorage.setItem('fees_group_mode', 'single_head');
+        sessionStorage.setItem('fees_group_right_tab', 'no_class_heads');
+    });
 
     // Listen to course selection & form inputs to toggle Reset Form button
     $(document).on('change', '#course_selector', function() {
