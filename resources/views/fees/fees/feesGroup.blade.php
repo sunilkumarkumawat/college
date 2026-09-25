@@ -946,7 +946,7 @@ foreach ($collectedRows as $cr) {
                                         </label>
                                         
                                         <!-- Quick Presets for College Fee Heads -->
-                                        <div class="mb-2 p-1 border rounded bg-white" style="max-height: 140px; overflow-y: auto;">
+                                        <div class="mb-2 p-1 border rounded bg-white">
                                             <div class="d-flex flex-wrap" style="gap: 3px;">
                                                 <!-- Admission & Registration -->
                                                 <span class="quick-preset-btn" onclick="setHeadOnly('Admission Fee', 'admission', 'no')"><i class="fa fa-tag text-success mr-1"></i>Admission Fee</span>
