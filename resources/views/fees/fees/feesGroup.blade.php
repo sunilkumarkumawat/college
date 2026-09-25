@@ -1283,13 +1283,12 @@ foreach ($collectedRows as $cr) {
                                                                     <table class="table table-bordered table-striped table-hover mb-0 padding_table" style="font-size: 11.5px;">
                                                                         <thead>
                                                                             <tr>
-                                                                                <th width="35px" class="text-center">#</th>
+                                                                                <th width="40px" class="text-center">#</th>
                                                                                 <th>Fee Head Name</th>
-                                                                                <th width="150px">Applicable Class / Sem</th>
-                                                                                <th width="130px" class="text-center">Category</th>
-                                                                                <th width="115px" class="text-center">Due Date</th>
-                                                                                <th width="120px" class="text-right">Amount (₹)</th>
-                                                                                <th width="60px" class="text-center">Action</th>
+                                                                                <th width="150px" class="text-center">Category</th>
+                                                                                <th width="130px" class="text-center">Due Date</th>
+                                                                                <th width="130px" class="text-right">Amount (₹)</th>
+                                                                                <th width="65px" class="text-center">Action</th>
                                                                             </tr>
                                                                         </thead>
                                                                         <tbody>
@@ -1319,31 +1318,28 @@ foreach ($collectedRows as $cr) {
                                                                                             <span class="badge badge-refundable ml-1" style="font-size: 8.5px; padding: 2px 4px;">Refundable</span>
                                                                                         @endif
                                                                                     </td>
-                                                                                    <td class="align-middle text-primary font-weight-bold">
-                                                                                        <i class="fa fa-book text-muted mr-1"></i> {{ $clName }}
-                                                                                    </td>
                                                                                     <td class="text-center align-middle">
                                                                                         <span class="badge {{ $badgeClass }}" style="font-size: 10px; padding: 3px 6px;">{{ ucfirst(str_replace('_', ' & ', $fgType)) }}</span>
                                                                                     </td>
                                                                                     <td class="text-center align-middle text-muted">
                                                                                         @if($dueDateStr !== '-')
-                                                                                            <span class="badge badge-light border text-info" style="font-size: 9.5px;">
+                                                                                            <span class="badge badge-light border text-info font-weight-bold" style="font-size: 10px; padding: 2px 6px;">
                                                                                                 <i class="fa fa-calendar-check-o"></i> {{ $dueDateStr }}
                                                                                             </span>
                                                                                         @else
-                                                                                            <span class="text-muted">-</span>
+                                                                                            <span class="text-muted font-italic">-</span>
                                                                                         @endif
                                                                                     </td>
-                                                                                    <td class="text-right align-middle font-weight-bold text-success" style="font-size: 12px;">
+                                                                                    <td class="text-right align-middle font-weight-bold text-success" style="font-size: 12.5px;">
                                                                                         ₹{{ number_format($amt) }}
                                                                                     </td>
                                                                                     <td class="text-center align-middle">
                                                                                         @if(!$isFmAssigned && !$isFmCollected)
                                                                                             <button type="button" 
                                                                                                     class="btn btn-xs btn-outline-danger" 
-                                                                                                    title="Delete {{ $fgName }} from {{ $clName }}" 
-                                                                                                    onclick="confirmDeleteFeesMaster('{{ $sRow->id }}', '{{ addslashes($fgName) }}', '{{ addslashes($clName) }}')"
-                                                                                                    style="font-size: 10px; padding: 1px 6px;">
+                                                                                                    title="Delete {{ $fgName }} from {{ $c->name }}" 
+                                                                                                    onclick="confirmDeleteFeesMaster('{{ $sRow->id }}', '{{ addslashes($fgName) }}', '{{ addslashes($c->name) }}')"
+                                                                                                    style="font-size: 11px; padding: 2px 7px;">
                                                                                                 <i class="fa fa-trash"></i>
                                                                                             </button>
                                                                                         @else
@@ -1357,7 +1353,7 @@ foreach ($collectedRows as $cr) {
                                                                         </tbody>
                                                                         <tfoot>
                                                                             <tr class="bg-light font-weight-bold">
-                                                                                <td colspan="5" class="text-right align-middle">Total Course Fee ({{ count($cAllFeesMaster) }} Fee Heads):</td>
+                                                                                <td colspan="4" class="text-right align-middle" style="font-size: 12px;">Total Course Fee ({{ count($cAllFeesMaster) }} Fee Heads):</td>
                                                                                 <td class="text-right align-middle text-success course-card-foot-total" style="font-size: 12.5px;">₹{{ number_format($cTotalFee) }}</td>
                                                                                 <td></td>
                                                                             </tr>
