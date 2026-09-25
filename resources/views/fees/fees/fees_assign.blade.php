@@ -1187,14 +1187,136 @@ $(document).ready(function() {
         });
     });
 
+    // MODAL: RECALCULATE SUMMARY TOTALS
+    function recalculateModalSummary() {
+        var total = 0;
+        var discount = 0;
+        $('#table_student_fee_edit tbody tr').each(function() {
+            var amt = parseFloat($(this).find('.input-amount').val()) || 0;
+            var disc = parseFloat($(this).find('.input-discount').val()) || 0;
+            var net = Math.max(0, amt - disc);
+            total += amt;
+            discount += disc;
+            $(this).find('.net-display').text('₹' + net.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+        });
+        var netPayable = Math.max(0, total - discount);
+        $('#modal_summary_total').text('₹' + total.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+        $('#modal_summary_net').text('₹' + netPayable.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+    }
+
+    // MODAL: DISCOUNT TYPE CHANGE
+    $(document).on('change', '#modal_discount_type', function() {
+        var type = $(this).val();
+        if (type === 'percentage') {
+            $('#modal_discount_addon').text('%');
+            $('#lbl_discount_input').html('<i class="fa fa-percent text-primary mr-1"></i> Discount Percentage (%)');
+            $('#modal_total_discount_value').attr('placeholder', 'e.g. 10 for 10%').attr('max', '100');
+        } else {
+            $('#modal_discount_addon').text('₹');
+            $('#lbl_discount_input').html('<i class="fa fa-tag text-primary mr-1"></i> Total Discount Value');
+            $('#modal_total_discount_value').attr('placeholder', 'Enter amount in ₹...').removeAttr('max');
+        }
+    });
+
+    // MODAL: CHECK / UNCHECK ALL HEADS
+    $(document).on('change', '#modal_check_all_heads', function() {
+        var isChecked = $(this).is(':checked');
+        $('.modal-head-select').prop('checked', isChecked);
+        updateSelectedHeadsBadge();
+    });
+
+    // MODAL: INDIVIDUAL HEAD CHECKBOX CHANGE
+    $(document).on('change', '.modal-head-select', function() {
+        var allChecked = $('.modal-head-select').length === $('.modal-head-select:checked').length;
+        $('#modal_check_all_heads').prop('checked', allChecked);
+        updateSelectedHeadsBadge();
+    });
+
+    function updateSelectedHeadsBadge() {
+        var total = $('.modal-head-select').length;
+        var checked = $('.modal-head-select:checked').length;
+        $('#modal_selected_heads_count').text(checked + ' of ' + total + ' Heads Selected');
+    }
+
+    // MODAL: AUTO ALLOCATE DISCOUNT EQUALLY ACROSS SELECTED HEADS
+    $(document).on('click', '#btn_auto_allocate_discount', function() {
+        var discountType = $('#modal_discount_type').val();
+        var rawDiscountVal = parseFloat($('#modal_total_discount_value').val());
+
+        if (isNaN(rawDiscountVal) || rawDiscountVal <= 0) {
+            showFeeToast('Please enter a valid discount value greater than 0', 'warning');
+            $('#modal_total_discount_value').focus();
+            return;
+        }
+
+        var $checkedBoxes = $('.modal-head-select:checked');
+        if ($checkedBoxes.length === 0) {
+            showFeeToast('Please select at least one fee head checkbox to allocate discount', 'warning');
+            return;
+        }
+
+        var totalAmountOfSelected = 0;
+        var selectedRows = [];
+        $checkedBoxes.each(function() {
+            var detailId = $(this).data('detail-id');
+            var $row = $('#row_detail_' + detailId);
+            var amt = parseFloat($row.find('.input-amount').val()) || 0;
+            totalAmountOfSelected += amt;
+            selectedRows.push({ $row: $row, amt: amt });
+        });
+
+        var totalDiscountAmt = 0;
+        if (discountType === 'percentage') {
+            var pct = Math.min(100, Math.max(0, rawDiscountVal));
+            totalDiscountAmt = (pct / 100) * totalAmountOfSelected;
+        } else {
+            totalDiscountAmt = Math.min(rawDiscountVal, totalAmountOfSelected);
+        }
+
+        var count = selectedRows.length;
+        var perHeadDiscount = totalDiscountAmt / count;
+
+        $.each(selectedRows, function(index, item) {
+            var allocatedDisc = Math.round(perHeadDiscount * 100) / 100;
+            // Adjust last row for precise round-off sum matching
+            if (index === count - 1) {
+                var prevSum = (Math.round(perHeadDiscount * 100) / 100) * (count - 1);
+                allocatedDisc = Math.round((totalDiscountAmt - prevSum) * 100) / 100;
+            }
+            item.$row.find('.input-discount').val(allocatedDisc);
+            var net = Math.max(0, item.amt - allocatedDisc);
+            item.$row.find('.net-display').text('₹' + net.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+        });
+
+        recalculateModalSummary();
+        showFeeToast('₹' + totalDiscountAmt.toFixed(2) + ' discount allocated equally across ' + count + ' fee heads!', 'success');
+    });
+
+    // MODAL: RESET / CLEAR ALL DISCOUNTS
+    $(document).on('click', '#btn_reset_discount', function() {
+        var $checkedBoxes = $('.modal-head-select:checked');
+        if ($checkedBoxes.length > 0) {
+            $checkedBoxes.each(function() {
+                var detailId = $(this).data('detail-id');
+                var $row = $('#row_detail_' + detailId);
+                $row.find('.input-discount').val(0);
+            });
+        } else {
+            $('.input-discount').val(0);
+        }
+        recalculateModalSummary();
+        showFeeToast('Discounts cleared', 'info');
+    });
+
     // MODAL: LIVE CALCULATION ON INPUT CHANGE
     $(document).on('input', '.input-amount, .input-discount', function() {
         var detailId = $(this).data('detail-id');
         var $row = $('#row_detail_' + detailId);
         var amt = parseFloat($row.find('.input-amount').val()) || 0;
         var disc = parseFloat($row.find('.input-discount').val()) || 0;
-        var net = amt - disc;
+        var net = Math.max(0, amt - disc);
         $row.find('.net-display').text('₹' + net.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+        recalculateModalSummary();
     });
 
     // MODAL: SAVE INDIVIDUAL ROW VIA AJAX
@@ -1244,6 +1366,66 @@ $(document).ready(function() {
             error: function() {
                 $btn.prop('disabled', false).html('<i class="fa fa-save"></i> Save');
                 showFeeToast('Server error while saving fee detail', 'error');
+            }
+        });
+    });
+
+    // MODAL: SAVE ALL DETAILS AT ONCE (BATCH SAVE)
+    $(document).on('click', '#btn_save_all_modal_details', function() {
+        var admissionId = $(this).data('admission-id');
+        var $btn = $(this);
+        var details = [];
+
+        $('#table_student_fee_edit tbody tr').each(function() {
+            var detailId = $(this).find('.input-amount').data('detail-id');
+            if (detailId) {
+                details.push({
+                    id: detailId,
+                    amount: $(this).find('.input-amount').val(),
+                    discount: $(this).find('.input-discount').val(),
+                    due_date: $(this).find('.input-due-date').val(),
+                    fine: $(this).find('.input-fine').val()
+                });
+            }
+        });
+
+        if (details.length === 0) {
+            showFeeToast('No fee records found to save', 'warning');
+            return;
+        }
+
+        $btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin mr-1"></i> Saving All...');
+
+        $.ajax({
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            url: "{{ url('updateStudentFeeDetailsBatch') }}",
+            method: 'POST',
+            data: {
+                admission_id: admissionId,
+                details: details
+            },
+            success: function(res) {
+                $btn.prop('disabled', false).html('<i class="fa fa-check text-white mr-1"></i> All Changes Saved');
+                setTimeout(function() {
+                    $btn.html('<i class="fa fa-check-circle mr-1"></i> Save All Changes');
+                }, 2500);
+
+                if (res.status === 'success') {
+                    if (res.total_amount !== undefined) {
+                        $('#modal_summary_total').text('₹' + parseFloat(res.total_amount).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+                        $('#student_total_' + admissionId).text('₹' + parseFloat(res.total_amount).toLocaleString('en-IN'));
+                    }
+                    if (res.net_amount !== undefined) {
+                        $('#modal_summary_net').text('₹' + parseFloat(res.net_amount).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+                    }
+                    showFeeToast('All student fee changes saved successfully!', 'success');
+                } else {
+                    showFeeToast(res.message || 'Error updating fees', 'error');
+                }
+            },
+            error: function() {
+                $btn.prop('disabled', false).html('<i class="fa fa-check-circle mr-1"></i> Save All Changes');
+                showFeeToast('Server error while saving fee details', 'error');
             }
         });
     });

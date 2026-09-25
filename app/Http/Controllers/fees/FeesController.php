@@ -2210,6 +2210,48 @@ class FeesController extends Controller
                     'message' => 'Fee detail updated successfully'
                 ]);
             }
+
+            public function updateStudentFeeDetailsBatch(Request $request){
+                $admission_id = $request->admission_id;
+                $details = $request->details;
+                if(!empty($details) && is_array($details)){
+                    foreach($details as $item){
+                        if(isset($item['id'])){
+                            $detail = FeesAssignDetail::find($item['id']);
+                            if($detail && $detail->admission_id == $admission_id){
+                                if(isset($item['amount'])) $detail->fees_group_amount = floatval($item['amount']);
+                                if(isset($item['discount'])) $detail->discount = floatval($item['discount']);
+                                if(isset($item['due_date'])) $detail->installment_due_date = $item['due_date'];
+                                if(isset($item['fine'])) $detail->installment_fine = floatval($item['fine']);
+                                $detail->save();
+                            }
+                        }
+                    }
+                }
+                
+                $feesAssign = FeesAssign::where('admission_id', $admission_id)->first();
+                if($feesAssign){
+                    $total = FeesAssignDetail::where('admission_id', $admission_id)->whereNull('deleted_at')->sum('fees_group_amount');
+                    $discount = FeesAssignDetail::where('admission_id', $admission_id)->whereNull('deleted_at')->sum('discount');
+                    $feesAssign->update([
+                        'total_amount' => $total,
+                        'net_amount' => ($total - $discount)
+                    ]);
+                    $net = $total - $discount;
+                } else {
+                    $total = 0;
+                    $discount = 0;
+                    $net = 0;
+                }
+                
+                return response()->json([
+                    'status' => 'success',
+                    'total_amount' => $total,
+                    'total_discount' => $discount,
+                    'net_amount' => $net,
+                    'message' => 'All fee details updated successfully'
+                ]);
+            }
             public function createFeesInstallment(Request $request){
                 if(!empty($request->installment_name)){
                     foreach($request->installment_name as $key=> $name)

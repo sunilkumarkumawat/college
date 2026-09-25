@@ -7,7 +7,7 @@
     </button>
 </div>
 
-<div class="modal-body p-3" style="background-color: #f8fafc;">
+<div class="modal-body p-3" style="background-color: #f8fafc;" data-admission-id="{{ $student->id }}">
     <!-- Student Summary Ribbon -->
     <div class="row mb-3">
         <div class="col-md-3 col-sm-6 mb-1">
@@ -40,21 +40,83 @@
         </div>
     </div>
 
-    <!-- Assigned Fee Heads Table -->
     @if(!empty($assignedDetails) && count($assignedDetails) > 0)
-        <div class="table-responsive border rounded bg-white">
-            <table class="table table-bordered table-sm mb-0" style="font-size: 12.5px;">
+        <!-- Total Discount & Auto Allocation Panel -->
+        <div class="card mb-3 border-0 shadow-sm" style="background: linear-gradient(135deg, #eef4f9 0%, #e2edf8 100%); border: 1px solid #cbd5e1 !important; border-radius: 8px;">
+            <div class="card-body p-2">
+                <div class="row align-items-center">
+                    <div class="col-md-3 col-12 mb-1">
+                        <label class="font-weight-bold text-dark mb-0 small" style="font-size: 11.5px;">
+                            <i class="fa fa-sliders text-primary mr-1"></i> Discount Type
+                        </label>
+                        <select id="modal_discount_type" class="form-control form-control-sm mt-1" style="height: 32px; font-weight: 600; border-radius: 5px;">
+                            <option value="fixed">Fixed Amount (₹)</option>
+                            <option value="percentage">Percentage (%)</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3 col-12 mb-1">
+                        <label class="font-weight-bold text-dark mb-0 small" id="lbl_discount_input" style="font-size: 11.5px;">
+                            <i class="fa fa-tag text-primary mr-1"></i> Total Discount Value
+                        </label>
+                        <div class="input-group input-group-sm mt-1">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text font-weight-bold bg-white text-primary" id="modal_discount_addon" style="height: 32px; border-radius: 5px 0 0 5px;">₹</span>
+                            </div>
+                            <input type="number" 
+                                   id="modal_total_discount_value" 
+                                   class="form-control form-control-sm" 
+                                   placeholder="Enter amount..." 
+                                   min="0" 
+                                   step="any" 
+                                   style="height: 32px; font-weight: 600; border-radius: 0 5px 5px 0;">
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 col-12 mb-1 d-flex align-items-end">
+                        <button type="button" 
+                                id="btn_auto_allocate_discount" 
+                                class="btn btn-sm btn-primary w-100 font-weight-bold shadow-sm" 
+                                style="height: 32px; border-radius: 5px;">
+                            <i class="fa fa-magic mr-1"></i> Auto Allocate
+                        </button>
+                    </div>
+
+                    <div class="col-md-3 col-12 mb-1 d-flex align-items-end">
+                        <button type="button" 
+                                id="btn_reset_discount" 
+                                class="btn btn-sm btn-outline-secondary w-100 font-weight-bold shadow-sm" 
+                                style="height: 32px; border-radius: 5px;">
+                            <i class="fa fa-eraser mr-1"></i> Clear Discounts
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-1 d-flex justify-content-between align-items-center text-muted px-1" style="font-size: 11.5px;">
+                    <span><i class="fa fa-info-circle text-info mr-1"></i> Discount will be equally distributed among all selected fee heads.</span>
+                    <span id="modal_selected_heads_count" class="badge badge-primary px-2 py-1" style="font-size: 11px;">
+                        {{ count($assignedDetails) }} Heads Selected
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Assigned Fee Heads Table (Fine Column Hidden) -->
+        <div class="table-responsive border rounded bg-white shadow-xs">
+            <table class="table table-bordered table-sm mb-0" id="table_student_fee_edit" style="font-size: 12.5px;">
                 <thead style="background-color: #002c54; color: #ffffff;">
                     <tr>
+                        <th style="width: 35px; text-align: center;">
+                            <input type="checkbox" id="modal_check_all_heads" checked title="Select / Deselect All">
+                        </th>
                         <th style="width: 35px; text-align: center;">#</th>
                         <th>Fee Head</th>
-                        <th style="width: 115px;">Amount (₹)</th>
-                        <th style="width: 110px;">Discount (₹)</th>
-                        <th style="width: 115px;">Net (₹)</th>
-                        <th style="width: 140px;">Due Date</th>
-                        <th style="width: 100px;">Fine (₹)</th>
+                        <th style="width: 125px;">Amount (₹)</th>
+                        <th style="width: 125px;">Discount (₹)</th>
+                        <th style="width: 125px;">Net (₹)</th>
+                        <th style="width: 145px;">Due Date</th>
                         <th style="width: 85px; text-align: center;">Paid</th>
-                        <th style="width: 80px; text-align: center;">Action</th>
+                        <th style="width: 85px; text-align: center;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -64,26 +126,34 @@
                             $headDisc = floatval($detail->discount ?? 0);
                             $headNet = $headTotal - $headDisc;
                         @endphp
-                        <tr id="row_detail_{{ $detail->id }}">
-                            <td class="text-center align-middle">{{ $k + 1 }}</td>
+                        <tr id="row_detail_{{ $detail->id }}" class="fee-detail-row">
+                            <td class="text-center align-middle">
+                                <input type="checkbox" 
+                                       class="modal-head-select" 
+                                       data-detail-id="{{ $detail->id }}" 
+                                       checked>
+                            </td>
+                            <td class="text-center align-middle text-muted">{{ $k + 1 }}</td>
                             <td class="align-middle font-weight-bold text-dark">
                                 {{ $detail->fees_group_name ?? 'Fee Head' }}
                             </td>
                             <td class="align-middle">
                                 <input type="number" 
                                        step="any" 
+                                       min="0"
                                        class="form-control form-control-sm text-right modal-detail-input input-amount" 
                                        data-detail-id="{{ $detail->id }}" 
                                        value="{{ $headTotal }}" 
-                                       style="font-size: 12px; height: 28px; padding: 2px 6px;">
+                                       style="font-size: 12px; height: 28px; padding: 2px 6px; font-weight: 600;">
                             </td>
                             <td class="align-middle">
                                 <input type="number" 
                                        step="any" 
+                                       min="0"
                                        class="form-control form-control-sm text-right modal-detail-input input-discount" 
                                        data-detail-id="{{ $detail->id }}" 
                                        value="{{ $headDisc }}" 
-                                       style="font-size: 12px; height: 28px; padding: 2px 6px;">
+                                       style="font-size: 12px; height: 28px; padding: 2px 6px; font-weight: 600;">
                             </td>
                             <td class="align-middle text-right font-weight-bold text-dark net-display" id="net_disp_{{ $detail->id }}">
                                 ₹{{ number_format($headNet, 2) }}
@@ -94,14 +164,11 @@
                                        data-detail-id="{{ $detail->id }}" 
                                        value="{{ $detail->installment_due_date ? date('Y-m-d', strtotime($detail->installment_due_date)) : '' }}" 
                                        style="font-size: 11.5px; height: 28px; padding: 2px 4px;">
-                            </td>
-                            <td class="align-middle">
-                                <input type="number" 
-                                       step="any" 
-                                       class="form-control form-control-sm text-right modal-detail-input input-fine" 
+                                <!-- Hidden Fine Field -->
+                                <input type="hidden" 
+                                       class="input-fine" 
                                        data-detail-id="{{ $detail->id }}" 
-                                       value="{{ floatval($detail->installment_fine ?? 0) }}" 
-                                       style="font-size: 12px; height: 28px; padding: 2px 6px;">
+                                       value="{{ floatval($detail->installment_fine ?? 0) }}">
                             </td>
                             <td class="align-middle text-center">
                                 @if(($detail->paid_amount ?? 0) > 0)
@@ -115,7 +182,7 @@
                                         class="btn btn-sm btn-primary btn-save-detail-row px-2 py-0" 
                                         data-detail-id="{{ $detail->id }}" 
                                         data-admission-id="{{ $student->id }}"
-                                        title="Save this fee head"
+                                        title="Save this row"
                                         style="font-size: 11px; height: 26px; line-height: 24px;">
                                     <i class="fa fa-save"></i> Save
                                 </button>
@@ -135,9 +202,16 @@
 </div>
 
 <div class="modal-footer py-2 px-3 bg-light d-flex justify-content-between">
-    <span class="text-muted small">
-        <i class="fa fa-info-circle mr-1"></i> Changes will update the student's fee ledger instantly.
-    </span>
+    <div>
+        @if(!empty($assignedDetails) && count($assignedDetails) > 0)
+            <button type="button" 
+                    class="btn btn-success btn-sm font-weight-bold px-3 shadow-sm" 
+                    id="btn_save_all_modal_details" 
+                    data-admission-id="{{ $student->id }}">
+                <i class="fa fa-check-circle mr-1"></i> Save All Changes
+            </button>
+        @endif
+    </div>
     <button type="button" class="btn btn-secondary btn-sm px-3 btn-close-modal" data-dismiss="modal" data-bs-dismiss="modal">
         <i class="fa fa-times mr-1"></i> Close
     </button>

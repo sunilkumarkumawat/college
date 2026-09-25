@@ -253,6 +253,7 @@ Route::match(['get', 'post'], 'bulkAssignCourseFees', 'fees\FeesController@bulkA
 Route::match(['get', 'post'], 'clearStudentFeeHeads', 'fees\FeesController@clearStudentFeeHeads');
 Route::match(['get', 'post'], 'getStudentFeeDetailsModal', 'fees\FeesController@getStudentFeeDetailsModal');
 Route::match(['get', 'post'], 'updateStudentFeeDetailInline', 'fees\FeesController@updateStudentFeeDetailInline');
+Route::match(['get', 'post'], 'updateStudentFeeDetailsBatch', 'fees\FeesController@updateStudentFeeDetailsBatch');
 Route::match(['get', 'post'], 'getMasterData', 'fees\FeesController@getMasterData');
 Route::match(['get', 'post'], 'feesModification', 'fees\FeesController@feesModification');
 Route::match(['get', 'post'], 'deleteAssignedFees', 'fees\FeesController@deleteAssignedFees');
