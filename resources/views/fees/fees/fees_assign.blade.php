@@ -254,10 +254,10 @@
                                 <!-- 2. Batch Select -->
                                 <div class="col-md-3 col-sm-6 mb-2">
                                     <label class="filter-label">
-                                        <span>Batch</span>
+                                        <span>Batch <span class="text-danger">*</span></span>
                                     </label>
                                     <select class="form-control form-control-sm select2" id="filter_batch" name="batch" style="width: 100%;">
-                                        <option value="">-- All Batches --</option>
+                                        <option value="">-- Select Batch --</option>
                                         @if(!empty($batches))
                                             @foreach($batches as $batch)
                                                 <option value="{{ $batch->name ?? '' }}">{{ $batch->name ?? '' }}</option>
@@ -346,7 +346,7 @@
                                         <tr>
                                             <td colspan="10" class="text-center py-5 text-muted">
                                                 <i class="fa fa-filter fa-2x mb-2 text-secondary d-block"></i>
-                                                Please select a <b>Course</b> above to view and assign students.
+                                                Please select both <b>Course</b> and <b>Batch</b> above to view and assign students.
                                             </td>
                                         </tr>
                                     </tbody>
@@ -411,8 +411,16 @@ function loadStudents() {
     var batch = $('#filter_batch').val();
     var admissionNo = $('#filter_admission_no').val();
     
-    if (!course_id && !admissionNo) {
-        $('#tbody_students_list').html('<tr><td colspan="10" class="text-center py-5 text-muted"><i class="fa fa-filter fa-2x mb-2 text-secondary d-block"></i> Please select a <b>Course</b> above to view and assign students.</td></tr>');
+    if ((!course_id || !batch) && !admissionNo) {
+        var msg = 'Please select both <b>Course</b> and <b>Batch</b> above to view and assign students.';
+        if (!course_id && !batch) {
+            msg = 'Please select a <b>Course</b> and <b>Batch</b> above to view students.';
+        } else if (!course_id) {
+            msg = 'Please select a <b>Course</b> above.';
+        } else if (!batch) {
+            msg = 'Please select a <b>Batch</b> above to load student list.';
+        }
+        $('#tbody_students_list').html('<tr><td colspan="10" class="text-center py-5 text-muted"><i class="fa fa-filter fa-2x mb-2 text-secondary d-block"></i> ' + msg + '</td></tr>');
         updateSelectedCount();
         return;
     }
@@ -516,7 +524,7 @@ $(document).ready(function() {
         $('#filter_batch').val('').trigger('change');
         $('#filter_admission_no').val('');
         $('#filter_fees_master_ids').empty().trigger('change');
-        $('#tbody_students_list').html('<tr><td colspan="10" class="text-center py-5 text-muted"><i class="fa fa-filter fa-2x mb-2 text-secondary d-block"></i> Please select a <b>Course</b> above.</td></tr>');
+        $('#tbody_students_list').html('<tr><td colspan="10" class="text-center py-5 text-muted"><i class="fa fa-filter fa-2x mb-2 text-secondary d-block"></i> Please select both <b>Course</b> and <b>Batch</b> above.</td></tr>');
         updateSelectedCount();
     });
 

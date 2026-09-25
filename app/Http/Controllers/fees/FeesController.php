@@ -1601,6 +1601,14 @@ class FeesController extends Controller
                 $course_id = $request->course_id ?? '';
                 $batch = $request->batch ?? '';
                 $admissionNo = $request->admissionNo ?? '';
+
+                if(empty($admissionNo) && (empty($course_id) || empty($batch))){
+                    return view('fees.modification.admissionList', [
+                        'data' => collect([]),
+                        'courseFeesMasters' => collect([]),
+                        'assignedDetailMap' => []
+                    ]);
+                }
                 
                 $data = Admission::with('ClassTypes')
                     ->where('session_id', Session::get('session_id'))
