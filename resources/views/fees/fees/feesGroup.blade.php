@@ -15,7 +15,14 @@ if (!empty($allFeesMasterRows)) {
         }
     }
 }
-$feeHeadsList = !empty($dataview) ? $dataview : [];
+$feeHeadsList = [];
+if (!empty($dataview)) {
+    foreach ($dataview as $head) {
+        if (!preg_match('/-\s*(Sem|Semester|Year)\s*\d+/i', $head->name)) {
+            $feeHeadsList[] = $head;
+        }
+    }
+}
 $noClassHeads = $feeHeadsList;
 
 // Check which fees_group / fees_master rows are assigned to students or have payments collected
