@@ -4,23 +4,19 @@ $getSession = Helper::getSession();
 $classType = Helper::classType();
 $courses = $courses ?? Helper::getCourses();
 
-// Usage map to find which heads are used in fees_master
+// Usage map & count to find which heads are used in fees_master
 $feesGroupUsageMap = [];
+$headUsageCount = [];
 if (!empty($allFeesMasterRows)) {
     foreach ($allFeesMasterRows as $row) {
         if (!empty($row->fees_group_id)) {
             $feesGroupUsageMap[$row->fees_group_id] = true;
+            $headUsageCount[$row->fees_group_id] = ($headUsageCount[$row->fees_group_id] ?? 0) + 1;
         }
     }
 }
-$noClassHeads = [];
-if (!empty($dataview)) {
-    foreach ($dataview as $head) {
-        if (!isset($feesGroupUsageMap[$head->id])) {
-            $noClassHeads[] = $head;
-        }
-    }
-}
+$feeHeadsList = !empty($dataview) ? $dataview : [];
+$noClassHeads = $feeHeadsList;
 
 // Check which fees_group / fees_master rows are assigned to students or have payments collected
 $assignedMap = [];
@@ -1083,8 +1079,8 @@ foreach ($collectedRows as $cr) {
                                     <i class="fa fa-th-large mr-1"></i> Class-wise Fees Master
                                 </button>
                                 <button type="button" class="btn btn-sm btn-light font-weight-bold text-dark" id="btn_tab_no_class" onclick="switchRightTab('no_class_heads')" style="font-size: 11px; padding: 3px 10px;">
-                                    <i class="fa fa-tag mr-1 text-primary"></i> No-Class Fee Heads
-                                    <span class="badge badge-primary ml-1" id="total_no_class_heads_badge">{{ count($noClassHeads) }}</span>
+                                    <i class="fa fa-tags mr-1 text-primary"></i> Fee Heads Master
+                                    <span class="badge badge-primary ml-1" id="total_no_class_heads_badge">{{ count($feeHeadsList) }}</span>
                                 </button>
                             </div>
                         </div>  
@@ -1385,18 +1381,18 @@ foreach ($collectedRows as $cr) {
                                         </div>
                                     </div>
 
-                                    <!-- TAB 2: STANDALONE / NO-CLASS FEE HEADS TABULAR LIST -->
+                                     <!-- TAB 2: ALL FEE HEADS MASTER TABULAR LIST -->
                                     <div id="container_no_class_heads" style="display: none;">
                                         <div class="d-flex justify-content-between align-items-center p-2 mb-2 rounded border" style="background: #f8fafc;">
                                             <div class="d-flex align-items-center">
                                                 <span id="no_class_count_badge" class="badge badge-primary mr-2" style="font-size: 11px; padding: 4px 7px;">
-                                                    <i class="fa fa-tag"></i> {{ count($noClassHeads) }}
+                                                    <i class="fa fa-tags"></i> {{ count($feeHeadsList) }}
                                                 </span>
                                                 <div>
                                                     <span class="font-weight-bold text-dark" style="font-size: 12.5px;">
-                                                        Standalone Fee Heads (No Class Assigned)
+                                                        Fee Heads Master (All Created Heads)
                                                     </span>
-                                                    <span class="text-muted d-block" style="font-size: 10.5px;">These heads are created without any class/semester mapping.</span>
+                                                    <span class="text-muted d-block" style="font-size: 10.5px;">All created fee heads. You can assign any head to multiple courses or specific classes anytime.</span>
                                                 </div>
                                             </div>
                                             <div>
@@ -1406,20 +1402,21 @@ foreach ($collectedRows as $cr) {
                                             </div>
                                         </div>
 
-                                        @if(count($noClassHeads) > 0)
+                                        @if(count($feeHeadsList) > 0)
                                             <div class="table-responsive border rounded" style="background: #ffffff;">
                                                 <table class="table table-bordered table-striped table-hover mb-0 padding_table" style="font-size: 11.5px;">
                                                     <thead>
                                                         <tr>
                                                             <th width="40px" class="text-center">#</th>
                                                             <th>Fee Head Name</th>
-                                                            <th width="160px" class="text-center">Category</th>
-                                                            <th width="130px" class="text-center">Properties</th>
-                                                            <th width="80px" class="text-center">Action</th>
+                                                            <th width="150px" class="text-center">Category</th>
+                                                            <th width="120px" class="text-center">Properties</th>
+                                                            <th width="140px" class="text-center">Mapped Status</th>
+                                                            <th width="120px" class="text-center">Action</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        @foreach($noClassHeads as $idx => $nh)
+                                                        @foreach($feeHeadsList as $idx => $nh)
                                                             @php
                                                                 $nhCat = strtolower(trim($nh->group_type ?? 'other'));
                                                                 if ($nhCat === 'registration') $nhCat = 'admission';
@@ -1434,6 +1431,7 @@ foreach ($collectedRows as $cr) {
 
                                                                 $isRef = strtolower(trim($nh->fees_refund ?? '')) === 'yes';
                                                                 $isPart = ($nh->fees_partial ?? 0) == 1;
+                                                                $usageCount = $headUsageCount[$nh->id] ?? 0;
                                                             @endphp
                                                             <tr id="no_class_row_{{ $nh->id }}">
                                                                 <td class="text-center align-middle font-weight-bold text-muted">{{ $idx + 1 }}</td>
@@ -1460,6 +1458,17 @@ foreach ($collectedRows as $cr) {
                                                                         <span class="badge badge-academic" style="font-size: 10px; padding: 3px 6px;"><i class="fa fa-adjust mr-1"></i> 50% Partial</span>
                                                                     @else
                                                                         <span class="badge badge-other" style="font-size: 10px; padding: 3px 6px;">Standard</span>
+                                                                    @endif
+                                                                </td>
+                                                                <td class="text-center align-middle">
+                                                                    @if($usageCount > 0)
+                                                                        <span class="badge badge-success" style="font-size: 10px; padding: 3px 7px;" title="Mapped in Fees Master">
+                                                                            <i class="fa fa-check-circle mr-1"></i> Mapped ({{ $usageCount }} Class{{ $usageCount == 1 ? '' : 'es' }})
+                                                                        </span>
+                                                                    @else
+                                                                        <span class="badge badge-light border text-muted" style="font-size: 10px; padding: 3px 7px;">
+                                                                            <i class="fa fa-clock-o mr-1 text-secondary"></i> Unassigned
+                                                                        </span>
                                                                     @endif
                                                                 </td>
                                                                 <td class="text-center align-middle text-nowrap">
@@ -1509,7 +1518,7 @@ foreach ($collectedRows as $cr) {
                                         @else
                                             <div class="p-4 text-center text-muted border rounded" style="font-size: 12px; background: #ffffff;">
                                                 <i class="fa fa-info-circle text-info fa-2x mb-2 d-block"></i>
-                                                No standalone / no-class fee heads found.
+                                                No fee heads found. Click "Add Fee Head" to create one.
                                             </div>
                                         @endif
                                     </div>
@@ -2358,7 +2367,7 @@ function switchRightTab(tab) {
         $('#btn_tab_structures').removeClass('btn-primary active').addClass('btn-light text-dark');
         $('#container_class_structures').hide();
         $('#container_no_class_heads').stop(true, true).fadeIn(150);
-        $('#right_header_title').text('No-Class Fee Heads');
+        $('#right_header_title').text('Fee Heads Master');
     } else {
         $('#btn_tab_structures').removeClass('btn-light text-dark').addClass('btn-primary active');
         $('#btn_tab_no_class').removeClass('btn-primary active').addClass('btn-light text-dark');
