@@ -10,22 +10,107 @@
 @endphp
 
 <style>
-.table-assign thead th {
-    background-color: #002c54;
-    color: #ffffff;
-    font-size: 13px;
-    padding: 6px 8px;
-    vertical-align: middle;
-    border: 1px solid #1a4267;
+/* High Contrast Theme & Light Font on Dark Backgrounds */
+.fees-assign-page {
+    --brand-dark: #002c54;
+    --brand-dark-hover: #00407a;
+    --brand-darker: #001a33;
 }
+
+/* Header with Dark Background */
+.card-header.bg-primary {
+    background-color: var(--brand-dark) !important;
+    border-bottom: 1px solid var(--brand-darker) !important;
+}
+.card-header.bg-primary .card-title,
+.card-header.bg-primary h3,
+.card-header.bg-primary h3 i,
+.card-header.bg-primary span {
+    color: #ffffff !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+.card-header.bg-primary .btn {
+    background-color: rgba(255, 255, 255, 0.18) !important;
+    border: 1px solid rgba(255, 255, 255, 0.45) !important;
+    color: #ffffff !important;
+    font-weight: 600;
+}
+.card-header.bg-primary .btn:hover {
+    background-color: rgba(255, 255, 255, 0.32) !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+/* Table Header Dark Background & Light Font */
+.table-assign thead th {
+    background-color: var(--brand-dark) !important;
+    color: #ffffff !important;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 7px 8px;
+    vertical-align: middle;
+    border: 1px solid #143d66 !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+.table-assign thead th,
+.table-assign thead th * {
+    color: #ffffff !important;
+}
+
+/* Table Body Styling */
 .table-assign tbody td {
-    padding: 5px 8px;
+    padding: 6px 8px;
     font-size: 12.5px;
     vertical-align: middle;
+    color: #1e293b;
 }
 .table-assign tbody tr:hover {
-    background-color: #e9ecef !important;
+    background-color: #f1f5f9 !important;
 }
+
+/* Badges on Dark/Medium Backgrounds with High Contrast Light Font */
+.badge-head-tag {
+    background-color: #0284c7 !important;
+    color: #ffffff !important;
+    border: 1px solid #0369a1 !important;
+    font-weight: 600 !important;
+    font-size: 11.5px !important;
+    padding: 3px 8px !important;
+    border-radius: 4px !important;
+    display: inline-block !important;
+    margin: 2px !important;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+}
+.badge-head-tag i {
+    color: #ffffff !important;
+}
+.badge-secondary {
+    background-color: #475569 !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+.badge-success {
+    background-color: #16a34a !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+.badge-info {
+    background-color: #0284c7 !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+.badge-primary {
+    background-color: var(--brand-dark) !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+.badge-danger {
+    background-color: #dc2626 !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+
+/* Select2 Multiple Selected Tags (Dark Background with Crisp White Font) */
 .select2-container .select2-selection--single,
 .select2-container .select2-selection--multiple {
     min-height: 31px !important;
@@ -34,16 +119,43 @@
 .select2-container--default .select2-selection--single .select2-selection__rendered {
     line-height: 28px !important;
     font-size: 13px;
+    color: #1e293b;
 }
 .select2-container--default .select2-selection--multiple .select2-selection__rendered {
     padding: 0 4px;
     font-size: 12px;
 }
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: var(--brand-dark) !important;
+    border: 1px solid var(--brand-darker) !important;
+    color: #ffffff !important;
+    font-size: 11.5px !important;
+    font-weight: 600 !important;
+    padding: 2px 8px !important;
+    margin-top: 3px !important;
+    border-radius: 4px !important;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    color: #ffffff !important;
+    margin-right: 6px !important;
+    font-weight: bold !important;
+    opacity: 0.9 !important;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+    color: #facc15 !important;
+    opacity: 1 !important;
+}
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: var(--brand-dark) !important;
+    color: #ffffff !important;
+}
+
 .filter-label {
     font-size: 12px;
     font-weight: 600;
     margin-bottom: 2px;
-    color: #333;
+    color: #1e293b;
 }
 </style>
 

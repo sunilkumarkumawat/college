@@ -39,7 +39,7 @@
             <td class="align-middle text-left" style="min-width: 180px;">
                 @if(count($feesGroupData) > 0)
                     @foreach($feesGroupData as $fees_group)
-                        <span class="badge badge-info mr-1 mb-1 font-weight-normal" style="font-size: 11px; padding: 3px 6px;">
+                        <span class="badge-head-tag">
                             <i class="fa fa-check text-xs mr-1"></i>{{ $fees_group->name ?? '' }}
                         </span>
                     @endforeach
