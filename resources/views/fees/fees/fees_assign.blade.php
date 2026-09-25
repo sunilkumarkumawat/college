@@ -3,8 +3,7 @@
 
 @php
     $courses = Helper::getCourses();
-    $classType = Helper::classType();
-    $allClassType = Helper::classType();
+    $batches = Helper::getBatch();
     $getFeesGroup = Helper::getFeesGroup();
     $getSession = Helper::getSession();
 @endphp
@@ -233,9 +232,9 @@
                         <div class="card-body p-3">
                             @include('layout.message')
 
-                            <!-- Filter Inputs Row -->
+                            <!-- Filter Inputs Row in Perfect Sequence: Course -> Batch -> Search Student -> Fee Heads -->
                             <div class="row mb-2">
-                                <!-- Course Select -->
+                                <!-- 1. Course Select -->
                                 <div class="col-md-3 col-sm-6 mb-2">
                                     <label class="filter-label">Course <span class="text-danger">*</span></label>
                                     <select class="form-control form-control-sm select2" id="filter_course_id" name="course_id" style="width: 100%;">
@@ -248,24 +247,24 @@
                                     </select>
                                 </div>
 
-                                <!-- Class / Semester Select -->
+                                <!-- 2. Batch Select -->
                                 <div class="col-md-3 col-sm-6 mb-2">
-                                    <label class="filter-label">Class / Semester</label>
-                                    <select class="form-control form-control-sm select2" id="filter_class_type_id" name="class_type_id" style="width: 100%;">
-                                        <option value="">-- All Classes in Course --</option>
-                                        @if(!empty($classType))
-                                            @foreach($classType as $type)
-                                                <option value="{{ $type->id }}">{{ $type->name ?? '' }}</option>
+                                    <label class="filter-label">Batch</label>
+                                    <select class="form-control form-control-sm select2" id="filter_batch" name="batch" style="width: 100%;">
+                                        <option value="">-- All Batches --</option>
+                                        @if(!empty($batches))
+                                            @foreach($batches as $batch)
+                                                <option value="{{ $batch->name ?? '' }}">{{ $batch->name ?? '' }}</option>
                                             @endforeach
                                         @endif
                                     </select>
                                 </div>
 
-                                <!-- Admission No / Search -->
-                                <div class="col-md-2 col-sm-6 mb-2">
-                                    <label class="filter-label">Student ID / Name</label>
+                                <!-- 3. Admission No / Student ID / Name Search -->
+                                <div class="col-md-3 col-sm-6 mb-2">
+                                    <label class="filter-label">Student ID / Name / Mobile</label>
                                     <div class="input-group input-group-sm">
-                                        <input type="text" class="form-control form-control-sm" id="filter_admission_no" name="admissionNo" placeholder="Adm No. / Name / Mob">
+                                        <input type="text" class="form-control form-control-sm" id="filter_admission_no" name="admissionNo" placeholder="Type to filter instantly...">
                                         <div class="input-group-append">
                                             <button class="btn btn-primary" type="button" id="btn_search_students" title="Search">
                                                 <i class="fa fa-search"></i>
@@ -274,36 +273,39 @@
                                     </div>
                                 </div>
 
-                                <!-- Fees Master Heads Multi-Select for Bulk Action -->
-                                <div class="col-md-4 col-sm-6 mb-2">
+                                <!-- 4. Fees Master Heads Multi-Select for Quick Bulk Assign -->
+                                <div class="col-md-3 col-sm-6 mb-2">
                                     <label class="filter-label">
-                                        Specific Fee Heads (Optional for Bulk Assign)
+                                        Fee Heads (For 1-Click Multi-Assign)
                                     </label>
-                                    <select class="form-control form-control-sm select2" multiple="multiple" id="filter_fees_master_ids" name="fees_master_ids[]" data-placeholder="-- All Course Fee Heads (Default) --" style="width: 100%;">
+                                    <select class="form-control form-control-sm select2" multiple="multiple" id="filter_fees_master_ids" name="fees_master_ids[]" data-placeholder="-- All Course Fee Heads --" style="width: 100%;">
                                     </select>
                                 </div>
                             </div>
 
-                            <!-- Action Toolbar & Counter Strip -->
+                            <!-- Fast Action Toolbar & Real-Time Status Strip -->
                             <div class="mid-action-strip d-flex flex-wrap justify-content-between align-items-center mb-2">
-                                <div class="mb-1 mb-md-0 d-flex align-items-center flex-wrap">
-                                    <button type="button" class="btn btn-success btn-xs font-weight-bold mr-2" id="btn_bulk_assign_realtime" style="font-size: 12px; padding: 4px 12px;">
-                                        <i class="fa fa-check-circle mr-1"></i> Real-time Bulk Assign to Selected (<span class="selected_students_count_text">0</span>)
+                                <div class="mb-1 mb-md-0 d-flex align-items-center flex-wrap" style="gap: 6px;">
+                                    <button type="button" class="btn btn-warning btn-xs font-weight-bold shadow-xs text-dark" id="btn_quick_apply_all_loaded" style="font-size: 11.5px; padding: 4px 10px;">
+                                        <i class="fa fa-bolt text-dark mr-1"></i> Quick Apply to ALL Loaded (<span class="total_students_count_text">0</span>)
                                     </button>
-                                    <span style="font-size: 12px; color: #475569;">
-                                        <i class="fa fa-info-circle text-primary mr-1"></i> Checkbox clicks <b>auto-save</b> instantly.
+                                    <button type="button" class="btn btn-success btn-xs font-weight-bold shadow-xs" id="btn_bulk_assign_realtime" style="font-size: 11.5px; padding: 4px 10px;">
+                                        <i class="fa fa-check-circle mr-1"></i> Assign Selected Heads to Checked (<span class="selected_students_count_text">0</span>)
+                                    </button>
+                                    <span class="badge badge-light border text-muted py-1 px-2" style="font-size: 11px;">
+                                        <i class="fa fa-info-circle text-primary mr-1"></i> Clicking any checkbox auto-saves immediately
                                     </span>
                                 </div>
-                                <div class="d-flex align-items-center">
-                                    <span class="badge px-2 py-1 mr-1" id="total_students_badge" style="background-color: #334155; color: #ffffff; font-size: 12px; font-weight: 500;">Total: 0</span>
-                                    <span class="badge px-2 py-1 mr-2" id="selected_students_badge" style="background-color: #16a34a; color: #ffffff; font-size: 12px; font-weight: 600;">Selected: 0</span>
-                                    <button type="button" class="btn btn-default btn-xs border mr-1" id="btn_quick_select_all" style="font-size: 11.5px; padding: 3px 8px;">
+                                <div class="d-flex align-items-center" style="gap: 4px;">
+                                    <span class="badge px-2 py-1" id="total_students_badge" style="background-color: #334155; color: #ffffff; font-size: 12px; font-weight: 500;">Total: 0</span>
+                                    <span class="badge px-2 py-1 mr-1" id="selected_students_badge" style="background-color: #16a34a; color: #ffffff; font-size: 12px; font-weight: 600;">Selected: 0</span>
+                                    <button type="button" class="btn btn-default btn-xs border" id="btn_quick_select_all" style="font-size: 11.5px; padding: 3px 8px;" title="Select all loaded students">
                                         <i class="fa fa-check-square text-primary mr-1"></i>Select All
                                     </button>
-                                    <button type="button" class="btn btn-default btn-xs border mr-1" id="btn_quick_deselect_all" style="font-size: 11.5px; padding: 3px 8px;">
+                                    <button type="button" class="btn btn-default btn-xs border" id="btn_quick_deselect_all" style="font-size: 11.5px; padding: 3px 8px;" title="Deselect all">
                                         <i class="fa fa-square-o text-danger mr-1"></i>Deselect
                                     </button>
-                                    <button type="button" class="btn btn-default btn-xs border" id="btn_clear_filters" style="font-size: 11.5px; padding: 3px 8px;" title="Reset">
+                                    <button type="button" class="btn btn-default btn-xs border" id="btn_clear_filters" style="font-size: 11.5px; padding: 3px 8px;" title="Reset Filters">
                                         <i class="fa fa-refresh text-secondary mr-1"></i>Reset
                                     </button>
                                 </div>
@@ -360,7 +362,7 @@
 </div>
 
 <script>
-var defaultClasses = @json($allClassType ?? []);
+var searchTimer = null;
 
 function showFeeToast(msg, type = 'success') {
     var bgClass = type === 'success' ? 'alert-success' : 'alert-danger';
@@ -383,6 +385,7 @@ function updateSelectedCount() {
     $('#selected_students_badge').text('Selected: ' + checked);
     $('.selected_students_count_text').text(checked);
     $('#total_students_badge').text('Total: ' + total);
+    $('.total_students_count_text').text(total);
     
     if (total > 0 && checked === total) {
         $('#all_students').prop('checked', true);
@@ -391,9 +394,13 @@ function updateSelectedCount() {
     }
 }
 
-function loadStudents(class_type_id, admissionNo, course_id) {
-    if (!class_type_id && !course_id && !admissionNo) {
-        $('#tbody_students_list').html('<tr><td colspan="10" class="text-center py-5 text-muted"><i class="fa fa-info-circle mr-1"></i> Please select a Course or Class / Semester</td></tr>');
+function loadStudents() {
+    var course_id = $('#filter_course_id').val();
+    var batch = $('#filter_batch').val();
+    var admissionNo = $('#filter_admission_no').val();
+    
+    if (!course_id && !admissionNo) {
+        $('#tbody_students_list').html('<tr><td colspan="10" class="text-center py-5 text-muted"><i class="fa fa-filter fa-2x mb-2 text-secondary d-block"></i> Please select a <b>Course</b> above to view and assign students.</td></tr>');
         updateSelectedCount();
         return;
     }
@@ -405,8 +412,8 @@ function loadStudents(class_type_id, admissionNo, course_id) {
         url: "{{ url('getStudentsList') }}",
         method: 'POST',
         data: {
-            class_type_id: class_type_id,
             course_id: course_id,
+            batch: batch,
             admissionNo: admissionNo
         },
         success: function(response) {
@@ -420,15 +427,17 @@ function loadStudents(class_type_id, admissionNo, course_id) {
     });
 }
 
-function loadFeeMasterHeads(class_type_id, course_id) {
+function loadFeeMasterHeads(course_id) {
+    if (!course_id) {
+        $('#filter_fees_master_ids').empty().trigger('change');
+        return;
+    }
+
     $.ajax({
         headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
         url: "{{ url('getMasterData') }}",
         method: 'POST',
-        data: { 
-            class_type_id: class_type_id,
-            course_id: course_id
-        },
+        data: { course_id: course_id },
         success: function(response) {
             var options = [];
             if (response && response.length > 0) {
@@ -456,71 +465,31 @@ $(document).ready(function() {
     // Course Select Handler
     $('#filter_course_id').change(function() {
         var courseId = $(this).val();
-        var classSelect = $('#filter_class_type_id');
-        var admissionNo = $('#filter_admission_no').val();
-        
-        if (courseId) {
-            $.ajax({
-                url: "{{ url('getClassesByCourse') }}",
-                type: "POST",
-                data: { _token: "{{ csrf_token() }}", course_id: courseId },
-                dataType: "json",
-                success: function(data) {
-                    classSelect.empty().append('<option value="">-- All Classes in Course --</option>');
-                    if (data && data.length > 0) {
-                        $.each(data, function(key, val) {
-                            classSelect.append('<option value="' + val.id + '">' + val.name + '</option>');
-                        });
-                    }
-                    classSelect.val('').trigger('change.select2');
-                }
-            });
-            loadFeeMasterHeads('', courseId);
-            loadStudents('', admissionNo, courseId);
-        } else {
-            classSelect.empty().append('<option value="">-- All Classes in Course --</option>');
-            if (defaultClasses && defaultClasses.length > 0) {
-                $.each(defaultClasses, function(key, val) {
-                    classSelect.append('<option value="' + val.id + '">' + val.name + '</option>');
-                });
-            }
-            classSelect.val('').trigger('change.select2');
-            $('#filter_fees_master_ids').empty().trigger('change');
-            $('#tbody_students_list').html('<tr><td colspan="10" class="text-center py-5 text-muted"><i class="fa fa-filter fa-2x mb-2 text-secondary d-block"></i> Please select a <b>Course</b> above.</td></tr>');
-            updateSelectedCount();
-        }
+        loadFeeMasterHeads(courseId);
+        loadStudents();
     });
 
-    // Class Select Handler
-    $('#filter_class_type_id').change(function() {
-        var class_type_id = $(this).val();
-        var course_id = $('#filter_course_id').val();
-        var admissionNo = $('#filter_admission_no').val();
-        
-        loadFeeMasterHeads(class_type_id, course_id);
-        if (class_type_id || course_id) {
-            loadStudents(class_type_id, admissionNo, course_id);
-        }
+    // Batch Select Handler
+    $('#filter_batch').change(function() {
+        loadStudents();
     });
 
-    // Search Trigger
+    // Fast Debounced Student Search
+    $('#filter_admission_no').on('input', function() {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(function() {
+            loadStudents();
+        }, 350);
+    });
+
     $('#btn_search_students').click(function() {
-        var class_type_id = $('#filter_class_type_id').val();
-        var course_id = $('#filter_course_id').val();
-        var admissionNo = $('#filter_admission_no').val();
-        loadStudents(class_type_id, admissionNo, course_id);
-    });
-
-    $('#filter_admission_no').keypress(function(e) {
-        if (e.which === 13) {
-            e.preventDefault();
-            $('#btn_search_students').click();
-        }
+        loadStudents();
     });
 
     // Reset Filters
     $('#btn_clear_filters').click(function() {
         $('#filter_course_id').val('').trigger('change');
+        $('#filter_batch').val('').trigger('change');
         $('#filter_admission_no').val('');
         $('#filter_fees_master_ids').empty().trigger('change');
         $('#tbody_students_list').html('<tr><td colspan="10" class="text-center py-5 text-muted"><i class="fa fa-filter fa-2x mb-2 text-secondary d-block"></i> Please select a <b>Course</b> above.</td></tr>');
@@ -600,7 +569,52 @@ $(document).ready(function() {
         });
     });
 
-    // REAL-TIME BULK ASSIGN TO SELECTED STUDENTS
+    // ⚡ 1-CLICK QUICK APPLY ALL COURSE FEE HEADS TO ALL LOADED STUDENTS
+    $('#btn_quick_apply_all_loaded').click(function() {
+        var allStudentIds = [];
+        $('.student_select_checkbox').each(function() {
+            allStudentIds.push($(this).val());
+        });
+
+        if (allStudentIds.length === 0) {
+            alert('No students loaded in the table. Please select a Course first.');
+            return;
+        }
+
+        var feeMasterIds = $('#filter_fees_master_ids').val() || [];
+        var msg = 'Are you sure you want to assign ' + (feeMasterIds.length > 0 ? 'the selected fee heads' : 'ALL course fee heads') + ' to all ' + allStudentIds.length + ' student(s) loaded?';
+        if (!confirm(msg)) {
+            return;
+        }
+
+        var $btn = $(this);
+        $btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin mr-1"></i> Quick Applying...');
+
+        $.ajax({
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            url: "{{ url('bulkAssignCourseFees') }}",
+            method: 'POST',
+            data: {
+                admissionIds: allStudentIds,
+                fees_master_ids: feeMasterIds
+            },
+            success: function(res) {
+                $btn.prop('disabled', false).html('<i class="fa fa-bolt text-dark mr-1"></i> Quick Apply to ALL Loaded (<span class="total_students_count_text">' + allStudentIds.length + '</span>)');
+                if (res.status === 'success') {
+                    showFeeToast(res.message, 'success');
+                    loadStudents();
+                } else {
+                    showFeeToast(res.message || 'Error assigning fees', 'error');
+                }
+            },
+            error: function() {
+                $btn.prop('disabled', false).html('<i class="fa fa-bolt text-dark mr-1"></i> Quick Apply to ALL Loaded (<span class="total_students_count_text">' + allStudentIds.length + '</span>)');
+                showFeeToast('Server error during fee assignment', 'error');
+            }
+        });
+    });
+
+    // REAL-TIME BULK ASSIGN TO SELECTED/CHECKED STUDENTS
     $('#btn_bulk_assign_realtime').click(function() {
         var selectedStudents = [];
         $('.student_select_checkbox:checked').each(function() {
@@ -608,12 +622,12 @@ $(document).ready(function() {
         });
 
         if (selectedStudents.length === 0) {
-            alert('Please select at least one student from the table.');
+            alert('Please check at least one student checkbox in the table.');
             return;
         }
 
         var feeMasterIds = $('#filter_fees_master_ids').val() || [];
-        var confirmMsg = 'Are you sure you want to assign fees in real-time to ' + selectedStudents.length + ' selected student(s)?';
+        var confirmMsg = 'Are you sure you want to assign fees in real-time to ' + selectedStudents.length + ' checked student(s)?';
         if (!confirm(confirmMsg)) {
             return;
         }
@@ -630,19 +644,16 @@ $(document).ready(function() {
                 fees_master_ids: feeMasterIds
             },
             success: function(res) {
-                $btn.prop('disabled', false).html('<i class="fa fa-check-circle mr-1"></i> Real-time Bulk Assign to Selected (<span class="selected_students_count_text">' + selectedStudents.length + '</span>)');
+                $btn.prop('disabled', false).html('<i class="fa fa-check-circle mr-1"></i> Assign Selected Heads to Checked (<span class="selected_students_count_text">' + selectedStudents.length + '</span>)');
                 if (res.status === 'success') {
                     showFeeToast(res.message, 'success');
-                    var class_type_id = $('#filter_class_type_id').val();
-                    var course_id = $('#filter_course_id').val();
-                    var admissionNo = $('#filter_admission_no').val();
-                    loadStudents(class_type_id, admissionNo, course_id);
+                    loadStudents();
                 } else {
                     showFeeToast(res.message || 'Error assigning fees', 'error');
                 }
             },
             error: function() {
-                $btn.prop('disabled', false).html('<i class="fa fa-check-circle mr-1"></i> Real-time Bulk Assign to Selected (<span class="selected_students_count_text">' + selectedStudents.length + '</span>)');
+                $btn.prop('disabled', false).html('<i class="fa fa-check-circle mr-1"></i> Assign Selected Heads to Checked (<span class="selected_students_count_text">' + selectedStudents.length + '</span>)');
                 showFeeToast('Server error during bulk fee assignment', 'error');
             }
         });

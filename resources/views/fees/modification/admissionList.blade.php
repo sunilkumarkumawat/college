@@ -35,9 +35,14 @@
                 </span>
             </td>
             <td class="text-center align-middle text-nowrap" style="font-size: 12px; width: 120px;">
-                <span class="badge badge-light border text-dark font-weight-bold px-2 py-1">
+                <span class="badge badge-light border text-dark font-weight-bold px-2 py-1 d-block mb-1">
                     {{ $item->ClassTypes->name ?? '-' }}
                 </span>
+                @if(!empty($item->batch))
+                    <span class="badge badge-info px-1 py-0" style="font-size: 10.5px;">
+                        {{ $item->batch }}
+                    </span>
+                @endif
             </td>
             <td class="align-middle text-left text-muted" style="font-size: 12px; min-width: 120px;">
                 {{ $item->father_name ?? '-' }}

@@ -1599,6 +1599,7 @@ class FeesController extends Controller
             public function getStudentsList(Request $request){
                 $class_type_id = $request->class_type_id ?? '';
                 $course_id = $request->course_id ?? '';
+                $batch = $request->batch ?? '';
                 $admissionNo = $request->admissionNo ?? '';
                 
                 $data = Admission::with('ClassTypes')
@@ -1612,7 +1613,20 @@ class FeesController extends Controller
                     $courseClassIds = [$class_type_id];
                 } elseif($course_id != '') {
                     $courseClassIds = ClassType::where('course_id', $course_id)->pluck('id')->toArray();
-                    $data = $data->whereIn('class_type_id', $courseClassIds);
+                    $courseObj = \App\Models\Master\Course::find($course_id);
+                    $courseName = $courseObj ? $courseObj->name : null;
+
+                    $data = $data->where(function($q) use ($courseClassIds, $courseName) {
+                        if(!empty($courseClassIds)){
+                            $q->whereIn('class_type_id', $courseClassIds);
+                        }
+                        if($courseName){
+                            $q->orWhere('admissions.course', $courseName);
+                        }
+                    });
+                }
+                if($batch != ''){
+                    $data = $data->where('admissions.batch', $batch);
                 }
                 if($request->admission_type_id != ''){
                     $data = $data->where('admission_type_id', $request->admission_type_id);
