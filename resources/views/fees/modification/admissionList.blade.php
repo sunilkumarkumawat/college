@@ -6,10 +6,7 @@
 
     @foreach($data as $key => $item)
         @php
-            $studentMasters = $courseFeesMasters->where('class_type_id', $item->class_type_id);
-            if($studentMasters->isEmpty()){
-                $studentMasters = $courseFeesMasters;
-            }
+            $studentMasters = $courseFeesMasters;
             $studentTotal = isset($feesAssigns[$item->id]) ? floatval($feesAssigns[$item->id]) : 0;
         @endphp
         <tr id="student_row_{{ $item->id }}">

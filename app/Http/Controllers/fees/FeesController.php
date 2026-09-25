@@ -1812,10 +1812,20 @@ class FeesController extends Controller
                     
                     $targetMasters = $feesMasterIds;
                     if(empty($targetMasters)){
-                        $targetMasters = FeesMaster::where('class_type_id', $admis->class_type_id)
-                            ->where('session_id', Session::get('session_id'))
-                            ->where('branch_id', Session::get('branch_id'))
-                            ->pluck('id')->toArray();
+                        $classType = ClassType::find($admis->class_type_id);
+                        $courseId = $classType->course_id ?? null;
+                        if($courseId){
+                            $allClassIds = ClassType::where('course_id', $courseId)->pluck('id')->toArray();
+                            $targetMasters = FeesMaster::whereIn('class_type_id', $allClassIds)
+                                ->where('session_id', Session::get('session_id'))
+                                ->where('branch_id', Session::get('branch_id'))
+                                ->pluck('id')->toArray();
+                        } else {
+                            $targetMasters = FeesMaster::where('class_type_id', $admis->class_type_id)
+                                ->where('session_id', Session::get('session_id'))
+                                ->where('branch_id', Session::get('branch_id'))
+                                ->pluck('id')->toArray();
+                        }
                     }
                     
                     if(!empty($targetMasters)){
