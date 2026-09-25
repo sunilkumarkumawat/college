@@ -139,24 +139,24 @@
                             </td>
                             <td class="align-middle">
                                 <input type="number" 
-                                       step="any" 
+                                       step="1" 
                                        min="0"
                                        class="form-control form-control-sm text-right modal-detail-input input-amount" 
                                        data-detail-id="{{ $detail->id }}" 
-                                       value="{{ $headTotal }}" 
+                                       value="{{ ($headTotal == floor($headTotal)) ? intval($headTotal) : $headTotal }}" 
                                        style="font-size: 12px; height: 28px; padding: 2px 6px; font-weight: 600;">
                             </td>
                             <td class="align-middle">
                                 <input type="number" 
-                                       step="any" 
+                                       step="1" 
                                        min="0"
                                        class="form-control form-control-sm text-right modal-detail-input input-discount" 
                                        data-detail-id="{{ $detail->id }}" 
-                                       value="{{ $headDisc }}" 
+                                       value="{{ ($headDisc == floor($headDisc)) ? intval($headDisc) : $headDisc }}" 
                                        style="font-size: 12px; height: 28px; padding: 2px 6px; font-weight: 600;">
                             </td>
                             <td class="align-middle text-right font-weight-bold text-dark net-display" id="net_disp_{{ $detail->id }}">
-                                ₹{{ number_format($headNet, 2) }}
+                                ₹{{ ($headNet == floor($headNet)) ? number_format($headNet, 0) : number_format($headNet, 2) }}
                             </td>
                             <td class="align-middle">
                                 <input type="date" 

@@ -1197,11 +1197,16 @@ $(document).ready(function() {
             var net = Math.max(0, amt - disc);
             total += amt;
             discount += disc;
-            $(this).find('.net-display').text('₹' + net.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+            var netText = (net % 1 === 0) 
+                ? '₹' + net.toLocaleString('en-IN') 
+                : '₹' + net.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            $(this).find('.net-display').text(netText);
         });
         var netPayable = Math.max(0, total - discount);
-        $('#modal_summary_total').text('₹' + total.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
-        $('#modal_summary_net').text('₹' + netPayable.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+        var totalText = (total % 1 === 0) ? '₹' + total.toLocaleString('en-IN') : '₹' + total.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        var netText = (netPayable % 1 === 0) ? '₹' + netPayable.toLocaleString('en-IN') : '₹' + netPayable.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        $('#modal_summary_total').text(totalText);
+        $('#modal_summary_net').text(netText);
     }
 
     // MODAL: DISCOUNT TYPE CHANGE
@@ -1238,7 +1243,7 @@ $(document).ready(function() {
         $('#modal_selected_heads_count').text(checked + ' of ' + total + ' Heads Selected');
     }
 
-    // MODAL: AUTO ALLOCATE DISCOUNT EQUALLY ACROSS SELECTED HEADS
+    // MODAL: AUTO ALLOCATE DISCOUNT EQUALLY ACROSS SELECTED HEADS (INTEGER ONLY - NO DECIMALS)
     $(document).on('click', '#btn_auto_allocate_discount', function() {
         var discountType = $('#modal_discount_type').val();
         var rawDiscountVal = parseFloat($('#modal_total_discount_value').val());
@@ -1260,7 +1265,7 @@ $(document).ready(function() {
         $checkedBoxes.each(function() {
             var detailId = $(this).data('detail-id');
             var $row = $('#row_detail_' + detailId);
-            var amt = parseFloat($row.find('.input-amount').val()) || 0;
+            var amt = Math.round(parseFloat($row.find('.input-amount').val()) || 0);
             totalAmountOfSelected += amt;
             selectedRows.push({ $row: $row, amt: amt });
         });
@@ -1268,28 +1273,25 @@ $(document).ready(function() {
         var totalDiscountAmt = 0;
         if (discountType === 'percentage') {
             var pct = Math.min(100, Math.max(0, rawDiscountVal));
-            totalDiscountAmt = (pct / 100) * totalAmountOfSelected;
+            totalDiscountAmt = Math.round((pct / 100) * totalAmountOfSelected);
         } else {
-            totalDiscountAmt = Math.min(rawDiscountVal, totalAmountOfSelected);
+            totalDiscountAmt = Math.round(Math.min(rawDiscountVal, totalAmountOfSelected));
         }
 
         var count = selectedRows.length;
-        var perHeadDiscount = totalDiscountAmt / count;
+        var baseDiscount = Math.floor(totalDiscountAmt / count);
+        var remainder = totalDiscountAmt % count;
 
         $.each(selectedRows, function(index, item) {
-            var allocatedDisc = Math.round(perHeadDiscount * 100) / 100;
-            // Adjust last row for precise round-off sum matching
-            if (index === count - 1) {
-                var prevSum = (Math.round(perHeadDiscount * 100) / 100) * (count - 1);
-                allocatedDisc = Math.round((totalDiscountAmt - prevSum) * 100) / 100;
-            }
+            // First 'remainder' heads get baseDiscount + 1, others get baseDiscount (clean whole integer)
+            var allocatedDisc = baseDiscount + (index < remainder ? 1 : 0);
             item.$row.find('.input-discount').val(allocatedDisc);
             var net = Math.max(0, item.amt - allocatedDisc);
-            item.$row.find('.net-display').text('₹' + net.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+            item.$row.find('.net-display').text('₹' + net.toLocaleString('en-IN'));
         });
 
         recalculateModalSummary();
-        showFeeToast('₹' + totalDiscountAmt.toFixed(2) + ' discount allocated equally across ' + count + ' fee heads!', 'success');
+        showFeeToast('₹' + totalDiscountAmt.toLocaleString('en-IN') + ' discount allocated in whole rupees across ' + count + ' fee heads!', 'success');
     });
 
     // MODAL: RESET / CLEAR ALL DISCOUNTS
