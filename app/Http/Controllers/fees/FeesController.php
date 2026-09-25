@@ -507,13 +507,25 @@ class FeesController extends Controller
                         ->exists();
 
                     if ($isAssigned || $isCollected) {
-                        return redirect()->back()->with('error', 'Cannot delete this Fee Head because it has student assignments or fee collections!');
+                        $msg = 'Cannot delete this Fee Head because it has student assignments or fee collections!';
+                        if ($request->ajax()) {
+                            return response()->json(['status' => false, 'message' => $msg], 422);
+                        }
+                        return redirect()->back()->with('error', $msg);
                     }
 
                     $feesGroup->delete();
-                    return redirect()->back()->with('message', 'Fees Head Deleted Successfully !');
+                    $msg = 'Fees Head Deleted Successfully !';
+                    if ($request->ajax()) {
+                        return response()->json(['status' => true, 'message' => $msg, 'deleted_id' => $id]);
+                    }
+                    return redirect()->back()->with('message', $msg);
                 }
-                return redirect()->back()->with('error', 'Fee Head Not Found !');
+                $msg = 'Fee Head Not Found !';
+                if ($request->ajax()) {
+                    return response()->json(['status' => false, 'message' => $msg], 404);
+                }
+                return redirect()->back()->with('error', $msg);
             }
  
             public function studentFeesOnclick(Request $request){

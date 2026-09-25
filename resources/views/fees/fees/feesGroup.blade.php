@@ -1182,7 +1182,7 @@ foreach ($collectedRows as $cr) {
                                                                 @endif
                                                             </div>
                                                             <div class="d-flex align-items-center flex-wrap" style="gap: 6px;">
-                                                                <span class="badge badge-success px-2 py-1 font-weight-bold" style="font-size:11.5px;">
+                                                                <span class="badge badge-success px-2 py-1 font-weight-bold course-total-fee-badge" data-total="{{ $cTotalFee }}" style="font-size:11.5px;">
                                                                     ₹{{ number_format($cTotalFee) }} Total Course Fee
                                                                 </span>
                                                                 <button type="button" class="btn btn-xs btn-setup-course font-weight-bold shadow-sm" onclick="selectCourseForSetup('{{ $c->id }}')" style="font-size:10.5px;">
@@ -1215,7 +1215,7 @@ foreach ($collectedRows as $cr) {
                                                                                             <i class="fa fa-book text-muted mr-1"></i> {{ $cl->name }}
                                                                                         </td>
                                                                                         <td style="padding: 3px 6px;">
-                                                                                            <div class="d-flex flex-wrap" style="gap: 4px;">
+                                                                                            <div class="d-flex flex-wrap chips-container" style="gap: 4px;">
                                                                                                 @foreach($semRows as $sRow)
                                                                                                     @php
                                                                                                         $amt = (float)($sRow->amount ?? 0);
@@ -1234,7 +1234,7 @@ foreach ($collectedRows as $cr) {
                                                                                                         $isFmAssigned = !empty($assignedMap[$sRow->fees_group_id . '_' . $sRow->class_type_id]);
                                                                                                         $isFmCollected = !empty($collectedMap[$sRow->fees_group_id]);
                                                                                                     @endphp
-                                                                                                    <div class="d-inline-flex align-items-center border rounded px-2 py-1 bg-white shadow-sm" style="font-size: 11px; gap: 5px;">
+                                                                                                    <div id="fm_chip_{{ $sRow->id }}" class="fees-master-head-chip d-inline-flex align-items-center border rounded px-2 py-1 bg-white shadow-sm" data-amount="{{ $amt }}" style="font-size: 11px; gap: 5px;">
                                                                                                         <span class="badge {{ $badgeClass }}" style="font-size: 9px; padding: 2px 4px;">{{ ucfirst($fgType) }}</span>
                                                                                                         <span class="font-weight-bold text-dark">{{ $fgName }}:</span>
                                                                                                         <span class="font-weight-bold text-success">₹{{ number_format($amt) }}</span>
@@ -1260,7 +1260,7 @@ foreach ($collectedRows as $cr) {
                                                                                                 @endforeach
                                                                                             </div>
                                                                                         </td>
-                                                                                        <td class="text-right align-middle font-weight-bold text-success" style="font-size: 12.5px;">
+                                                                                        <td class="text-right align-middle font-weight-bold text-success sem-total-val" data-total="{{ $semTotal }}" style="font-size: 12.5px;">
                                                                                             ₹{{ number_format($semTotal) }}
                                                                                         </td>
                                                                                     </tr>
@@ -1307,7 +1307,7 @@ foreach ($collectedRows as $cr) {
                                     <div id="container_no_class_heads" style="display: none;">
                                         <div class="d-flex justify-content-between align-items-center p-2 mb-2 rounded border" style="background: #f8fafc;">
                                             <div class="d-flex align-items-center">
-                                                <span class="badge badge-primary mr-2" style="font-size: 11px; padding: 4px 7px;">
+                                                <span id="no_class_count_badge" class="badge badge-primary mr-2" style="font-size: 11px; padding: 4px 7px;">
                                                     <i class="fa fa-tag"></i> {{ count($noClassHeads) }}
                                                 </span>
                                                 <div>
@@ -1353,7 +1353,7 @@ foreach ($collectedRows as $cr) {
                                                                 $isRef = strtolower(trim($nh->fees_refund ?? '')) === 'yes';
                                                                 $isPart = ($nh->fees_partial ?? 0) == 1;
                                                             @endphp
-                                                            <tr>
+                                                            <tr id="no_class_row_{{ $nh->id }}">
                                                                 <td class="text-center align-middle font-weight-bold text-muted">{{ $idx + 1 }}</td>
                                                                 <td class="align-middle font-weight-bold text-dark">
                                                                     {{ $nh->name }}
@@ -1444,7 +1444,7 @@ foreach ($collectedRows as $cr) {
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form action="{{ url('feesGroupDelete') }}" method="post">
+            <form id="delete_fees_group_form" action="{{ url('feesGroupDelete') }}" method="post">
                 @csrf
                 <div class="modal-body">
                     {{ __('common.Are you sure you want to delete') }}?
@@ -1471,7 +1471,7 @@ foreach ($collectedRows as $cr) {
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form action="{{ url('feesMasterDelete') }}" method="post">
+            <form id="delete_fees_master_form" action="{{ url('feesMasterDelete') }}" method="post">
                 @csrf
                 <div class="modal-body text-center p-3">
                     <i class="fa fa-exclamation-triangle text-danger mb-2" style="font-size: 30px;"></i>
@@ -2207,6 +2207,13 @@ function updateClassDropdownByCourse(courseId, classSelect, defaultClasses) {
     }
 }
 
+function confirmDeleteFeesMaster(id, name, className) {
+    $('#delete_fees_master_id').val(id);
+    $('#delete_fm_title').text('Remove ' + name + ' from ' + className + '?');
+    $('#delete_fm_desc').text('Are you sure you want to remove "' + name + '" fee head from ' + className + '\'s fee structure?');
+    $('#delete_fees_master_modal').modal('show');
+}
+
 $(document).ready(function() {
     // Initial check: if course was selected, trigger auto-detect
     var initCourse = document.getElementById('course_selector');
@@ -2247,6 +2254,138 @@ $(document).ready(function() {
 
         $('#edit_fee_head_form').attr('action', "{{ url('feesGroupEdit') }}/" + headId);
         $('#edit_fee_head_modal').modal('show');
+    });
+
+    // AJAX Deletion for Fees Master (Course Card Heads)
+    $('#delete_fees_master_form').on('submit', function(e) {
+        e.preventDefault();
+        var form = $(this);
+        var submitBtn = form.find('button[type="submit"]');
+        var originalHtml = submitBtn.html();
+        var id = $('#delete_fees_master_id').val();
+
+        submitBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Removing...');
+
+        $.ajax({
+            url: form.attr('action'),
+            type: 'POST',
+            data: form.serialize(),
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            success: function(response) {
+                submitBtn.prop('disabled', false).html(originalHtml);
+                $('#delete_fees_master_modal').modal('hide');
+                $('body').removeClass('modal-open');
+                $('.modal-backdrop').remove();
+
+                if (response && response.status) {
+                    toastr.success(response.message || 'Fee head removed successfully!');
+
+                    var chip = $('#fm_chip_' + id);
+                    if (chip.length) {
+                        var amt = parseFloat(chip.data('amount')) || 0;
+                        var row = chip.closest('tr.course-class-row');
+                        var card = chip.closest('.course-card');
+
+                        // Recalculate Semester Total
+                        var semTotalTd = row.find('.sem-total-val');
+                        var currentSemTotal = parseFloat(semTotalTd.data('total')) || 0;
+                        var newSemTotal = Math.max(0, currentSemTotal - amt);
+                        semTotalTd.data('total', newSemTotal);
+                        semTotalTd.text('₹' + Number(newSemTotal).toLocaleString('en-IN'));
+
+                        // Recalculate Course Total Fee
+                        var courseBadge = card.find('.course-total-fee-badge');
+                        var currentCourseTotal = parseFloat(courseBadge.data('total')) || 0;
+                        var newCourseTotal = Math.max(0, currentCourseTotal - amt);
+                        courseBadge.data('total', newCourseTotal);
+                        courseBadge.text('₹' + Number(newCourseTotal).toLocaleString('en-IN') + ' Total Course Fee');
+
+                        chip.fadeOut(250, function() {
+                            var chipsContainer = $(this).closest('.chips-container');
+                            $(this).remove();
+                            if (chipsContainer.find('.fees-master-head-chip').length === 0) {
+                                row.fadeOut(200, function() {
+                                    $(this).remove();
+                                });
+                            }
+                        });
+                    }
+                } else {
+                    toastr.error((response && response.message) ? response.message : 'Unable to remove fee head.');
+                }
+            },
+            error: function(xhr) {
+                submitBtn.prop('disabled', false).html(originalHtml);
+                $('#delete_fees_master_modal').modal('hide');
+                $('body').removeClass('modal-open');
+                $('.modal-backdrop').remove();
+                var errMsg = 'An error occurred while removing fee head.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errMsg = xhr.responseJSON.message;
+                }
+                toastr.error(errMsg);
+            }
+        });
+    });
+
+    // AJAX Deletion for Standalone / No-Class Fee Heads
+    $('#delete_fees_group_form').on('submit', function(e) {
+        e.preventDefault();
+        var form = $(this);
+        var submitBtn = form.find('button[type="submit"]');
+        var originalHtml = submitBtn.html();
+        var id = $('#delete_id').val();
+
+        submitBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Deleting...');
+
+        $.ajax({
+            url: form.attr('action'),
+            type: 'POST',
+            data: form.serialize(),
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            success: function(response) {
+                submitBtn.prop('disabled', false).html(originalHtml);
+                $('#Modal_id').modal('hide');
+                $('body').removeClass('modal-open');
+                $('.modal-backdrop').remove();
+
+                if (response && response.status) {
+                    toastr.success(response.message || 'Fee head deleted successfully!');
+
+                    var row = $('#no_class_row_' + id);
+                    if (row.length) {
+                        row.fadeOut(250, function() {
+                            $(this).remove();
+
+                            // Update badge counter
+                            var countBadge = $('#no_class_count_badge');
+                            if (countBadge.length) {
+                                var curCount = parseInt(countBadge.text().trim()) || 0;
+                                var newCount = Math.max(0, curCount - 1);
+                                countBadge.html('<i class="fa fa-tag"></i> ' + newCount);
+                            }
+                        });
+                    }
+                } else {
+                    toastr.error((response && response.message) ? response.message : 'Unable to delete fee head.');
+                }
+            },
+            error: function(xhr) {
+                submitBtn.prop('disabled', false).html(originalHtml);
+                $('#Modal_id').modal('hide');
+                $('body').removeClass('modal-open');
+                $('.modal-backdrop').remove();
+                var errMsg = 'An error occurred while deleting fee head.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errMsg = xhr.responseJSON.message;
+                }
+                toastr.error(errMsg);
+            }
+        });
     });
 
     // Close handlers for modal

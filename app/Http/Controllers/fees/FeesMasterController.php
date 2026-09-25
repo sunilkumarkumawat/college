@@ -154,7 +154,6 @@ class FeesMasterController extends Controller
                         ->whereNull('deleted_at')
                         ->exists();
                     $isCollected = \App\Models\FeesDetail::where('fees_group_id', $feesMaster->fees_group_id)
-                        ->where('class_type_id', $feesMaster->class_type_id)
                         ->where('session_id', $session_id)
                         ->where('branch_id', $branch_id)
                         ->whereNull('deleted_at')
@@ -162,13 +161,25 @@ class FeesMasterController extends Controller
                         ->exists();
 
                     if ($isAssigned || $isCollected) {
-                        return redirect()->back()->with('error', 'Cannot delete this Fee Head from Fees Master because it is already assigned to student(s) or has collected fees!');
+                        $msg = 'Cannot delete this Fee Head from Fees Master because it is already assigned to student(s) or has collected fees!';
+                        if ($request->ajax()) {
+                            return response()->json(['status' => false, 'message' => $msg], 422);
+                        }
+                        return redirect()->back()->with('error', $msg);
                     }
 
                     $feesMaster->delete();
-                    return redirect()->back()->with('message', 'Fees Master Record Deleted Successfully !');
+                    $msg = 'Fees Master Record Deleted Successfully !';
+                    if ($request->ajax()) {
+                        return response()->json(['status' => true, 'message' => $msg, 'deleted_id' => $id]);
+                    }
+                    return redirect()->back()->with('message', $msg);
                 }
-                return redirect()->back()->with('error', 'Fees Master Record Not Found !');
+                $msg = 'Fees Master Record Not Found !';
+                if ($request->ajax()) {
+                    return response()->json(['status' => false, 'message' => $msg], 404);
+                }
+                return redirect()->back()->with('error', $msg);
             }
 
             public function feesMasterData(Request $request){
