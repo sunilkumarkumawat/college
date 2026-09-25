@@ -115,9 +115,18 @@ class FeesController extends Controller
                 $serach['session_id'] = $request->has('session_id') ? $request->session_id : Session::get('session_id');
                 $serach['admission_type_id'] = $request->admission_type_id ?? '';
                 $serach['class_type_id'] = !empty($request->class_type_id) ? $request->class_type_id : 0;
-                if ($request->isMethod('post')) {
+                
+                $hasFilter = !empty($request->class_type_id) 
+                    || !empty($request->name) 
+                    || !empty($request->admission_no) 
+                    || !empty($request->batch) 
+                    || !empty($request->course_id) 
+                    || !empty($request->admission_type_id)
+                    || ($request->isMethod('post') && $request->has('session_id'));
+
+                if ($request->isMethod('post') || $hasFilter) {
                     $value = $request->name;
-                    if ($request->class_type_id > 0 || $request->name != '' || $request->admission_no || $request->batch || !empty($request->course_id) || $request->has('session_id')) {
+                    if ($request->class_type_id > 0 || !empty($request->name) || !empty($request->admission_no) || !empty($request->batch) || !empty($request->course_id) || !empty($serach['session_id'])) {
                         $data =  Admission::with('ClassTypes')->where('status', 1)->where('school','=',1);
                         $data = $data->where('branch_id', Session::get('branch_id'));
 
@@ -138,7 +147,7 @@ class FeesController extends Controller
                             });
                         }
                        
-                        if ($request->name != '') {
+                        if (!empty($request->name)) {
                             $data = $data->where(function ($query) use ($value) {
                                 $query->where('first_name', 'like', '%' . $value . '%');
                                 $query->orWhere('userName', 'like', '%' . $value . '%');
@@ -151,24 +160,24 @@ class FeesController extends Controller
                                 $query->orWhere('admissionNo', 'like', '%' . $value . '%');
                             });
                         }
-                        if ($request->batch != '') {
+                        if (!empty($request->batch)) {
                             $data = $data->where("batch", $request->batch);
                         }
-                        if ($request->class_type_id != '') {
+                        if (!empty($request->class_type_id)) {
                             $data = $data->where("class_type_id", $request->class_type_id);
                         }
-                        if ($request->admission_type_id != '') {
+                        if (!empty($request->admission_type_id)) {
                             $data = $data->where("admission_type_id", $request->admission_type_id);
                         }
                         if (!empty($request->admission_no)) {
                             $data = $data->where("admissions.admissionNo", $request->admission_no);
                         }
                         $allstudents = $data->orderBy('id', 'ASC')->get();
+                        return  view('fees.fees_collect.add', ['data' => $allstudents, 'serach' => $serach]);
                     } 
                     else {
                         return redirect::to('Fees/add')->with('error', 'Please type the input value  !');
                     }
-                    return  view('fees.fees_collect.add', ['data' => $allstudents, 'serach' => $serach]);
                 }
                 return  view('fees.fees_collect.add', ['serach' => $serach]);
             }
