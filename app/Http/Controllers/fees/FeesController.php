@@ -1817,6 +1817,7 @@ class FeesController extends Controller
                 }
                 
                 $assignedCount = 0;
+                $updatedTotals = [];
                 foreach($admissionIds as $admission){
                     $admis = Admission::select('id', 'student_type', 'class_type_id')->find($admission);
                     if(!$admis) continue;
@@ -1903,13 +1904,66 @@ class FeesController extends Controller
                         $feesAssign->total_amount = $total_assign_detail;
                         $feesAssign->net_amount = ($total_assign_detail - $discount_assign_detail);
                         $feesAssign->save();
+                        
+                        $updatedTotals[$admission] = $total_assign_detail;
                     }
                 }
                 
                 return response()->json([
                     'status' => 'success',
                     'count' => $assignedCount,
+                    'total_amount' => count($updatedTotals) === 1 ? reset($updatedTotals) : 0,
+                    'updated_totals' => $updatedTotals,
                     'message' => 'Fees Structure assigned successfully in real-time!'
+                ]);
+            }
+
+            public function clearStudentFeeHeads(Request $request){
+                $admission_id = $request->admission_id;
+                $admissionIds = $request->admissionIds ?? [];
+                
+                if($admission_id){
+                    $admissionIds = [$admission_id];
+                }
+                
+                if(empty($admissionIds)){
+                    return response()->json(['status' => 'error', 'message' => 'No student specified to clear fee heads!']);
+                }
+                
+                $clearedCount = 0;
+                $updatedTotals = [];
+                
+                foreach($admissionIds as $admId){
+                    $admis = Admission::find($admId);
+                    if(!$admis) continue;
+                    
+                    // Unassign only unpaid fee heads
+                    FeesAssignDetail::where('admission_id', $admId)
+                        ->where(function($q){
+                            $q->whereNull('paid_amount')->orWhere('paid_amount', '<=', 0);
+                        })
+                        ->delete();
+                        
+                    $feesAssign = FeesAssign::where('admission_id', $admId)->first();
+                    if($feesAssign){
+                        $total = FeesAssignDetail::where('admission_id', $admId)->whereNull('deleted_at')->sum('fees_group_amount');
+                        $discount = FeesAssignDetail::where('admission_id', $admId)->whereNull('deleted_at')->sum('discount');
+                        $feesAssign->total_amount = $total;
+                        $feesAssign->net_amount = ($total - $discount);
+                        $feesAssign->save();
+                        $updatedTotals[$admId] = $total;
+                    } else {
+                        $updatedTotals[$admId] = 0;
+                    }
+                    $clearedCount++;
+                }
+                
+                return response()->json([
+                    'status' => 'success',
+                    'count' => $clearedCount,
+                    'total_amount' => count($updatedTotals) === 1 ? reset($updatedTotals) : 0,
+                    'updated_totals' => $updatedTotals,
+                    'message' => 'Unpaid fee heads cleared successfully in real-time!'
                 ]);
             }
 

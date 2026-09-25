@@ -373,6 +373,73 @@
     </div>
 </div>
 
+<!-- Custom Theme Confirmation Modal for Fee Assign / Clear Actions -->
+<div class="modal fade" id="feeAssignConfirmModal" tabindex="-1" role="dialog" aria-labelledby="feeAssignConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 480px;">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 12px; overflow: hidden;">
+            <!-- Modal Header -->
+            <div class="modal-header py-3 px-4 text-white" id="feeConfirmModalHeader" style="background: linear-gradient(135deg, #002c54 0%, #00172d 100%); border-bottom: 2px solid #ff7b00;">
+                <h5 class="modal-title font-weight-bold d-flex align-items-center" id="feeAssignConfirmModalLabel" style="font-size: 16px; letter-spacing: 0.3px; margin: 0;">
+                    <i class="fa fa-question-circle mr-2 text-warning" id="feeConfirmIcon"></i>
+                    <span id="feeConfirmTitle">Confirm Action</span>
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close" style="opacity: 0.9; text-shadow: none; outline: none;">
+                    <span aria-hidden="true" style="font-size: 22px;">&times;</span>
+                </button>
+            </div>
+            
+            <!-- Modal Body -->
+            <div class="modal-body p-4 text-center">
+                <!-- Action Icon Badge -->
+                <div class="mb-3">
+                    <div id="feeConfirmIconWrapper" class="d-inline-flex justify-content-center align-items-center rounded-circle" style="width: 65px; height: 65px; background: rgba(0, 44, 84, 0.08);">
+                        <i class="fa fa-check-square-o fa-2x text-success" id="feeConfirmBigIcon"></i>
+                    </div>
+                </div>
+
+                <!-- Headline -->
+                <h6 class="font-weight-bold text-dark mb-2" id="feeConfirmHeadline" style="font-size: 16px;">
+                    Assign All Fee Heads?
+                </h6>
+
+                <!-- Context Card -->
+                <div class="p-3 mb-3 text-left rounded" id="feeConfirmStudentInfoBox" style="background: #f8fafc; border: 1px solid #e2e8f0; font-size: 13px;">
+                    <div class="d-flex justify-content-between mb-1" id="feeConfirmStudentNameRow">
+                        <span class="text-muted"><i class="fa fa-user mr-1 text-primary"></i> Student Name:</span>
+                        <strong class="text-dark" id="feeConfirmStudentName">-</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-1" id="feeConfirmStudentAdmRow">
+                        <span class="text-muted"><i class="fa fa-id-card mr-1 text-secondary"></i> Admission No:</span>
+                        <strong class="badge badge-secondary px-2 py-1" id="feeConfirmStudentAdmNo">-</strong>
+                    </div>
+                    <div class="d-flex justify-content-between" id="feeConfirmExtraRow">
+                        <span class="text-muted"><i class="fa fa-tag mr-1 text-info"></i> Action:</span>
+                        <span class="font-weight-bold text-dark" id="feeConfirmExtraDetails">-</span>
+                    </div>
+                </div>
+
+                <!-- Message Text -->
+                <p class="text-muted mb-0" id="feeConfirmMessage" style="font-size: 13px; line-height: 1.5;">
+                    Are you sure you want to proceed with this real-time fee update?
+                </p>
+                <div class="alert alert-warning py-1 px-2 mt-2 mb-0 d-none text-left" id="feeConfirmPaidWarning" style="font-size: 11.5px; border-radius: 6px;">
+                    <i class="fa fa-shield mr-1"></i> <strong>Protection:</strong> Fee heads with already recorded payments will remain untouched.
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer py-2 px-4 bg-light d-flex justify-content-between border-top">
+                <button type="button" class="btn btn-sm btn-outline-secondary font-weight-bold px-3 py-1" data-dismiss="modal" style="border-radius: 6px;">
+                    <i class="fa fa-times mr-1"></i> Cancel
+                </button>
+                <button type="button" class="btn btn-sm btn-success font-weight-bold px-4 py-1" id="btn_confirm_fee_modal_action" style="border-radius: 6px;">
+                    <i class="fa fa-check mr-1"></i> <span id="btn_confirm_fee_modal_text">Yes, Proceed</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 var searchTimer = null;
 
@@ -601,166 +668,332 @@ $(document).ready(function() {
         });
     });
 
-    // ASSIGN ALL COURSE HEADS TO SINGLE STUDENT
+    // GLOBAL PENDING ACTION STATE FOR CUSTOM CONFIRMATION MODAL
+    var pendingFeeAction = {
+        type: null, // 'assign_all_student', 'clear_all_student', 'quick_apply_loaded', 'bulk_assign_selected'
+        admissionId: null,
+        admissionIds: [],
+        studentName: '',
+        admissionNo: '',
+        totalHeads: 0,
+        masterIds: []
+    };
+
+    // TRIGGER MODAL: ASSIGN ALL COURSE HEADS TO SINGLE STUDENT
     $(document).on('click', '.btn-student-assign-all-heads', function(e) {
         e.preventDefault();
         var admissionId = $(this).data('admission-id');
-        var $btn = $(this);
-        $btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
+        var studentName = $(this).data('student-name') || 'Selected Student';
+        var admissionNo = $(this).data('admission-no') || '-';
+        var totalHeads = $(this).data('total-heads') || 'all';
 
-        $.ajax({
-            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-            url: "{{ url('bulkAssignCourseFees') }}",
-            method: 'POST',
-            data: {
-                admissionIds: [admissionId],
-                fees_master_ids: []
-            },
-            success: function(res) {
-                $btn.prop('disabled', false).html('<i class="fa fa-check-square-o"></i> Check All');
-                if (res.status === 'success') {
-                    showFeeToast(res.message || 'All course fee heads assigned successfully', 'success');
-                    loadStudents();
-                } else {
-                    showFeeToast(res.message || 'Error assigning heads', 'error');
-                }
-            },
-            error: function() {
-                $btn.prop('disabled', false).html('<i class="fa fa-check-square-o"></i> Check All');
-                showFeeToast('Server error while assigning fee heads', 'error');
-            }
-        });
+        pendingFeeAction = {
+            type: 'assign_all_student',
+            admissionId: admissionId,
+            admissionIds: [admissionId],
+            studentName: studentName,
+            admissionNo: admissionNo,
+            totalHeads: totalHeads,
+            masterIds: []
+        };
+
+        // Configure Modal for Assign All
+        $('#feeConfirmModalHeader').css('border-bottom', '2px solid #28a745');
+        $('#feeConfirmIcon').attr('class', 'fa fa-check-circle mr-2 text-success');
+        $('#feeConfirmTitle').text('Assign All Course Fee Heads');
+        $('#feeConfirmBigIcon').attr('class', 'fa fa-check-square-o fa-2x text-success');
+        $('#feeConfirmIconWrapper').css('background', 'rgba(40, 167, 69, 0.12)');
+        $('#feeConfirmHeadline').text('Assign All Course Heads to Student?');
+        
+        $('#feeConfirmStudentInfoBox').show();
+        $('#feeConfirmStudentNameRow').show();
+        $('#feeConfirmStudentAdmRow').show();
+        $('#feeConfirmStudentName').text(studentName);
+        $('#feeConfirmStudentAdmNo').text(admissionNo);
+        $('#feeConfirmExtraDetails').html('<span class="text-success font-weight-bold">Assign all (' + totalHeads + ') fee heads in real-time</span>');
+        
+        $('#feeConfirmMessage').text('Are you sure you want to assign all course fee structure heads to ' + studentName + '? This will update instantly.');
+        $('#feeConfirmPaidWarning').addClass('d-none');
+        
+        $('#btn_confirm_fee_modal_action')
+            .removeClass('btn-danger btn-primary btn-warning')
+            .addClass('btn-success')
+            .prop('disabled', false)
+            .html('<i class="fa fa-check-square-o mr-1"></i> <span id="btn_confirm_fee_modal_text">Yes, Assign All</span>');
+
+        $('#feeAssignConfirmModal').modal('show');
     });
 
-    // CLEAR ALL UNPAID HEADS FOR SINGLE STUDENT
+    // TRIGGER MODAL: CLEAR ALL UNPAID HEADS FOR SINGLE STUDENT
     $(document).on('click', '.btn-student-unassign-all-heads', function(e) {
         e.preventDefault();
         var admissionId = $(this).data('admission-id');
+        var studentName = $(this).data('student-name') || 'Selected Student';
+        var admissionNo = $(this).data('admission-no') || '-';
         var $row = $('#student_row_' + admissionId);
         var assignedCheckboxes = $row.find('.toggle-fee-head-checkbox:checked');
         
         if (assignedCheckboxes.length === 0) {
-            showFeeToast('No fee heads currently assigned to clear', 'error');
+            showFeeToast('No fee heads are currently assigned to clear for this student', 'error');
             return;
         }
 
-        if (!confirm('Are you sure you want to unassign all fee heads for this student?')) {
-            return;
-        }
+        pendingFeeAction = {
+            type: 'clear_all_student',
+            admissionId: admissionId,
+            admissionIds: [admissionId],
+            studentName: studentName,
+            admissionNo: admissionNo,
+            totalHeads: assignedCheckboxes.length,
+            masterIds: []
+        };
 
-        var $btn = $(this);
-        $btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
+        // Configure Modal for Clear All
+        $('#feeConfirmModalHeader').css('border-bottom', '2px solid #dc3545');
+        $('#feeConfirmIcon').attr('class', 'fa fa-trash mr-2 text-danger');
+        $('#feeConfirmTitle').text('Clear All Assigned Fee Heads');
+        $('#feeConfirmBigIcon').attr('class', 'fa fa-trash fa-2x text-danger');
+        $('#feeConfirmIconWrapper').css('background', 'rgba(220, 53, 69, 0.12)');
+        $('#feeConfirmHeadline').text('Clear All Fee Heads for Student?');
+        
+        $('#feeConfirmStudentInfoBox').show();
+        $('#feeConfirmStudentNameRow').show();
+        $('#feeConfirmStudentAdmRow').show();
+        $('#feeConfirmStudentName').text(studentName);
+        $('#feeConfirmStudentAdmNo').text(admissionNo);
+        $('#feeConfirmExtraDetails').html('<span class="text-danger font-weight-bold">Clear (' + assignedCheckboxes.length + ') assigned heads</span>');
+        
+        $('#feeConfirmMessage').text('Are you sure you want to unassign all fee heads for ' + studentName + '?');
+        $('#feeConfirmPaidWarning').removeClass('d-none');
+        
+        $('#btn_confirm_fee_modal_action')
+            .removeClass('btn-success btn-primary btn-warning')
+            .addClass('btn-danger')
+            .prop('disabled', false)
+            .html('<i class="fa fa-trash mr-1"></i> <span id="btn_confirm_fee_modal_text">Yes, Clear All</span>');
 
-        var ajaxCalls = [];
-        assignedCheckboxes.each(function() {
-            var masterId = $(this).data('master-id');
-            ajaxCalls.push($.ajax({
-                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-                url: "{{ url('toggleStudentFeeHead') }}",
-                method: 'POST',
-                data: {
-                    admission_id: admissionId,
-                    fees_master_id: masterId,
-                    state: 0
-                }
-            }));
-        });
-
-        $.when.apply($, ajaxCalls).always(function() {
-            $btn.prop('disabled', false).html('<i class="fa fa-square-o"></i> Clear');
-            showFeeToast('Fee heads cleared', 'success');
-            loadStudents();
-        });
+        $('#feeAssignConfirmModal').modal('show');
     });
 
-    // ⚡ 1-CLICK QUICK APPLY ALL COURSE FEE HEADS TO ALL LOADED STUDENTS
-    $('#btn_quick_apply_all_loaded').click(function() {
+    // TRIGGER MODAL: QUICK APPLY ALL HEADS TO ALL LOADED STUDENTS
+    $('#btn_quick_apply_all_loaded').click(function(e) {
+        e.preventDefault();
         var allStudentIds = [];
         $('.student_select_checkbox').each(function() {
             allStudentIds.push($(this).val());
         });
 
         if (allStudentIds.length === 0) {
-            alert('No students loaded in the table. Please select a Course first.');
+            showFeeToast('No students loaded in the table. Please select Course and Batch first.', 'error');
             return;
         }
 
         var feeMasterIds = $('#filter_fees_master_ids').val() || [];
-        var msg = 'Are you sure you want to assign ' + (feeMasterIds.length > 0 ? 'the selected fee heads' : 'ALL course fee heads') + ' to all ' + allStudentIds.length + ' student(s) loaded?';
-        if (!confirm(msg)) {
-            return;
-        }
+        var count = allStudentIds.length;
 
-        var $btn = $(this);
-        $btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin mr-1"></i> Quick Applying...');
+        pendingFeeAction = {
+            type: 'quick_apply_loaded',
+            admissionId: null,
+            admissionIds: allStudentIds,
+            studentName: '',
+            admissionNo: '',
+            totalHeads: 0,
+            masterIds: feeMasterIds
+        };
 
-        $.ajax({
-            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-            url: "{{ url('bulkAssignCourseFees') }}",
-            method: 'POST',
-            data: {
-                admissionIds: allStudentIds,
-                fees_master_ids: feeMasterIds
-            },
-            success: function(res) {
-                $btn.prop('disabled', false).html('<i class="fa fa-bolt text-dark mr-1"></i> Quick Apply All Heads to ALL Loaded (<span class="total_students_count_text">' + allStudentIds.length + '</span>)');
-                if (res.status === 'success') {
-                    showFeeToast(res.message, 'success');
-                    loadStudents();
-                } else {
-                    showFeeToast(res.message || 'Error assigning fees', 'error');
-                }
-            },
-            error: function() {
-                $btn.prop('disabled', false).html('<i class="fa fa-bolt text-dark mr-1"></i> Quick Apply All Heads to ALL Loaded (<span class="total_students_count_text">' + allStudentIds.length + '</span>)');
-                showFeeToast('Server error during fee assignment', 'error');
-            }
-        });
+        // Configure Modal for Quick Apply
+        $('#feeConfirmModalHeader').css('border-bottom', '2px solid #ffc107');
+        $('#feeConfirmIcon').attr('class', 'fa fa-bolt mr-2 text-warning');
+        $('#feeConfirmTitle').text('Quick Apply All Fee Heads');
+        $('#feeConfirmBigIcon').attr('class', 'fa fa-bolt fa-2x text-warning');
+        $('#feeConfirmIconWrapper').css('background', 'rgba(255, 193, 7, 0.15)');
+        $('#feeConfirmHeadline').text('Quick Apply to ALL Loaded Students?');
+        
+        $('#feeConfirmStudentInfoBox').show();
+        $('#feeConfirmStudentNameRow').hide();
+        $('#feeConfirmStudentAdmRow').hide();
+        $('#feeConfirmExtraDetails').html('<span class="badge badge-primary px-2 py-1" style="font-size: 13px;">' + count + ' Students Loaded</span>');
+        
+        $('#feeConfirmMessage').text('Are you sure you want to assign all course fee structure heads to ALL ' + count + ' students loaded in this batch? This will be applied live in real-time.');
+        $('#feeConfirmPaidWarning').addClass('d-none');
+        
+        $('#btn_confirm_fee_modal_action')
+            .removeClass('btn-danger btn-warning btn-primary')
+            .addClass('btn-success')
+            .prop('disabled', false)
+            .html('<i class="fa fa-bolt mr-1"></i> <span id="btn_confirm_fee_modal_text">Yes, Quick Apply (' + count + ')</span>');
+
+        $('#feeAssignConfirmModal').modal('show');
     });
 
-    // REAL-TIME BULK ASSIGN TO SELECTED/CHECKED STUDENTS
-    $('#btn_bulk_assign_realtime').click(function() {
+    // TRIGGER MODAL: BULK ASSIGN TO SELECTED/CHECKED STUDENTS
+    $('#btn_bulk_assign_realtime').click(function(e) {
+        e.preventDefault();
         var selectedStudents = [];
         $('.student_select_checkbox:checked').each(function() {
             selectedStudents.push($(this).val());
         });
 
         if (selectedStudents.length === 0) {
-            alert('Please check at least one student checkbox in the table.');
+            showFeeToast('Please select at least one student checkbox in the table.', 'error');
             return;
         }
 
         var feeMasterIds = $('#filter_fees_master_ids').val() || [];
-        var confirmMsg = 'Are you sure you want to assign fees in real-time to ' + selectedStudents.length + ' checked student(s)?';
-        if (!confirm(confirmMsg)) {
-            return;
-        }
+        var count = selectedStudents.length;
 
-        var $btn = $(this);
-        $btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin mr-1"></i> Assigning...');
+        pendingFeeAction = {
+            type: 'bulk_assign_selected',
+            admissionId: null,
+            admissionIds: selectedStudents,
+            studentName: '',
+            admissionNo: '',
+            totalHeads: 0,
+            masterIds: feeMasterIds
+        };
 
-        $.ajax({
-            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-            url: "{{ url('bulkAssignCourseFees') }}",
-            method: 'POST',
-            data: {
-                admissionIds: selectedStudents,
-                fees_master_ids: feeMasterIds
-            },
-            success: function(res) {
-                $btn.prop('disabled', false).html('<i class="fa fa-check-circle mr-1"></i> Assign to Selected Students (<span class="selected_students_count_text">' + selectedStudents.length + '</span>)');
-                if (res.status === 'success') {
-                    showFeeToast(res.message, 'success');
-                    loadStudents();
-                } else {
-                    showFeeToast(res.message || 'Error assigning fees', 'error');
+        // Configure Modal for Selected Bulk Assign
+        $('#feeConfirmModalHeader').css('border-bottom', '2px solid #002c54');
+        $('#feeConfirmIcon').attr('class', 'fa fa-users mr-2 text-info');
+        $('#feeConfirmTitle').text('Assign Fee Heads to Selected Students');
+        $('#feeConfirmBigIcon').attr('class', 'fa fa-users fa-2x text-primary');
+        $('#feeConfirmIconWrapper').css('background', 'rgba(0, 44, 84, 0.12)');
+        $('#feeConfirmHeadline').text('Assign Heads to ' + count + ' Selected Student(s)?');
+        
+        $('#feeConfirmStudentInfoBox').show();
+        $('#feeConfirmStudentNameRow').hide();
+        $('#feeConfirmStudentAdmRow').hide();
+        $('#feeConfirmExtraDetails').html('<span class="badge badge-success px-2 py-1" style="font-size: 13px;">' + count + ' Students Selected</span>');
+        
+        $('#feeConfirmMessage').text('Are you sure you want to assign fee structure heads to the ' + count + ' checked student(s) in real-time?');
+        $('#feeConfirmPaidWarning').addClass('d-none');
+        
+        $('#btn_confirm_fee_modal_action')
+            .removeClass('btn-danger btn-warning btn-success')
+            .addClass('btn-primary')
+            .prop('disabled', false)
+            .html('<i class="fa fa-check-circle mr-1"></i> <span id="btn_confirm_fee_modal_text">Yes, Assign to (' + count + ')</span>');
+
+        $('#feeAssignConfirmModal').modal('show');
+    });
+
+    // PROCEED EXECUTION HANDLER FOR CUSTOM CONFIRMATION MODAL
+    $('#btn_confirm_fee_modal_action').click(function() {
+        var $confirmBtn = $(this);
+        $confirmBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin mr-1"></i> Processing in real-time...');
+
+        if (pendingFeeAction.type === 'assign_all_student') {
+            var admissionId = pendingFeeAction.admissionId;
+            $.ajax({
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                url: "{{ url('bulkAssignCourseFees') }}",
+                method: 'POST',
+                data: {
+                    admissionIds: [admissionId],
+                    fees_master_ids: []
+                },
+                success: function(res) {
+                    $('#feeAssignConfirmModal').modal('hide');
+                    if (res.status === 'success') {
+                        // Real-time update row DOM
+                        var $row = $('#student_row_' + admissionId);
+                        $row.find('.toggle-fee-head-checkbox').prop('checked', true);
+                        $row.find('.fee-head-chip').removeClass('chip-unassigned').addClass('chip-assigned');
+                        $row.find('[id^="icon_' + admissionId + '_"]').removeClass('d-none');
+                        
+                        if (res.updated_totals && res.updated_totals[admissionId] !== undefined) {
+                            $('#student_total_' + admissionId).text('₹' + parseFloat(res.updated_totals[admissionId]).toLocaleString('en-IN'));
+                        } else if (res.total_amount !== undefined && res.total_amount > 0) {
+                            $('#student_total_' + admissionId).text('₹' + parseFloat(res.total_amount).toLocaleString('en-IN'));
+                        }
+                        showFeeToast(pendingFeeAction.studentName + ': All course fee heads assigned successfully!', 'success');
+                    } else {
+                        showFeeToast(res.message || 'Error assigning heads', 'error');
+                    }
+                },
+                error: function() {
+                    $('#feeAssignConfirmModal').modal('hide');
+                    showFeeToast('Server error while assigning fee heads', 'error');
                 }
-            },
-            error: function() {
-                $btn.prop('disabled', false).html('<i class="fa fa-check-circle mr-1"></i> Assign to Selected Students (<span class="selected_students_count_text">' + selectedStudents.length + '</span>)');
-                showFeeToast('Server error during bulk fee assignment', 'error');
-            }
-        });
+            });
+        } 
+        else if (pendingFeeAction.type === 'clear_all_student') {
+            var admissionId = pendingFeeAction.admissionId;
+            $.ajax({
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                url: "{{ url('clearStudentFeeHeads') }}",
+                method: 'POST',
+                data: {
+                    admission_id: admissionId
+                },
+                success: function(res) {
+                    $('#feeAssignConfirmModal').modal('hide');
+                    if (res.status === 'success') {
+                        // Real-time update row DOM
+                        var $row = $('#student_row_' + admissionId);
+                        $row.find('.toggle-fee-head-checkbox').prop('checked', false);
+                        $row.find('.fee-head-chip').removeClass('chip-assigned').addClass('chip-unassigned');
+                        $row.find('[id^="icon_' + admissionId + '_"]').addClass('d-none');
+                        
+                        var newTotal = (res.updated_totals && res.updated_totals[admissionId] !== undefined) ? res.updated_totals[admissionId] : (res.total_amount || 0);
+                        $('#student_total_' + admissionId).text('₹' + parseFloat(newTotal).toLocaleString('en-IN'));
+                        
+                        showFeeToast(pendingFeeAction.studentName + ': Unpaid fee heads cleared successfully!', 'success');
+                    } else {
+                        showFeeToast(res.message || 'Error clearing fee heads', 'error');
+                    }
+                },
+                error: function() {
+                    $('#feeAssignConfirmModal').modal('hide');
+                    showFeeToast('Server error while clearing fee heads', 'error');
+                }
+            });
+        }
+        else if (pendingFeeAction.type === 'quick_apply_loaded' || pendingFeeAction.type === 'bulk_assign_selected') {
+            var targetIds = pendingFeeAction.admissionIds;
+            var masterIds = pendingFeeAction.masterIds;
+
+            $.ajax({
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                url: "{{ url('bulkAssignCourseFees') }}",
+                method: 'POST',
+                data: {
+                    admissionIds: targetIds,
+                    fees_master_ids: masterIds
+                },
+                success: function(res) {
+                    $('#feeAssignConfirmModal').modal('hide');
+                    if (res.status === 'success') {
+                        // Real-time update all affected rows
+                        targetIds.forEach(function(admId) {
+                            var $row = $('#student_row_' + admId);
+                            if (masterIds && masterIds.length > 0) {
+                                masterIds.forEach(function(mId) {
+                                    $row.find('.toggle-fee-head-checkbox[data-master-id="' + mId + '"]').prop('checked', true);
+                                    $('#chip_' + admId + '_' + mId).removeClass('chip-unassigned').addClass('chip-assigned');
+                                    $('#icon_' + admId + '_' + mId).removeClass('d-none');
+                                });
+                            } else {
+                                $row.find('.toggle-fee-head-checkbox').prop('checked', true);
+                                $row.find('.fee-head-chip').removeClass('chip-unassigned').addClass('chip-assigned');
+                                $row.find('[id^="icon_' + admId + '_"]').removeClass('d-none');
+                            }
+
+                            if (res.updated_totals && res.updated_totals[admId] !== undefined) {
+                                $('#student_total_' + admId).text('₹' + parseFloat(res.updated_totals[admId]).toLocaleString('en-IN'));
+                            }
+                        });
+                        showFeeToast(res.message || 'Bulk fee assignment completed successfully!', 'success');
+                    } else {
+                        showFeeToast(res.message || 'Error during bulk assignment', 'error');
+                    }
+                },
+                error: function() {
+                    $('#feeAssignConfirmModal').modal('hide');
+                    showFeeToast('Server error during bulk fee assignment', 'error');
+                }
+            });
+        }
     });
 
     // OPEN STUDENT FEE EDIT / MODIFICATION MODAL

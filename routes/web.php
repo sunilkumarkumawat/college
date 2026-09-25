@@ -249,6 +249,7 @@ Route::match(['get', 'post'], 'assignFeesMultipleStudents', 'fees\FeesController
 Route::match(['get', 'post'], 'fees_assign', 'fees\FeesController@feesAssign');
 Route::match(['get', 'post'], 'toggleStudentFeeHead', 'fees\FeesController@toggleStudentFeeHead');
 Route::match(['get', 'post'], 'bulkAssignCourseFees', 'fees\FeesController@bulkAssignCourseFees');
+Route::match(['get', 'post'], 'clearStudentFeeHeads', 'fees\FeesController@clearStudentFeeHeads');
 Route::match(['get', 'post'], 'getStudentFeeDetailsModal', 'fees\FeesController@getStudentFeeDetailsModal');
 Route::match(['get', 'post'], 'updateStudentFeeDetailInline', 'fees\FeesController@updateStudentFeeDetailInline');
 Route::match(['get', 'post'], 'getMasterData', 'fees\FeesController@getMasterData');

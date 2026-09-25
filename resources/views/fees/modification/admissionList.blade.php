@@ -55,10 +55,19 @@
                             <i class="fa fa-list-ul mr-1"></i> Course Heads ({{ count($studentMasters) }})
                         </span>
                         <div>
-                            <button type="button" class="btn btn-xs btn-outline-success font-weight-bold px-1 py-0 mr-1 btn-student-assign-all-heads" data-admission-id="{{ $item->id }}" title="Assign all course fee heads to this student" style="font-size: 10.5px;">
+                            <button type="button" class="btn btn-xs btn-outline-success font-weight-bold px-1 py-0 mr-1 btn-student-assign-all-heads" 
+                                    data-admission-id="{{ $item->id }}" 
+                                    data-student-name="{{ $item->first_name ?? '' }} {{ $item->last_name ?? '' }}"
+                                    data-admission-no="{{ $item->admissionNo ?? '-' }}"
+                                    data-total-heads="{{ count($studentMasters) }}"
+                                    title="Assign all course fee heads to this student" style="font-size: 10.5px;">
                                 <i class="fa fa-check-square-o"></i> Check All
                             </button>
-                            <button type="button" class="btn btn-xs btn-outline-secondary font-weight-bold px-1 py-0 btn-student-unassign-all-heads" data-admission-id="{{ $item->id }}" title="Clear all fee heads for this student" style="font-size: 10.5px;">
+                            <button type="button" class="btn btn-xs btn-outline-secondary font-weight-bold px-1 py-0 btn-student-unassign-all-heads" 
+                                    data-admission-id="{{ $item->id }}" 
+                                    data-student-name="{{ $item->first_name ?? '' }} {{ $item->last_name ?? '' }}"
+                                    data-admission-no="{{ $item->admissionNo ?? '-' }}"
+                                    title="Clear all fee heads for this student" style="font-size: 10.5px;">
                                 <i class="fa fa-square-o"></i> Clear
                             </button>
                         </div>
