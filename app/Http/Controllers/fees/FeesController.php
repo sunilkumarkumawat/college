@@ -558,20 +558,22 @@ class FeesController extends Controller
                         $amt = (float)($request->course_amount[$courseId] ?? 0);
                         $dueDate = !empty($request->course_due_date[$courseId]) ? $request->course_due_date[$courseId] : null;
 
-                        // Find all classes/semesters for this course
-                        $classes = ClassType::where('course_id', $courseId)
+                        // Find the 1st (entry) class/semester for this course
+                        $firstClass = ClassType::where('course_id', $courseId)
                             ->where(function($q) use ($session_id, $branch_id) {
                                 if (!empty($session_id)) $q->where('session_id', $session_id);
                                 if (!empty($branch_id)) $q->where('branch_id', $branch_id);
                             })
                             ->whereNull('deleted_at')
-                            ->get();
+                            ->orderBy('orderBy', 'ASC')
+                            ->orderBy('id', 'ASC')
+                            ->first();
 
-                        foreach ($classes as $cl) {
+                        if ($firstClass) {
                             $fm = FeesMaster::where('session_id', $session_id)
                                 ->where('branch_id', $branch_id)
                                 ->where('fees_group_id', $fees_group_id)
-                                ->where('class_type_id', $cl->id)
+                                ->where('class_type_id', $firstClass->id)
                                 ->whereNull('deleted_at')
                                 ->first();
 
@@ -581,7 +583,7 @@ class FeesController extends Controller
                                 $fm->session_id = $session_id;
                                 $fm->branch_id = $branch_id;
                                 $fm->fees_group_id = $fees_group_id;
-                                $fm->class_type_id = $cl->id;
+                                $fm->class_type_id = $firstClass->id;
                             }
                             $fm->amount = $amt;
                             $fm->nri = $amt;
@@ -595,7 +597,7 @@ class FeesController extends Controller
                         $courseCount++;
                     }
 
-                    $msg = 'Fee Head "' . $feesGroup->name . '" successfully assigned to ' . $courseCount . ' Course(s) (' . $assignedCount . ' Classes/Semesters)!';
+                    $msg = 'Fee Head "' . $feesGroup->name . '" successfully assigned to ' . $courseCount . ' Course(s) (1st Sem)!';
                 } else {
                     $class_type_ids = $request->class_type_id ?? [];
                     if (empty($class_type_ids)) {

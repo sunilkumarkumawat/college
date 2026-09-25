@@ -1722,7 +1722,7 @@ foreach ($collectedRows as $cr) {
                     <div id="assign_panel_course" class="assign-mode-panel">
                         <div class="alert alert-info py-2 px-3 mb-2 font-weight-normal" style="font-size: 11.5px; border-left: 4px solid #002c54;">
                             <i class="fa fa-info-circle mr-1 text-primary"></i> 
-                            Selecting a course assigns this fee head with the specified amount across <strong>all classes / semesters</strong> of that course.
+                            Selecting a course assigns this fee head to the <strong>course's entry semester (1st Sem)</strong> as a single head. To assign to particular semesters (e.g. 2nd Sem, 3rd Sem, etc.), please switch to the <strong>"Assign to Class / Semester"</strong> tab.
                         </div>
 
                         <!-- Course Quick Apply Bar -->
@@ -1763,7 +1763,7 @@ foreach ($collectedRows as $cr) {
                                         <tr>
                                             <th class="text-center align-middle" style="width: 45px;">#</th>
                                             <th class="align-middle">Course Name</th>
-                                            <th class="text-center align-middle" style="width: 140px;">Semesters</th>
+                                            <th class="text-center align-middle" style="width: 150px;">Entry Class / Sem</th>
                                             <th class="align-middle" style="width: 160px;">Amount (₹) <span class="text-danger">*</span></th>
                                             <th class="align-middle" style="width: 160px;">Due Date</th>
                                         </tr>
@@ -1772,11 +1772,13 @@ foreach ($collectedRows as $cr) {
                                         @if(!empty($courses))
                                             @foreach($courses as $c)
                                                 @php
-                                                    $semCount = 0;
+                                                    $firstSemName = '';
                                                     if (!empty($classType)) {
                                                         foreach ($classType as $cl) {
                                                             if ($cl->course_id == $c->id) {
-                                                                $semCount++;
+                                                                if (empty($firstSemName)) {
+                                                                    $firstSemName = $cl->name;
+                                                                }
                                                             }
                                                         }
                                                     }
@@ -1794,8 +1796,8 @@ foreach ($collectedRows as $cr) {
                                                         </label>
                                                     </td>
                                                     <td class="text-center align-middle">
-                                                        <span class="badge badge-light border text-muted" style="font-size: 10.5px; padding: 3px 7px;">
-                                                            <i class="fa fa-book mr-1 text-info"></i> {{ $semCount }} Sem / Class{{ $semCount == 1 ? '' : 'es' }}
+                                                        <span class="badge badge-light border text-primary font-weight-bold" style="font-size: 11px; padding: 3px 8px;">
+                                                            <i class="fa fa-graduation-cap mr-1 text-primary"></i> {{ $firstSemName ?: '1st Sem' }}
                                                         </span>
                                                     </td>
                                                     <td class="align-middle">
