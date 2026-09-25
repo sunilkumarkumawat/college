@@ -670,8 +670,11 @@ $classType = Helper::classType();
                 <!-- Left Side: Create Fee Heads & Assign to Fees Master -->
                 <div class="col-md-5 pr-0 {{($getPermission->add == 1) ? '' : 'd-none'}}">
                     <div class="card card-outline card-orange mr-1">
-                        <div class="card-header bg-primary py-2">
+                        <div class="card-header bg-primary py-2 d-flex align-items-center justify-content-between">
                             <h3 class="card-title font-weight-bold mb-0" style="font-size:14px;"><i class="fa fa-money"></i> &nbsp;Fee Structure & Heads Setup</h3>
+                            <button type="button" id="btn_reset_form" class="btn btn-danger btn-xs font-weight-bold shadow-none" style="display: none; font-size: 11px; padding: 2px 8px; border-radius: 4px;" data-toggle="modal" data-target="#reset_form_confirm_modal" data-bs-toggle="modal" data-bs-target="#reset_form_confirm_modal">
+                                <i class="fa fa-refresh"></i> Reset Form
+                            </button>
                         </div>                 
                         
                         <div class="card-body p-2">
@@ -1387,6 +1390,37 @@ $classType = Helper::classType();
 
 <!-- Modals Section for Unified Fees Setup -->
 
+<!-- 0. Reset Form Confirmation Modal -->
+<div class="modal fade fees-unified-page" id="reset_form_confirm_modal" tabindex="-1" aria-labelledby="resetModalLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-danger text-white py-2">
+                <h5 class="modal-title font-weight-bold" style="font-size: 13.5px;" id="resetModalLabel">
+                    <i class="fa fa-exclamation-triangle"></i> Reset Form Confirmation
+                </h5>
+                <button type="button" class="close text-white" data-bs-dismiss="modal" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center p-3">
+                <i class="fa fa-refresh text-danger mb-2" style="font-size: 32px;"></i>
+                <h6 class="font-weight-bold text-dark mb-1" style="font-size: 13px;">Form Data Will Be Cleared!</h6>
+                <p class="text-muted mb-0" style="font-size: 11px;">
+                    Are you sure you want to reset? Any unsaved fee head entries and course selections in the form will be lost.
+                </p>
+            </div>
+            <div class="modal-footer py-2 justify-content-center bg-light">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-dismiss="modal" style="font-size: 11.5px;">
+                    <i class="fa fa-times"></i> Cancel
+                </button>
+                <button type="button" class="btn btn-danger btn-sm font-weight-bold" onclick="executeFormReset()" style="font-size: 11.5px;">
+                    <i class="fa fa-check"></i> Yes, Reset Form
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- 1. Registration / Special Fee Modal -->
 <div class="modal fade fees-unified-page" id="special_fee_modal" data-keyboard="false" data-backdrop="static">
   <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -1800,18 +1834,21 @@ function switchMode(mode) {
         submitBtn.className = 'btn btn-primary btn-sm btn-block font-weight-bold py-2 shadow-sm';
         updateHeadOnlyPreview();
     }
+    checkFormHasData();
 }
 
 function setSemBase(name, cat) {
     document.getElementById('sem_base_name').value = name;
     if (cat) document.getElementById('sem_group_type').value = cat;
     updateSemPreview();
+    checkFormHasData();
 }
 
 function setSingleClassName(name, cat) {
     document.getElementById('single_class_fee_name').value = name;
     if (cat) document.getElementById('single_class_group_type').value = cat;
     updateSingleClassPreview();
+    checkFormHasData();
 }
 
 function setHeadOnly(name, cat, isRefund) {
@@ -1826,6 +1863,7 @@ function setHeadOnly(name, cat, isRefund) {
         document.getElementById('fees_refund').value = 'no';
     }
     updateHeadOnlyPreview();
+    checkFormHasData();
 }
 
 function updateHeadOnlyRefund(checkbox) {
@@ -2098,11 +2136,104 @@ function selectCourseForSetup(courseId) {
     sel.value = courseId;
     $(sel).trigger('change');
     switchMode('semester');
+    checkFormHasData();
     
     // Smooth scroll to left form
     $('html, body').animate({
         scrollTop: $('#course_selector_box').offset().top - 70
     }, 400);
+}
+
+// Check if Left Form has any selected course or entered data to toggle Reset Form button
+function checkFormHasData() {
+    var courseVal = $('#course_selector').val();
+    var singleName = $('#single_class_fee_name').val();
+    var singleClassType = $('#single_class_type_id').val();
+    var singleAmt = $('#single_class_amount').val();
+    var headOnlyName = $('#head_only_name').val();
+    var semCommonAmt = $('#sem_common_amount').val();
+    
+    var hasData = false;
+    if (courseVal && courseVal !== '') {
+        hasData = true;
+    } else if (singleName && singleName.trim() !== '') {
+        hasData = true;
+    } else if (singleClassType && singleClassType !== '') {
+        hasData = true;
+    } else if (singleAmt && singleAmt.trim() !== '') {
+        hasData = true;
+    } else if (headOnlyName && headOnlyName.trim() !== '') {
+        hasData = true;
+    } else if (semCommonAmt && semCommonAmt.trim() !== '') {
+        hasData = true;
+    }
+    
+    if (hasData) {
+        $('#btn_reset_form').stop(true, true).fadeIn(150);
+    } else {
+        $('#btn_reset_form').stop(true, true).fadeOut(150);
+    }
+}
+
+// Reset Entire Left Unified Form with complete state clearance
+function executeFormReset() {
+    // 1. Reset Course Selector & Select2
+    var courseSel = $('#course_selector');
+    courseSel.val('').trigger('change.select2');
+    $('#course_detected_info').hide();
+    $('#course_detected_text').text('');
+    currentCourseClasses = [];
+    
+    // 2. Reset Semester Section
+    $('#section_semester_controls').hide();
+    $('#course_required_notice').show();
+    $('#sem_base_name').val('Tuition Fee');
+    $('#sem_group_type').val('academic');
+    $('#sem_refundable').val('no');
+    $('#sem_partial').val('0');
+    $('#sem_same_amount').prop('checked', true);
+    $('#sem_common_amount').val('');
+    $('#sem_common_due_date').val('');
+    $('#sem_amount_row').show();
+    
+    // 3. Reset Single Class Section
+    $('#single_class_type_id').val('').trigger('change.select2');
+    $('#single_class_fee_name').val('');
+    $('#single_class_amount').val('');
+    $('#single_class_due_date').val('');
+    $('#single_class_group_type').val('academic');
+    
+    // 4. Reset Fee Head Only Section
+    $('#head_only_name').val('');
+    $('#head_only_group_type').val('admission');
+    $('#head_only_refund').prop('checked', false);
+    $('#head_only_partial').prop('checked', false);
+    $('#fees_refund').val('no');
+    $('#fees_partial').val('0');
+    
+    // 5. Clear preview & batch inputs
+    $('#batch_inputs_container').empty();
+    $('#preview_box').empty();
+    $('#preview_box_container').hide();
+    
+    // 6. Reset Submit Button
+    var submitBtn = document.getElementById('submit_btn');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.className = 'btn btn-secondary btn-sm btn-block font-weight-bold py-2 disabled';
+        submitBtn.innerHTML = '<i class="fa fa-hand-o-up"></i> Please Select a Course to Continue';
+    }
+    
+    // 7. Switch back to semester mode
+    switchMode('semester');
+    
+    // 8. Hide Reset Button
+    $('#btn_reset_form').hide();
+    
+    // 9. Close Modal
+    $('#reset_form_confirm_modal').modal('hide');
+    $('body').removeClass('modal-open');
+    $('.modal-backdrop').remove();
 }
 
 function getStudents(class_type_id, bulk_admission_no, admission_type_id) {
@@ -2185,6 +2316,15 @@ $(document).ready(function() {
     } else {
         switchMode('semester');
     }
+    checkFormHasData();
+
+    // Listen to course selection & form inputs to toggle Reset Form button
+    $(document).on('change', '#course_selector', function() {
+        checkFormHasData();
+    });
+    $(document).on('input change', '#quickForm input, #quickForm select, #course_selector', function() {
+        checkFormHasData();
+    });
     
     $(document).on('click', '.deleteData', function() {
         var delete_id = $(this).data('id');
