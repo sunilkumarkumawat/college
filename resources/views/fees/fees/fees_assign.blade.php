@@ -15,22 +15,35 @@
     background-color: #f4f6f9;
 }
 
-/* Card Header - Solid Brand Dark with Crisp White Text */
+/* Card Header - Solid Brand Dark with Crisp White Text & Right-Aligned Tools */
 .card-outline.card-orange .card-header.bg-primary {
     background-color: #002c54 !important;
     background: #002c54 !important;
     color: #ffffff !important;
-    padding: 10px 15px !important;
+    padding: 8px 15px !important;
     border-bottom: 2px solid #001a33 !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
 }
 .card-header.bg-primary h3,
-.card-header.bg-primary .card-title,
-.card-header.bg-primary i,
-.card-header.bg-primary span {
+.card-header.bg-primary .card-title {
     color: #ffffff !important;
     font-size: 1.1rem !important;
     font-weight: 700 !important;
     margin: 0 !important;
+    float: none !important;
+    display: flex !important;
+    align-items: center !important;
+}
+.card-header.bg-primary .card-tools {
+    margin-left: auto !important;
+    margin-right: 0 !important;
+    float: none !important;
+    position: static !important;
+    display: flex !important;
+    align-items: center !important;
 }
 .card-header.bg-primary .btn {
     background-color: rgba(255, 255, 255, 0.2) !important;
@@ -169,10 +182,10 @@
                                 <i class="fa fa-users mr-1"></i> Student Fee Assign
                             </h3>
                             <div class="card-tools">
-                                <a href="{{ url('feesGroup') }}" class="btn btn-primary btn-sm" title="Fees Group & Master">
+                                <a href="{{ url('feesGroup') }}" class="btn btn-primary btn-sm mr-2" title="Fees Group & Master">
                                     <i class="fa fa-money mr-1"></i> Fees Structure
                                 </a>
-                                <a href="{{ url('fee_dashboard') }}" class="btn btn-primary btn-sm ml-1" title="Back">
+                                <a href="{{ url('fee_dashboard') }}" class="btn btn-primary btn-sm" title="Back">
                                     <i class="fa fa-arrow-left mr-1"></i> Back
                                 </a>
                             </div>
