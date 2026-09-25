@@ -490,8 +490,30 @@ class FeesController extends Controller
             
             public function feesGroupDelete(Request $request){
                 $id = $request->delete_id;
-                $feesGroup = FeesGroup::find($id)->delete();
-                return redirect::to('feesGroup')->with('message', 'Fees Group Deleted Successfully !');
+                $feesGroup = FeesGroup::find($id);
+                if ($feesGroup) {
+                    $session_id = Session::get('session_id');
+                    $branch_id = Session::get('branch_id');
+                    $isAssigned = \App\Models\fees\FeesAssignDetail::where('fees_group_id', $id)
+                        ->where('session_id', $session_id)
+                        ->where('branch_id', $branch_id)
+                        ->whereNull('deleted_at')
+                        ->exists();
+                    $isCollected = \App\Models\FeesDetail::where('fees_group_id', $id)
+                        ->where('session_id', $session_id)
+                        ->where('branch_id', $branch_id)
+                        ->whereNull('deleted_at')
+                        ->where('paid_amount', '>', 0)
+                        ->exists();
+
+                    if ($isAssigned || $isCollected) {
+                        return redirect()->back()->with('error', 'Cannot delete this Fee Head because it has student assignments or fee collections!');
+                    }
+
+                    $feesGroup->delete();
+                    return redirect()->back()->with('message', 'Fees Head Deleted Successfully !');
+                }
+                return redirect()->back()->with('error', 'Fee Head Not Found !');
             }
  
             public function studentFeesOnclick(Request $request){

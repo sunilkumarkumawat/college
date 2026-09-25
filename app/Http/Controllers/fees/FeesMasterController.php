@@ -143,8 +143,32 @@ class FeesMasterController extends Controller
 
             public function feesMasterDelete(Request $request){
                 $id = $request->delete_id;
-                $feesMaster = FeesMaster::find($id)->delete();
-                return redirect::to('feesMasterAdd')->with('message', 'Fees Record Deleted Successfully !');
+                $feesMaster = FeesMaster::find($id);
+                if ($feesMaster) {
+                    $session_id = Session::get('session_id');
+                    $branch_id = Session::get('branch_id');
+                    $isAssigned = \App\Models\fees\FeesAssignDetail::where('fees_group_id', $feesMaster->fees_group_id)
+                        ->where('class_type_id', $feesMaster->class_type_id)
+                        ->where('session_id', $session_id)
+                        ->where('branch_id', $branch_id)
+                        ->whereNull('deleted_at')
+                        ->exists();
+                    $isCollected = \App\Models\FeesDetail::where('fees_group_id', $feesMaster->fees_group_id)
+                        ->where('class_type_id', $feesMaster->class_type_id)
+                        ->where('session_id', $session_id)
+                        ->where('branch_id', $branch_id)
+                        ->whereNull('deleted_at')
+                        ->where('paid_amount', '>', 0)
+                        ->exists();
+
+                    if ($isAssigned || $isCollected) {
+                        return redirect()->back()->with('error', 'Cannot delete this Fee Head from Fees Master because it is already assigned to student(s) or has collected fees!');
+                    }
+
+                    $feesMaster->delete();
+                    return redirect()->back()->with('message', 'Fees Master Record Deleted Successfully !');
+                }
+                return redirect()->back()->with('error', 'Fees Master Record Not Found !');
             }
 
             public function feesMasterData(Request $request){

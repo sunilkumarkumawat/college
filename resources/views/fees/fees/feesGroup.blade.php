@@ -20,6 +20,33 @@ if (!empty($dataview)) {
         }
     }
 }
+
+// Check which fees_group / fees_master rows are assigned to students or have payments collected
+$assignedMap = [];
+$collectedMap = [];
+$activeSessionId = Session::get('session_id');
+$activeBranchId = Session::get('branch_id');
+
+$assignedRows = \App\Models\fees\FeesAssignDetail::where('session_id', $activeSessionId)
+    ->where('branch_id', $activeBranchId)
+    ->whereNull('deleted_at')
+    ->select('fees_group_id', 'class_type_id')
+    ->get();
+foreach ($assignedRows as $ar) {
+    $assignedMap[$ar->fees_group_id] = true;
+    $assignedMap[$ar->fees_group_id . '_' . $ar->class_type_id] = true;
+}
+
+$collectedRows = \App\Models\FeesDetail::where('session_id', $activeSessionId)
+    ->where('branch_id', $activeBranchId)
+    ->whereNull('deleted_at')
+    ->where('paid_amount', '>', 0)
+    ->select('fees_group_id', 'class_type_id')
+    ->get();
+foreach ($collectedRows as $cr) {
+    $collectedMap[$cr->fees_group_id] = true;
+    $collectedMap[$cr->fees_group_id . '_' . $cr->class_type_id] = true;
+}
 @endphp
 
 @extends('layout.app') 
@@ -1205,6 +1232,8 @@ if (!empty($dataview)) {
                                                                                                         elseif ($fgType === 'hostel_transport') $badgeClass = 'badge-hostel_transport';
 
                                                                                                         $dueDateStr = !empty($sRow->installment_due_date) ? date('d-M-y', strtotime($sRow->installment_due_date)) : null;
+                                                                                                        $isFmAssigned = !empty($assignedMap[$sRow->fees_group_id . '_' . $sRow->class_type_id]);
+                                                                                                        $isFmCollected = !empty($collectedMap[$sRow->fees_group_id . '_' . $sRow->class_type_id]);
                                                                                                     @endphp
                                                                                                     <div class="d-inline-flex align-items-center border rounded px-2 py-1 bg-white shadow-sm" style="font-size: 11px; gap: 5px;">
                                                                                                         <span class="badge {{ $badgeClass }}" style="font-size: 9px; padding: 2px 4px;">{{ ucfirst($fgType) }}</span>
@@ -1213,6 +1242,19 @@ if (!empty($dataview)) {
                                                                                                         @if($dueDateStr)
                                                                                                             <span class="badge badge-light border text-muted" style="font-size: 9px;" title="Due Date">
                                                                                                                 <i class="fa fa-calendar-check-o text-info"></i> {{ $dueDateStr }}
+                                                                                                            </span>
+                                                                                                        @endif
+                                                                                                        @if(!$isFmAssigned && !$isFmCollected)
+                                                                                                            <button type="button" 
+                                                                                                                    class="btn btn-xs btn-outline-danger p-0 border-0 ml-1" 
+                                                                                                                    title="Delete {{ $fgName }} from {{ $cl->name }}" 
+                                                                                                                    onclick="confirmDeleteFeesMaster('{{ $sRow->id }}', '{{ addslashes($fgName) }}', '{{ addslashes($cl->name) }}')"
+                                                                                                                    style="line-height: 1;">
+                                                                                                                <i class="fa fa-times-circle text-danger" style="font-size: 13px;"></i>
+                                                                                                            </button>
+                                                                                                        @else
+                                                                                                            <span class="badge badge-light border text-muted ml-1" style="font-size: 8.5px; padding: 1px 3px;" title="{{ $isFmCollected ? 'Fees Collected (Locked)' : 'Assigned to Students (Locked)' }}">
+                                                                                                                <i class="fa fa-lock text-secondary"></i>
                                                                                                             </span>
                                                                                                         @endif
                                                                                                     </div>
@@ -1351,17 +1393,27 @@ if (!empty($dataview)) {
                                                                             style="font-size: 11px; padding: 2px 7px;">
                                                                         <i class="fa fa-pencil"></i>
                                                                     </button>
-                                                                    <a href="javascript:void(0)" 
-                                                                       class="btn btn-xs btn-outline-danger deleteData" 
-                                                                       data-id="{{ $nh->id }}" 
-                                                                       data-toggle="modal" 
-                                                                       data-target="#Modal_id" 
-                                                                       data-bs-toggle="modal" 
-                                                                       data-bs-target="#Modal_id" 
-                                                                       title="Delete Fee Head" 
-                                                                       style="font-size: 11px; padding: 2px 7px;">
-                                                                        <i class="fa fa-trash"></i>
-                                                                    </a>
+                                                                    @php
+                                                                        $isNhAssigned = !empty($assignedMap[$nh->id]);
+                                                                        $isNhCollected = !empty($collectedMap[$nh->id]);
+                                                                    @endphp
+                                                                    @if(!$isNhAssigned && !$isNhCollected)
+                                                                        <a href="javascript:void(0)" 
+                                                                           class="btn btn-xs btn-outline-danger deleteData" 
+                                                                           data-id="{{ $nh->id }}" 
+                                                                           data-toggle="modal" 
+                                                                           data-target="#Modal_id" 
+                                                                           data-bs-toggle="modal" 
+                                                                           data-bs-target="#Modal_id" 
+                                                                           title="Delete Fee Head" 
+                                                                           style="font-size: 11px; padding: 2px 7px;">
+                                                                            <i class="fa fa-trash"></i>
+                                                                        </a>
+                                                                    @else
+                                                                        <span class="badge badge-light border text-muted ml-1" style="font-size: 10px; padding: 3px 5px;" title="{{ $isNhCollected ? 'Fees Collected (Locked)' : 'Assigned to Students (Locked)' }}">
+                                                                            <i class="fa fa-lock text-secondary"></i>
+                                                                        </span>
+                                                                    @endif
                                                                 </td>
                                                             </tr>
                                                         @endforeach
@@ -1383,7 +1435,7 @@ if (!empty($dataview)) {
     </section>
 </div>
 
-<!-- Delete Confirmation Modal -->
+<!-- Delete Fees Group Modal -->
 <div class="modal fade" id="Modal_id" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -1402,6 +1454,41 @@ if (!empty($dataview)) {
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('common.Close') }}</button>
                     <button type="submit" class="btn btn-danger">{{ __('common.Delete') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Fees Master Head Confirmation Modal -->
+<div class="modal fade fees-unified-page" id="delete_fees_master_modal" tabindex="-1" role="dialog" aria-labelledby="deleteFeesMasterLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-danger py-2 text-white">
+                <h5 class="modal-title text-white font-weight-bold" id="deleteFeesMasterLabel" style="font-size: 13.5px;">
+                    <i class="fa fa-trash"></i> Remove Fee Head
+                </h5>
+                <button type="button" class="close text-white" data-bs-dismiss="modal" data-dismiss="modal" aria-label="Close" style="opacity: 0.9;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="{{ url('feesMasterDelete') }}" method="post">
+                @csrf
+                <div class="modal-body text-center p-3">
+                    <i class="fa fa-exclamation-triangle text-danger mb-2" style="font-size: 30px;"></i>
+                    <h6 class="font-weight-bold text-dark mb-1" id="delete_fm_title">Remove Fee Head from Class?</h6>
+                    <p class="text-muted mb-0" id="delete_fm_desc" style="font-size: 11.5px;">
+                        Are you sure you want to remove this fee head from this semester's fee structure?
+                    </p>
+                    <input type="hidden" name="delete_id" id="delete_fees_master_id">
+                </div>
+                <div class="modal-footer py-2 justify-content-center bg-light">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-dismiss="modal" style="font-size: 11.5px;">
+                        <i class="fa fa-times"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn btn-danger btn-sm font-weight-bold" style="font-size: 11.5px;">
+                        <i class="fa fa-trash"></i> Yes, Remove
+                    </button>
                 </div>
             </form>
         </div>
@@ -1805,13 +1892,15 @@ function updateSemPreview() {
     if (currentCourseClasses.length > 0) {
         var loopCount = Math.min(count, currentCourseClasses.length);
         html += '<div class="table-responsive" style="height: auto; border: 1px solid #c2d4ea; border-radius: 4px;">';
-        html += '<table class="table table-sm table-bordered table-striped mb-0 text-dark" style="font-size: 11px; background: #ffffff;">';
+        html += '<table class="table table-sm table-bordered table-striped mb-0 text-dark" style="font-size: 11px; background: #ffffff;" id="sem_setup_table">';
         html += '<thead style="background: #002c54; color: #ffffff; position: sticky; top: 0; z-index: 2;">';
         html += '<tr>';
-        html += '<th style="padding: 4px 6px; width: 25%; background: #002c54; color: #ffffff;">Class / Sem</th>';
-        html += '<th style="padding: 4px 6px; width: 31%; background: #002c54; color: #ffffff;">Fee Head Name</th>';
-        html += '<th style="padding: 4px 6px; width: 22%; background: #002c54; color: #ffffff;">Amount (₹)</th>';
+        html += '<th style="padding: 4px 5px; width: 28px; background: #002c54; color: #ffffff; text-align: center;"><input type="checkbox" id="check_all_sem_rows" checked onchange="toggleAllSemRows(this)" title="Check/Uncheck All"></th>';
+        html += '<th style="padding: 4px 6px; width: 22%; background: #002c54; color: #ffffff;">Class / Sem</th>';
+        html += '<th style="padding: 4px 6px; width: 28%; background: #002c54; color: #ffffff;">Fee Head Name</th>';
+        html += '<th style="padding: 4px 6px; width: 20%; background: #002c54; color: #ffffff;">Amount (₹)</th>';
         html += '<th style="padding: 4px 6px; width: 22%; background: #002c54; color: #ffffff;">Due Date</th>';
+        html += '<th style="padding: 4px 4px; width: 28px; background: #002c54; color: #ffffff; text-align: center;"><i class="fa fa-trash text-white"></i></th>';
         html += '</tr>';
         html += '</thead>';
         html += '<tbody>';
@@ -1820,19 +1909,25 @@ function updateSemPreview() {
             var cl = currentCourseClasses[i];
             var headName = baseName + ' - Sem ' + (i + 1);
 
-            html += '<tr>';
+            html += '<tr class="sem-setup-row" id="sem_row_' + i + '">';
+            html += '<td style="vertical-align: middle; padding: 4px 5px; text-align: center;">';
+            html += '<input type="checkbox" class="sem-row-check" checked onchange="onSemRowToggle(this)" title="Include this semester in setup">';
+            html += '</td>';
             html += '<td style="vertical-align: middle; padding: 4px 6px;">';
             html += '<strong class="text-primary">' + cl.name + '</strong>';
-            html += '<input type="hidden" name="class_type_id[]" value="' + cl.id + '">';
+            html += '<input type="hidden" name="class_type_id[]" value="' + cl.id + '" class="sem-input-field">';
             html += '</td>';
             html += '<td style="vertical-align: middle; padding: 4px 6px;">';
-            html += '<input type="text" name="fee_name[]" class="form-control form-control-sm p-1 font-weight-bold text-dark sem-head-name" value="' + headName + '" style="font-size: 11px; height: 26px; border: 1px solid #ced4da;">';
+            html += '<input type="text" name="fee_name[]" class="form-control form-control-sm p-1 font-weight-bold text-dark sem-head-name sem-input-field" value="' + headName + '" style="font-size: 11px; height: 26px; border: 1px solid #ced4da;">';
             html += '</td>';
             html += '<td style="vertical-align: middle; padding: 4px 6px;">';
-            html += '<input type="number" name="amount[]" class="form-control form-control-sm p-1 font-weight-bold text-success text-right sem-row-amount" value="' + commonAmount + '" min="0" style="font-size: 11px; height: 26px; border: 1px solid #28a745; background: #f8fff9;">';
+            html += '<input type="number" name="amount[]" class="form-control form-control-sm p-1 font-weight-bold text-success text-right sem-row-amount sem-input-field" value="' + commonAmount + '" min="0" style="font-size: 11px; height: 26px; border: 1px solid #28a745; background: #f8fff9;">';
             html += '</td>';
             html += '<td style="vertical-align: middle; padding: 4px 6px;">';
-            html += '<input type="date" name="due_date[]" class="form-control form-control-sm p-1 sem-row-due" value="" style="font-size: 10px; height: 26px; border: 1px solid #ced4da;">';
+            html += '<input type="date" name="due_date[]" class="form-control form-control-sm p-1 sem-row-due sem-input-field" value="" style="font-size: 10px; height: 26px; border: 1px solid #ced4da;">';
+            html += '</td>';
+            html += '<td style="vertical-align: middle; padding: 4px 4px; text-align: center;">';
+            html += '<button type="button" class="btn btn-xs btn-outline-danger p-0 border-0" title="Remove this semester from setup" onclick="removeSemRow(this)"><i class="fa fa-trash text-danger" style="font-size: 13px;"></i></button>';
             html += '</td>';
             html += '</tr>';
         }
@@ -1844,10 +1939,66 @@ function updateSemPreview() {
 
     document.getElementById('preview_title').innerText = 'Semester-wise Fees & Amount Setup:';
     document.getElementById('preview_box').innerHTML = html;
-    document.getElementById('preview_count_badge').innerText = (currentCourseClasses.length > 0 ? Math.min(count, currentCourseClasses.length) : count) + ' Semesters';
+    updateSemCountBadgeAndBtn();
 
     // Auto-apply schedule if start date is set
     applyDueDateSchedule();
+}
+
+function onSemRowToggle(checkbox) {
+    var tr = $(checkbox).closest('tr');
+    var isChecked = $(checkbox).is(':checked');
+    if (isChecked) {
+        tr.removeClass('table-secondary text-muted').css('opacity', '1');
+        tr.find('.sem-input-field').prop('disabled', false);
+        tr.find('.sem-row-amount').css('background', '#f8fff9');
+    } else {
+        tr.addClass('table-secondary text-muted').css('opacity', '0.5');
+        tr.find('.sem-input-field').prop('disabled', true);
+        tr.find('.sem-row-amount').css('background', '#f1f5f9');
+    }
+    updateSemCountBadgeAndBtn();
+}
+
+function removeSemRow(btn) {
+    var tr = $(btn).closest('tr');
+    tr.remove();
+    updateSemCountBadgeAndBtn();
+}
+
+function toggleAllSemRows(masterCheck) {
+    var isChecked = $(masterCheck).is(':checked');
+    $('.sem-row-check').each(function() {
+        $(this).prop('checked', isChecked);
+        onSemRowToggle(this);
+    });
+}
+
+function updateSemCountBadgeAndBtn() {
+    var activeCount = $('.sem-row-check:checked').length;
+    var totalRows = $('.sem-row-check').length;
+    
+    $('#preview_count_badge').text(activeCount + ' / ' + totalRows + ' Semesters');
+    
+    var submitBtn = document.getElementById('submit_btn');
+    if (submitBtn) {
+        if (activeCount > 0) {
+            submitBtn.disabled = false;
+            submitBtn.className = 'btn btn-primary btn-sm btn-block font-weight-bold py-2 shadow-sm';
+            submitBtn.innerHTML = '<i class="fa fa-check-circle"></i> Save ' + activeCount + ' Semester Fee Structure (Fees Master)';
+        } else {
+            submitBtn.disabled = true;
+            submitBtn.className = 'btn btn-secondary btn-sm btn-block font-weight-bold py-2 disabled';
+            submitBtn.innerHTML = '<i class="fa fa-exclamation-circle"></i> Please select at least 1 Semester to Save';
+        }
+    }
+}
+
+function confirmDeleteFeesMaster(id, headName, className) {
+    $('#delete_fees_master_id').val(id);
+    $('#delete_fm_title').html('Remove <b>' + headName + '</b>?');
+    $('#delete_fm_desc').html('Are you sure you want to remove <b>' + headName + '</b> from <b>' + className + '</b> fee structure?');
+    $('#delete_fees_master_modal').modal('show');
 }
 
 function updateSingleClassPreview() {
