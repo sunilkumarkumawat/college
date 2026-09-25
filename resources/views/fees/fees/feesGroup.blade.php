@@ -958,110 +958,28 @@ if (!empty($dataview)) {
                                     <i class="fa fa-check-circle"></i> Save Fee Structure & Heads
                                 </button>
                             </form>
-
-                            <!-- Standalone / No-Class Fee Heads Section (Shown when "Fee Head Only" mode is active) -->
-                            <div id="section_single_head_list" style="display: none;" class="mt-3">
-                                <div class="card card-outline card-secondary shadow-none border mb-0">
-                                    <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center">
-                                        <h6 class="card-title font-weight-bold mb-0 text-dark" style="font-size:12px;">
-                                            <i class="fa fa-list text-primary mr-1"></i> Standalone Fee Heads (No Class Assigned)
-                                        </h6>
-                                        <span class="badge badge-primary px-2" style="font-size: 10px;">{{ count($noClassHeads) }} Heads</span>
-                                    </div>
-                                    <div class="card-body p-0">
-                                        @if(count($noClassHeads) > 0)
-                                            <div class="table-responsive" style="max-height: 380px; overflow-y: auto;">
-                                                <table class="table table-sm table-bordered table-striped table-hover mb-0 text-dark" style="font-size: 11px;">
-                                                    <thead class="thead-light" style="position: sticky; top: 0; z-index: 1;">
-                                                        <tr>
-                                                            <th width="35px" class="text-center">#</th>
-                                                            <th>Fee Head Name</th>
-                                                            <th width="95px" class="text-center">Category</th>
-                                                            <th width="65px" class="text-center">Action</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @foreach($noClassHeads as $idx => $nh)
-                                                            @php
-                                                                $nhCat = strtolower(trim($nh->group_type ?? 'other'));
-                                                                if ($nhCat === 'registration') $nhCat = 'admission';
-                                                                $nhCatClass = 'badge-other';
-                                                                if ($nhCat === 'academic') $nhCatClass = 'badge-academic';
-                                                                elseif ($nhCat === 'admission') $nhCatClass = 'badge-admission';
-                                                                elseif ($nhCat === 'examination') $nhCatClass = 'badge-examination';
-                                                                elseif ($nhCat === 'practical') $nhCatClass = 'badge-practical';
-                                                                elseif ($nhCat === 'facility') $nhCatClass = 'badge-facility';
-                                                                elseif ($nhCat === 'refundable') $nhCatClass = 'badge-refundable';
-                                                                elseif ($nhCat === 'hostel_transport') $nhCatClass = 'badge-hostel_transport';
-
-                                                                $isRef = strtolower(trim($nh->fees_refund ?? '')) === 'yes';
-                                                                $isPart = ($nh->fees_partial ?? 0) == 1;
-                                                            @endphp
-                                                            <tr>
-                                                                <td class="text-center align-middle font-weight-bold text-muted">{{ $idx + 1 }}</td>
-                                                                <td class="align-middle">
-                                                                    <span class="font-weight-bold text-dark">{{ $nh->name }}</span>
-                                                                    @if($isRef)
-                                                                        <span class="badge badge-refundable ml-1" style="font-size: 8.5px; padding: 1px 4px;">Refundable</span>
-                                                                    @endif
-                                                                    @if($isPart)
-                                                                        <span class="badge badge-info ml-1" style="font-size: 8.5px; padding: 1px 4px;">50% Partial</span>
-                                                                    @endif
-                                                                </td>
-                                                                <td class="text-center align-middle">
-                                                                    <span class="badge {{ $nhCatClass }}" style="font-size: 9.5px; padding: 2px 5px;">{{ ucfirst($nhCat) }}</span>
-                                                                </td>
-                                                                <td class="text-center align-middle text-nowrap">
-                                                                    <button type="button" 
-                                                                            class="btn btn-xs btn-outline-primary btn-edit-fee-head" 
-                                                                            data-id="{{ $nh->id }}" 
-                                                                            data-name="{{ $nh->name }}" 
-                                                                            data-category="{{ $nhCat }}" 
-                                                                            data-refund="{{ $nh->fees_refund ?? 'no' }}" 
-                                                                            data-partial="{{ $nh->fees_partial ?? 0 }}"
-                                                                            title="Edit Fee Head" 
-                                                                            style="font-size: 10px; padding: 1px 5px;">
-                                                                        <i class="fa fa-pencil"></i>
-                                                                    </button>
-                                                                    <a href="javascript:void(0)" 
-                                                                       class="btn btn-xs btn-outline-danger deleteData" 
-                                                                       data-id="{{ $nh->id }}" 
-                                                                       data-toggle="modal" 
-                                                                       data-target="#Modal_id" 
-                                                                       data-bs-toggle="modal" 
-                                                                       data-bs-target="#Modal_id" 
-                                                                       title="Delete Fee Head" 
-                                                                       style="font-size: 10px; padding: 1px 5px;">
-                                                                        <i class="fa fa-trash"></i>
-                                                                    </a>
-                                                                </td>
-                                                            </tr>
-                                                        @endforeach
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        @else
-                                            <div class="p-3 text-center text-muted" style="font-size: 11px;">
-                                                <i class="fa fa-info-circle text-info mr-1"></i> No standalone / no-class fee heads found.
-                                            </div>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>          
                 </div>
                 
-                <!-- Right Side: Unified Fees Master Structure -->
+                <!-- Right Side: Unified Fees Master Structure & No-Class Fee Heads -->
                 <div class="{{($getPermission->add == 1) ? 'col-md-7 pl-0' : 'col-md-12 pl-0'}}">
                     <div class="card card-outline card-orange ml-1">
-                        <div class="card-header bg-primary py-2 d-flex justify-content-between align-items-center">
+                        <div class="card-header bg-primary py-2 d-flex justify-content-between align-items-center flex-wrap" style="gap: 6px;">
                             <h3 class="card-title font-weight-bold mb-0" style="font-size:14px;">
-                                <i class="fa fa-table"></i> &nbsp;Class-wise Fees Master
+                                <i class="fa fa-cubes"></i> &nbsp;<span id="right_header_title">Class-wise Fees Master</span>
                             </h3>
-                            <span class="badge badge-light px-2 py-1" style="font-size:11px;">
-                                {{ count($courses ?? []) }} Courses
-                            </span>
+
+                            <!-- View Mode Switcher Tabs -->
+                            <div class="btn-group btn-group-sm bg-white p-1 rounded shadow-sm" role="group" id="right_tab_switcher">
+                                <button type="button" class="btn btn-sm btn-primary font-weight-bold active" id="btn_tab_structures" onclick="switchRightTab('structures')" style="font-size: 11px; padding: 3px 10px;">
+                                    <i class="fa fa-th-large mr-1"></i> Class-wise Fees Master
+                                </button>
+                                <button type="button" class="btn btn-sm btn-light font-weight-bold text-dark" id="btn_tab_no_class" onclick="switchRightTab('no_class_heads')" style="font-size: 11px; padding: 3px 10px;">
+                                    <i class="fa fa-tag mr-1 text-primary"></i> No-Class Fee Heads
+                                    <span class="badge badge-primary ml-1" id="total_no_class_heads_badge">{{ count($noClassHeads) }}</span>
+                                </button>
+                            </div>
                         </div>  
                         
                         <div class="card-body p-2">
@@ -1101,245 +1019,353 @@ if (!empty($dataview)) {
                                         $totalDistinctHeads = count($distinctHeads);
                                     @endphp
 
-                                    <!-- Top KPI Summary Cards -->
-                                    <div class="row mb-2">
-                                        <div class="col-6 col-md-3 mb-1">
-                                            <div class="kpi-chip-card">
-                                                <div class="kpi-chip-icon icon-courses">
-                                                    <i class="fa fa-graduation-cap"></i>
+                                    <!-- TAB 1: CLASS-WISE FEES MASTER STRUCTURE -->
+                                    <div id="container_class_structures">
+                                        <!-- Top KPI Summary Cards -->
+                                        <div class="row mb-2">
+                                            <div class="col-6 col-md-3 mb-1">
+                                                <div class="kpi-chip-card">
+                                                    <div class="kpi-chip-icon icon-courses">
+                                                        <i class="fa fa-graduation-cap"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="kpi-chip-val text-primary">{{ $totalConfiguredCourses }} <small class="text-muted" style="font-size:10px;">/ {{ count($courses ?? []) }}</small></div>
+                                                        <div class="kpi-chip-label">Configured Courses</div>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <div class="kpi-chip-val text-primary">{{ $totalConfiguredCourses }} <small class="text-muted" style="font-size:10px;">/ {{ count($courses ?? []) }}</small></div>
-                                                    <div class="kpi-chip-label">Configured Courses</div>
+                                            </div>
+                                            <div class="col-6 col-md-3 mb-1">
+                                                <div class="kpi-chip-card">
+                                                    <div class="kpi-chip-icon icon-classes">
+                                                        <i class="fa fa-book"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="kpi-chip-val text-info">{{ $totalConfiguredClasses }} <small class="text-muted" style="font-size:10px;">Semesters</small></div>
+                                                        <div class="kpi-chip-label">Active Classes</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-6 col-md-3 mb-1">
+                                                <div class="kpi-chip-card">
+                                                    <div class="kpi-chip-icon icon-pool">
+                                                        <i class="fa fa-inr"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="kpi-chip-val text-success">₹{{ number_format($totalAmountConfigured) }}</div>
+                                                        <div class="kpi-chip-label">Total Fee Pool</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-6 col-md-3 mb-1">
+                                                <div class="kpi-chip-card">
+                                                    <div class="kpi-chip-icon icon-heads">
+                                                        <i class="fa fa-tags"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="kpi-chip-val text-warning">{{ $totalDistinctHeads }} <small class="text-muted" style="font-size:10px;">Heads</small></div>
+                                                        <div class="kpi-chip-label">Fee Heads Used</div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-6 col-md-3 mb-1">
-                                            <div class="kpi-chip-card">
-                                                <div class="kpi-chip-icon icon-classes">
-                                                    <i class="fa fa-book"></i>
-                                                </div>
-                                                <div>
-                                                    <div class="kpi-chip-val text-info">{{ $totalConfiguredClasses }} <small class="text-muted" style="font-size:10px;">Semesters</small></div>
-                                                    <div class="kpi-chip-label">Active Classes</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-6 col-md-3 mb-1">
-                                            <div class="kpi-chip-card">
-                                                <div class="kpi-chip-icon icon-pool">
-                                                    <i class="fa fa-inr"></i>
-                                                </div>
-                                                <div>
-                                                    <div class="kpi-chip-val text-success">₹{{ number_format($totalAmountConfigured) }}</div>
-                                                    <div class="kpi-chip-label">Total Fee Pool</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-6 col-md-3 mb-1">
-                                            <div class="kpi-chip-card">
-                                                <div class="kpi-chip-icon icon-heads">
-                                                    <i class="fa fa-tags"></i>
-                                                </div>
-                                                <div>
-                                                    <div class="kpi-chip-val text-warning">{{ $totalDistinctHeads }} <small class="text-muted" style="font-size:10px;">Heads</small></div>
-                                                    <div class="kpi-chip-label">Fee Heads Used</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
 
-                                    <!-- Quick Course Filter Pills Bar -->
-                                    <div class="quick-filters-box">
-                                        <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <label class="font-weight-bold mb-0">
-                                                <i class="fa fa-filter"></i> Quick Course Filters:
-                                            </label>
-                                            <small>Click course to filter instantly</small>
-                                        </div>
-                                        <div class="course-filter-wrapper">
-                                            <button type="button" class="course-scroll-btn" onclick="scrollCourseFilters(-220)" title="Scroll Left">
-                                                <i class="fa fa-chevron-left"></i>
-                                            </button>
-                                            <div class="course-filter-scroll" id="course_pill_list">
-                                                <button type="button" class="course-pill-btn active" data-course-id="all" onclick="filterByCourse('all', this)">
-                                                    <i class="fa fa-globe"></i> All Courses <span class="badge-counter">{{ $totalConfiguredCourses }}</span>
+                                        <!-- Quick Course Filter Pills Bar -->
+                                        <div class="quick-filters-box">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <label class="font-weight-bold mb-0">
+                                                    <i class="fa fa-filter"></i> Quick Course Filters:
+                                                </label>
+                                                <small>Click course to filter instantly</small>
+                                            </div>
+                                            <div class="course-filter-wrapper">
+                                                <button type="button" class="course-scroll-btn" onclick="scrollCourseFilters(-220)" title="Scroll Left">
+                                                    <i class="fa fa-chevron-left"></i>
                                                 </button>
-                                                @if(!empty($courses))
-                                                    @foreach($courses as $c)
-                                                        @php
-                                                            $cClasses = !empty($allClassType) ? $allClassType->where('course_id', $c->id) : collect();
-                                                            $cConfiguredCount = 0;
-                                                            $cTotalFee = 0;
-                                                            foreach($cClasses as $cl) {
-                                                                if (isset($feesMasterByClass[$cl->id])) {
-                                                                    $cConfiguredCount++;
-                                                                    foreach($feesMasterByClass[$cl->id] as $fRow) {
-                                                                        $cTotalFee += (float)($fRow->amount ?? 0);
+                                                <div class="course-filter-scroll" id="course_pill_list">
+                                                    <button type="button" class="course-pill-btn active" data-course-id="all" onclick="filterByCourse('all', this)">
+                                                        <i class="fa fa-globe"></i> All Courses <span class="badge-counter">{{ $totalConfiguredCourses }}</span>
+                                                    </button>
+                                                    @if(!empty($courses))
+                                                        @foreach($courses as $c)
+                                                            @php
+                                                                $cClasses = !empty($allClassType) ? $allClassType->where('course_id', $c->id) : collect();
+                                                                $cConfiguredCount = 0;
+                                                                $cTotalFee = 0;
+                                                                foreach($cClasses as $cl) {
+                                                                    if (isset($feesMasterByClass[$cl->id])) {
+                                                                        $cConfiguredCount++;
+                                                                        foreach($feesMasterByClass[$cl->id] as $fRow) {
+                                                                            $cTotalFee += (float)($fRow->amount ?? 0);
+                                                                        }
                                                                     }
                                                                 }
-                                                            }
-                                                        @endphp
-                                                        <button type="button" class="course-pill-btn" data-course-id="{{ $c->id }}" onclick="filterByCourse('{{ $c->id }}', this)">
-                                                            <i class="fa fa-graduation-cap"></i> {{ $c->name }}
-                                                            <span class="badge-counter">₹{{ number_format($cTotalFee) }}</span>
-                                                        </button>
-                                                    @endforeach
-                                                @endif
+                                                            @endphp
+                                                            <button type="button" class="course-pill-btn" data-course-id="{{ $c->id }}" onclick="filterByCourse('{{ $c->id }}', this)">
+                                                                <i class="fa fa-graduation-cap"></i> {{ $c->name }}
+                                                                <span class="badge-counter">₹{{ number_format($cTotalFee) }}</span>
+                                                            </button>
+                                                        @endforeach
+                                                    @endif
+                                                </div>
+                                                <button type="button" class="course-scroll-btn" onclick="scrollCourseFilters(220)" title="Scroll Right">
+                                                    <i class="fa fa-chevron-right"></i>
+                                                </button>
                                             </div>
-                                            <button type="button" class="course-scroll-btn" onclick="scrollCourseFilters(220)" title="Scroll Right">
-                                                <i class="fa fa-chevron-right"></i>
-                                            </button>
                                         </div>
-                                    </div>
 
-                                    <!-- Course-wise Cards Layout -->
-                                    <div id="course_cards_container" class="mt-2">
-                                        @if(!empty($courses))
-                                            @php $renderedCourses = 0; @endphp
-                                            @foreach($courses as $c)
-                                                @php
-                                                    $cClasses = !empty($allClassType) ? $allClassType->where('course_id', $c->id) : collect();
-                                                    $cConfiguredCount = 0;
-                                                    $cTotalFee = 0;
-                                                    $cClassRows = [];
+                                        <!-- Course-wise Cards Layout -->
+                                        <div id="course_cards_container" class="mt-2">
+                                            @if(!empty($courses))
+                                                @php $renderedCourses = 0; @endphp
+                                                @foreach($courses as $c)
+                                                    @php
+                                                        $cClasses = !empty($allClassType) ? $allClassType->where('course_id', $c->id) : collect();
+                                                        $cConfiguredCount = 0;
+                                                        $cTotalFee = 0;
+                                                        $cClassRows = [];
 
-                                                    foreach($cClasses as $cl) {
-                                                        if (isset($feesMasterByClass[$cl->id])) {
-                                                            $cConfiguredCount++;
-                                                            $cClassRows[$cl->id] = $feesMasterByClass[$cl->id];
-                                                            foreach($feesMasterByClass[$cl->id] as $fRow) {
-                                                                $cTotalFee += (float)($fRow->amount ?? 0);
+                                                        foreach($cClasses as $cl) {
+                                                            if (isset($feesMasterByClass[$cl->id])) {
+                                                                $cConfiguredCount++;
+                                                                $cClassRows[$cl->id] = $feesMasterByClass[$cl->id];
+                                                                foreach($feesMasterByClass[$cl->id] as $fRow) {
+                                                                    $cTotalFee += (float)($fRow->amount ?? 0);
+                                                                }
                                                             }
                                                         }
-                                                    }
-                                                    $dur = !empty($c->duration) ? (int)$c->duration : 3;
-                                                    $totSem = !empty($c->total_semester) && (int)$c->total_semester > 0 ? (int)$c->total_semester : ($dur * 2);
-                                                    $renderedCourses++;
-                                                @endphp
+                                                        $dur = !empty($c->duration) ? (int)$c->duration : 3;
+                                                        $totSem = !empty($c->total_semester) && (int)$c->total_semester > 0 ? (int)$c->total_semester : ($dur * 2);
+                                                        $renderedCourses++;
+                                                    @endphp
 
-                                                <div class="course-card course-group-item" id="course_card_{{ $c->id }}" data-course-id="{{ $c->id }}" data-course-name="{{ strtolower($c->name) }}">
-                                                    <!-- Course Executive Banner -->
-                                                    <div class="course-card-header">
-                                                        <div class="d-flex align-items-center flex-wrap" style="gap: 8px;">
-                                                            <span class="course-card-title">
-                                                                <i class="fa fa-graduation-cap"></i> {{ $c->name }}
-                                                            </span>
-                                                            <span class="badge badge-light text-dark font-weight-bold" style="font-size:10px;">
-                                                                {{ ($c->course_type == 'Yearly') ? ($dur . ' Year(s) - Yearly') : ($totSem . ' Semesters') }}
-                                                            </span>
-                                                            @if($cConfiguredCount > 0)
-                                                                <span class="badge badge-warning text-dark font-weight-bold" style="font-size:10px;">
-                                                                    {{ $cConfiguredCount }} / {{ $cClasses->count() }} Semesters Configured
+                                                    <div class="course-card course-group-item" id="course_card_{{ $c->id }}" data-course-id="{{ $c->id }}" data-course-name="{{ strtolower($c->name) }}">
+                                                        <!-- Course Executive Banner -->
+                                                        <div class="course-card-header">
+                                                            <div class="d-flex align-items-center flex-wrap" style="gap: 8px;">
+                                                                <span class="course-card-title">
+                                                                    <i class="fa fa-graduation-cap"></i> {{ $c->name }}
                                                                 </span>
-                                                            @else
-                                                                <span class="badge badge-secondary" style="font-size:10px;">Not Configured</span>
-                                                            @endif
-                                                        </div>
-                                                        <div class="d-flex align-items-center flex-wrap" style="gap: 6px;">
-                                                            <span class="badge badge-success px-2 py-1 font-weight-bold" style="font-size:11.5px;">
-                                                                ₹{{ number_format($cTotalFee) }} Total Course Fee
-                                                            </span>
-                                                            <button type="button" class="btn btn-xs btn-setup-course font-weight-bold shadow-sm" onclick="selectCourseForSetup('{{ $c->id }}')" style="font-size:10.5px;">
-                                                                <i class="fa fa-pencil-square-o"></i> Update Fees Structure
-                                                            </button>
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Course Body: Semester Breakdown Table -->
-                                                    <div class="p-2">
-                                                        @if($cConfiguredCount > 0)
-                                                            <div class="table-responsive">
-                                                                <table class="table table-bordered table-striped table-hover mb-0 padding_table" style="font-size: 11.5px;">
-                                                                    <thead>
-                                                                        <tr>
-                                                                            <th width="140px"><i class="fa fa-calendar-o"></i> Semester / Class</th>
-                                                                            <th>Fee Heads Breakdown (Category | Amount | Due Date)</th>
-                                                                            <th width="130px" class="text-right">Total Semester Fee</th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        @foreach($cClasses as $cl)
-                                                                            @if(isset($cClassRows[$cl->id]))
-                                                                                @php
-                                                                                    $semRows = $cClassRows[$cl->id];
-                                                                                    $semTotal = 0;
-                                                                                @endphp
-                                                                                <tr class="course-class-row" data-class-name="{{ strtolower($cl->name) }}">
-                                                                                    <td class="font-weight-bold text-primary align-middle">
-                                                                                        <i class="fa fa-book text-muted mr-1"></i> {{ $cl->name }}
-                                                                                    </td>
-                                                                                    <td style="padding: 3px 6px;">
-                                                                                        <div class="d-flex flex-wrap" style="gap: 4px;">
-                                                                                            @foreach($semRows as $sRow)
-                                                                                                @php
-                                                                                                    $amt = (float)($sRow->amount ?? 0);
-                                                                                                    $semTotal += $amt;
-                                                                                                    $fgName = $sRow->feesGroup->name ?? 'Fee Head';
-                                                                                                    $fgType = $sRow->feesGroup->group_type ?? 'academic';
-                                                                                                    $badgeClass = 'badge-academic';
-                                                                                                    if ($fgType === 'examination') $badgeClass = 'badge-examination';
-                                                                                                    elseif ($fgType === 'practical') $badgeClass = 'badge-practical';
-                                                                                                    elseif ($fgType === 'admission') $badgeClass = 'badge-admission';
-                                                                                                    elseif ($fgType === 'facility') $badgeClass = 'badge-facility';
-                                                                                                    elseif ($fgType === 'refundable') $badgeClass = 'badge-refundable';
-                                                                                                    elseif ($fgType === 'hostel_transport') $badgeClass = 'badge-hostel_transport';
-
-                                                                                                    $dueDateStr = !empty($sRow->installment_due_date) ? date('d-M-y', strtotime($sRow->installment_due_date)) : null;
-                                                                                                @endphp
-                                                                                                <div class="d-inline-flex align-items-center border rounded px-2 py-1 bg-white shadow-sm" style="font-size: 11px; gap: 5px;">
-                                                                                                    <span class="badge {{ $badgeClass }}" style="font-size: 9px; padding: 2px 4px;">{{ ucfirst($fgType) }}</span>
-                                                                                                    <span class="font-weight-bold text-dark">{{ $fgName }}:</span>
-                                                                                                    <span class="font-weight-bold text-success">₹{{ number_format($amt) }}</span>
-                                                                                                    @if($dueDateStr)
-                                                                                                        <span class="badge badge-light border text-muted" style="font-size: 9px;" title="Due Date">
-                                                                                                            <i class="fa fa-calendar-check-o text-info"></i> {{ $dueDateStr }}
-                                                                                                        </span>
-                                                                                                    @endif
-                                                                                                </div>
-                                                                                            @endforeach
-                                                                                        </div>
-                                                                                    </td>
-                                                                                    <td class="text-right align-middle font-weight-bold text-success" style="font-size: 12.5px;">
-                                                                                        ₹{{ number_format($semTotal) }}
-                                                                                    </td>
-                                                                                </tr>
-                                                                            @endif
-                                                                        @endforeach
-                                                                    </tbody>
-                                                                </table>
+                                                                <span class="badge badge-light text-dark font-weight-bold" style="font-size:10px;">
+                                                                    {{ ($c->course_type == 'Yearly') ? ($dur . ' Year(s) - Yearly') : ($totSem . ' Semesters') }}
+                                                                </span>
+                                                                @if($cConfiguredCount > 0)
+                                                                    <span class="badge badge-warning text-dark font-weight-bold" style="font-size:10px;">
+                                                                        {{ $cConfiguredCount }} / {{ $cClasses->count() }} Semesters Configured
+                                                                    </span>
+                                                                @else
+                                                                    <span class="badge badge-secondary" style="font-size:10px;">Not Configured</span>
+                                                                @endif
                                                             </div>
-                                                        @else
-                                                            <div class="empty-course-box">
-                                                                <div class="empty-msg">
-                                                                    <i class="fa fa-info-circle"></i> No fee structure configured for <strong>{{ $c->name }}</strong> in this session.
-                                                                </div>
-                                                                <button type="button" class="btn btn-configure-course shadow-sm" onclick="selectCourseForSetup('{{ $c->id }}')">
-                                                                    <i class="fa fa-plus-circle"></i> Click Here to Configure {{ $c->name }}
+                                                            <div class="d-flex align-items-center flex-wrap" style="gap: 6px;">
+                                                                <span class="badge badge-success px-2 py-1 font-weight-bold" style="font-size:11.5px;">
+                                                                    ₹{{ number_format($cTotalFee) }} Total Course Fee
+                                                                </span>
+                                                                <button type="button" class="btn btn-xs btn-setup-course font-weight-bold shadow-sm" onclick="selectCourseForSetup('{{ $c->id }}')" style="font-size:10.5px;">
+                                                                    <i class="fa fa-pencil-square-o"></i> Update Fees Structure
                                                                 </button>
                                                             </div>
-                                                        @endif
-                                                    </div>
-                                                </div>
-                                            @endforeach
-                                        @else
-                                            <div class="alert alert-light text-center border">
-                                                No courses available to display.
-                                            </div>
-                                        @endif
+                                                        </div>
 
-                                        <div id="no_course_search_results" class="p-4 text-center border rounded bg-white mt-2" style="display:none; border: 1.5px dashed #cbd5e1 !important;">
-                                            <i class="fa fa-graduation-cap text-muted mb-2" style="font-size:24px;"></i>
-                                            <h6 class="font-weight-bold text-dark mb-1" style="font-size:13px;">No Fee Structures Found</h6>
-                                            <p class="text-muted mb-2" style="font-size:11px;">Try selecting "All Courses" from the filter bar above.</p>
-                                            <button type="button" class="btn btn-xs btn-primary font-weight-bold" onclick="$('.course-pill-btn[data-course-id=\'all\']').click()">Show All Courses</button>
+                                                        <!-- Course Body: Semester Breakdown Table -->
+                                                        <div class="p-2">
+                                                            @if($cConfiguredCount > 0)
+                                                                <div class="table-responsive">
+                                                                    <table class="table table-bordered table-striped table-hover mb-0 padding_table" style="font-size: 11.5px;">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th width="140px"><i class="fa fa-calendar-o"></i> Semester / Class</th>
+                                                                                <th>Fee Heads Breakdown (Category | Amount | Due Date)</th>
+                                                                                <th width="130px" class="text-right">Total Semester Fee</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            @foreach($cClasses as $cl)
+                                                                                @if(isset($cClassRows[$cl->id]))
+                                                                                    @php
+                                                                                        $semRows = $cClassRows[$cl->id];
+                                                                                        $semTotal = 0;
+                                                                                    @endphp
+                                                                                    <tr class="course-class-row" data-class-name="{{ strtolower($cl->name) }}">
+                                                                                        <td class="font-weight-bold text-primary align-middle">
+                                                                                            <i class="fa fa-book text-muted mr-1"></i> {{ $cl->name }}
+                                                                                        </td>
+                                                                                        <td style="padding: 3px 6px;">
+                                                                                            <div class="d-flex flex-wrap" style="gap: 4px;">
+                                                                                                @foreach($semRows as $sRow)
+                                                                                                    @php
+                                                                                                        $amt = (float)($sRow->amount ?? 0);
+                                                                                                        $semTotal += $amt;
+                                                                                                        $fgName = $sRow->feesGroup->name ?? 'Fee Head';
+                                                                                                        $fgType = $sRow->feesGroup->group_type ?? 'academic';
+                                                                                                        $badgeClass = 'badge-academic';
+                                                                                                        if ($fgType === 'examination') $badgeClass = 'badge-examination';
+                                                                                                        elseif ($fgType === 'practical') $badgeClass = 'badge-practical';
+                                                                                                        elseif ($fgType === 'admission') $badgeClass = 'badge-admission';
+                                                                                                        elseif ($fgType === 'facility') $badgeClass = 'badge-facility';
+                                                                                                        elseif ($fgType === 'refundable') $badgeClass = 'badge-refundable';
+                                                                                                        elseif ($fgType === 'hostel_transport') $badgeClass = 'badge-hostel_transport';
+
+                                                                                                        $dueDateStr = !empty($sRow->installment_due_date) ? date('d-M-y', strtotime($sRow->installment_due_date)) : null;
+                                                                                                    @endphp
+                                                                                                    <div class="d-inline-flex align-items-center border rounded px-2 py-1 bg-white shadow-sm" style="font-size: 11px; gap: 5px;">
+                                                                                                        <span class="badge {{ $badgeClass }}" style="font-size: 9px; padding: 2px 4px;">{{ ucfirst($fgType) }}</span>
+                                                                                                        <span class="font-weight-bold text-dark">{{ $fgName }}:</span>
+                                                                                                        <span class="font-weight-bold text-success">₹{{ number_format($amt) }}</span>
+                                                                                                        @if($dueDateStr)
+                                                                                                            <span class="badge badge-light border text-muted" style="font-size: 9px;" title="Due Date">
+                                                                                                                <i class="fa fa-calendar-check-o text-info"></i> {{ $dueDateStr }}
+                                                                                                            </span>
+                                                                                                        @endif
+                                                                                                    </div>
+                                                                                                @endforeach
+                                                                                            </div>
+                                                                                        </td>
+                                                                                        <td class="text-right align-middle font-weight-bold text-success" style="font-size: 12.5px;">
+                                                                                            ₹{{ number_format($semTotal) }}
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                @endif
+                                                                            @endforeach
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            @else
+                                                                <div class="empty-course-box">
+                                                                    <div class="empty-msg">
+                                                                        <i class="fa fa-info-circle"></i> No fee structure configured for <strong>{{ $c->name }}</strong> in this session.
+                                                                    </div>
+                                                                    <button type="button" class="btn btn-configure-course shadow-sm" onclick="selectCourseForSetup('{{ $c->id }}')">
+                                                                        <i class="fa fa-plus-circle"></i> Click Here to Configure {{ $c->name }}
+                                                                    </button>
+                                                                </div>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            @else
+                                                <div class="alert alert-light text-center border">
+                                                    No courses available to display.
+                                                </div>
+                                            @endif
+
+                                            <div id="no_course_search_results" class="p-4 text-center border rounded bg-white mt-2" style="display:none; border: 1.5px dashed #cbd5e1 !important;">
+                                                <i class="fa fa-graduation-cap text-muted mb-2" style="font-size:24px;"></i>
+                                                <h6 class="font-weight-bold text-dark mb-1" style="font-size:13px;">No Fee Structures Found</h6>
+                                                <p class="text-muted mb-2" style="font-size:11px;">Try selecting "All Courses" from the filter bar above.</p>
+                                                <button type="button" class="btn btn-xs btn-primary font-weight-bold" onclick="$('.course-pill-btn[data-course-id=\'all\']').click()">Show All Courses</button>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-12 mt-2">
+                                            <p class="text-muted mb-0" style="font-size:11px;">
+                                                <i class="fa fa-info-circle text-info"></i> <b>Tip:</b> Creating fee heads here with Amount & Due Date automatically configures Fees Master for student admissions & collection.
+                                            </p>
                                         </div>
                                     </div>
 
-                                    <div class="col-md-12 mt-2">
-                                        <p class="text-muted mb-0" style="font-size:11px;">
-                                            <i class="fa fa-info-circle text-info"></i> <b>Tip:</b> Creating fee heads here with Amount & Due Date automatically configures Fees Master for student admissions & collection.
-                                        </p>
+                                    <!-- TAB 2: STANDALONE / NO-CLASS FEE HEADS TABULAR LIST -->
+                                    <div id="container_no_class_heads" style="display: none;">
+                                        <div class="card card-outline card-secondary shadow-none border mb-0">
+                                            <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center">
+                                                <h6 class="card-title font-weight-bold mb-0 text-dark" style="font-size:13px;">
+                                                    <i class="fa fa-list text-primary mr-1"></i> Standalone Fee Heads (No Class Assigned)
+                                                </h6>
+                                                <span class="badge badge-primary px-2" style="font-size: 11px;">{{ count($noClassHeads) }} Fee Heads</span>
+                                            </div>
+                                            <div class="card-body p-0">
+                                                @if(count($noClassHeads) > 0)
+                                                    <div class="table-responsive">
+                                                        <table class="table table-bordered table-striped table-hover mb-0 text-dark padding_table" style="font-size: 11.5px;">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th width="40px" class="text-center">#</th>
+                                                                    <th>Fee Head Name</th>
+                                                                    <th width="160px" class="text-center">Category</th>
+                                                                    <th width="130px" class="text-center">Properties</th>
+                                                                    <th width="80px" class="text-center">Action</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach($noClassHeads as $idx => $nh)
+                                                                    @php
+                                                                        $nhCat = strtolower(trim($nh->group_type ?? 'other'));
+                                                                        if ($nhCat === 'registration') $nhCat = 'admission';
+                                                                        $nhCatClass = 'badge-other';
+                                                                        if ($nhCat === 'academic') $nhCatClass = 'badge-academic';
+                                                                        elseif ($nhCat === 'admission') $nhCatClass = 'badge-admission';
+                                                                        elseif ($nhCat === 'examination') $nhCatClass = 'badge-examination';
+                                                                        elseif ($nhCat === 'practical') $nhCatClass = 'badge-practical';
+                                                                        elseif ($nhCat === 'facility') $nhCatClass = 'badge-facility';
+                                                                        elseif ($nhCat === 'refundable') $nhCatClass = 'badge-refundable';
+                                                                        elseif ($nhCat === 'hostel_transport') $nhCatClass = 'badge-hostel_transport';
+
+                                                                        $isRef = strtolower(trim($nh->fees_refund ?? '')) === 'yes';
+                                                                        $isPart = ($nh->fees_partial ?? 0) == 1;
+                                                                    @endphp
+                                                                    <tr>
+                                                                        <td class="text-center align-middle font-weight-bold text-muted">{{ $idx + 1 }}</td>
+                                                                        <td class="align-middle font-weight-bold text-dark">
+                                                                            {{ $nh->name }}
+                                                                            @if($isRef)
+                                                                                <span class="badge badge-refundable ml-1" style="font-size: 9px; padding: 2px 5px;" title="Refundable Deposit">
+                                                                                    Refundable
+                                                                                </span>
+                                                                            @endif
+                                                                            @if($isPart)
+                                                                                <span class="badge badge-info ml-1" style="font-size: 9px; padding: 2px 5px;" title="Partial Payment (50%) Allowed">
+                                                                                    50% Partial
+                                                                                </span>
+                                                                            @endif
+                                                                        </td>
+                                                                        <td class="text-center align-middle">
+                                                                            <span class="badge {{ $nhCatClass }}" style="font-size: 10px; padding: 3px 7px;">{{ ucfirst(str_replace('_', ' & ', $nhCat)) }}</span>
+                                                                        </td>
+                                                                        <td class="text-center align-middle">
+                                                                            @if($isRef)
+                                                                                <span class="badge badge-success" style="font-size: 10px;">Refundable</span>
+                                                                            @elseif($isPart)
+                                                                                <span class="badge badge-info" style="font-size: 10px;">50% Partial</span>
+                                                                            @else
+                                                                                <span class="badge badge-light border text-muted" style="font-size: 10px;">Standard</span>
+                                                                            @endif
+                                                                        </td>
+                                                                        <td class="text-center align-middle text-nowrap">
+                                                                            <button type="button" 
+                                                                                    class="btn btn-xs btn-outline-primary btn-edit-fee-head" 
+                                                                                    data-id="{{ $nh->id }}" 
+                                                                                    data-name="{{ $nh->name }}" 
+                                                                                    data-category="{{ $nhCat }}" 
+                                                                                    data-refund="{{ $nh->fees_refund ?? 'no' }}" 
+                                                                                    data-partial="{{ $nh->fees_partial ?? 0 }}"
+                                                                                    title="Edit Fee Head" 
+                                                                                    style="font-size: 11px; padding: 2px 7px;">
+                                                                                <i class="fa fa-pencil"></i>
+                                                                            </button>
+                                                                            <a href="javascript:void(0)" 
+                                                                               class="btn btn-xs btn-outline-danger deleteData" 
+                                                                               data-id="{{ $nh->id }}" 
+                                                                               data-toggle="modal" 
+                                                                               data-target="#Modal_id" 
+                                                                               data-bs-toggle="modal" 
+                                                                               data-bs-target="#Modal_id" 
+                                                                               title="Delete Fee Head" 
+                                                                               style="font-size: 11px; padding: 2px 7px;">
+                                                                                <i class="fa fa-trash"></i>
+                                                                            </a>
+                                                                        </td>
+                                                                    </tr>
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                @else
+                                                    <div class="p-4 text-center text-muted" style="font-size: 12px;">
+                                                        <i class="fa fa-info-circle text-info fa-2x mb-2 d-block"></i>
+                                                        No standalone / no-class fee heads found.
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        </div>
                                     </div>
                         </div>
                     </div>          
@@ -1597,11 +1623,6 @@ function switchMode(mode) {
     document.getElementById('section_single_class').style.display = 'none';
     document.getElementById('section_single_head').style.display = 'none';
 
-    var singleHeadList = document.getElementById('section_single_head_list');
-    if (singleHeadList) {
-        singleHeadList.style.display = (mode === 'single_head') ? 'block' : 'none';
-    }
-
     var courseBox = document.getElementById('course_selector_box');
     var courseBadge = document.getElementById('course_mode_badge');
     var courseReqStar = document.getElementById('course_req_star');
@@ -1612,6 +1633,7 @@ function switchMode(mode) {
     var courseSelected = document.getElementById('course_selector').value !== '';
 
     if (mode === 'semester') {
+        switchRightTab('structures');
         document.getElementById('btn_mode_semester').classList.add('active');
         document.getElementById('section_semester').style.display = 'block';
         courseBox.style.display = 'block';
@@ -1635,6 +1657,7 @@ function switchMode(mode) {
             submitBtn.innerHTML = '<i class="fa fa-hand-o-up"></i> Please Select a Course to Continue';
         }
     } else if (mode === 'single_class') {
+        switchRightTab('structures');
         document.getElementById('btn_mode_single_class').classList.add('active');
         document.getElementById('section_single_class').style.display = 'block';
         courseBox.style.display = 'block';
@@ -1646,6 +1669,7 @@ function switchMode(mode) {
         submitBtn.className = 'btn btn-primary btn-sm btn-block font-weight-bold py-2 shadow-sm';
         updateSingleClassPreview();
     } else {
+        switchRightTab('no_class_heads');
         document.getElementById('btn_mode_single_head').classList.add('active');
         document.getElementById('section_single_head').style.display = 'block';
         courseBox.style.display = 'none';
@@ -1655,6 +1679,23 @@ function switchMode(mode) {
         updateHeadOnlyPreview();
     }
     checkFormHasData();
+}
+
+// Right Panel Tab Switcher (Class-wise Fees Master vs No-Class Fee Heads)
+function switchRightTab(tab) {
+    if (tab === 'no_class_heads') {
+        $('#btn_tab_no_class').removeClass('btn-light text-dark').addClass('btn-primary active');
+        $('#btn_tab_structures').removeClass('btn-primary active').addClass('btn-light text-dark');
+        $('#container_class_structures').hide();
+        $('#container_no_class_heads').stop(true, true).fadeIn(150);
+        $('#right_header_title').text('No-Class Fee Heads');
+    } else {
+        $('#btn_tab_structures').removeClass('btn-light text-dark').addClass('btn-primary active');
+        $('#btn_tab_no_class').removeClass('btn-primary active').addClass('btn-light text-dark');
+        $('#container_no_class_heads').hide();
+        $('#container_class_structures').stop(true, true).fadeIn(150);
+        $('#right_header_title').text('Class-wise Fees Master');
+    }
 }
 
 function setSemBase(name, cat) {
