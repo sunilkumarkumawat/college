@@ -1597,27 +1597,34 @@ class FeesController extends Controller
                 return Response::json(array('id' =>$assign_id )); 
             }
             public function getStudentsList(Request $request){
-                $fees_assign_details = FeesAssignDetail::where('session_id',Session::get('session_id'))->where('branch_id',Session::get('branch_id'))
-                ->groupBy('admission_id')->pluck('admission_id')->implode(',');
-                $admissionIds = [];
-                if(!empty($fees_assign_details)){
-                    $admissionIds = explode(',', $fees_assign_details);
-                }
                 $class_type_id = $request->class_type_id ?? '';
-                $admissionNo= $request->admissionNo ?? '';
-                $data = Admission::where('session_id',Session::get('session_id'))
-               ->where('status',1)
-               ->where('branch_id',Session::get('branch_id'));
+                $course_id = $request->course_id ?? '';
+                $admissionNo = $request->admissionNo ?? '';
+                
+                $data = Admission::with('ClassTypes')
+                    ->where('session_id', Session::get('session_id'))
+                    ->where('status', 1)
+                    ->where('branch_id', Session::get('branch_id'));
+
                 if($class_type_id != ''){
-                    $data= $data->where('class_type_id', $class_type_id);
+                    $data = $data->where('class_type_id', $class_type_id);
+                }
+                if($course_id != ''){
+                    $data = $data->where('course_id', $course_id);
                 }
                 if($request->admission_type_id != ''){
-                    $data = $data->where('admission_type_id',$request->admission_type_id);
+                    $data = $data->where('admission_type_id', $request->admission_type_id);
                 }
                 if($admissionNo != ''){
-                    $data= $data->where('admissionNo',$admissionNo);
+                    $data = $data->where(function($q) use ($admissionNo) {
+                        $q->where('admissionNo', 'like', '%' . $admissionNo . '%')
+                          ->orWhere('first_name', 'like', '%' . $admissionNo . '%')
+                          ->orWhere('last_name', 'like', '%' . $admissionNo . '%')
+                          ->orWhere('mobile', 'like', '%' . $admissionNo . '%')
+                          ->orWhere('father_name', 'like', '%' . $admissionNo . '%');
+                    });
                 }
-                $data = $data->get();
+                $data = $data->orderBy('first_name', 'ASC')->get();
                 return view('fees.modification.admissionList', ['data' => $data]);
             }
             public function createFeesInstallment(Request $request){

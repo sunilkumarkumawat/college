@@ -15,39 +15,43 @@
             }
         @endphp
         <tr>
-            <td style="text-align: center; vertical-align: middle;">
-                <input type="checkbox" name="admissionIds[]" class="student_select_checkbox" value="{{ $item->id ?? '' }}" style="transform: scale(1.2); cursor: pointer;" />
+            <td class="text-center align-middle" style="width: 40px;">
+                <input type="checkbox" name="admissionIds[]" class="student_select_checkbox" value="{{ $item->id ?? '' }}" style="cursor: pointer;" />
             </td>
-            <td class="font-weight-bold text-dark">
+            <td class="text-center align-middle" style="width: 45px;">{{ $key + 1 }}</td>
+            <td class="align-middle text-left font-weight-bold text-dark">
                 {{ $item->first_name ?? '' }} {{ $item->last_name ?? '' }}
             </td>
-            <td>
-                <span class="badge badge-light border px-2 py-1 font-weight-normal" style="font-size: 0.85rem;">
+            <td class="text-center align-middle">
+                <span class="badge badge-secondary px-2 py-1" style="font-size: 11.5px; font-weight: 500;">
                     {{ $item->admissionNo ?? '-' }}
                 </span>
             </td>
-            <td>
-                <i class="fa fa-phone text-muted mr-1"></i> {{ $item->mobile ?? '-' }}
+            <td class="text-center align-middle text-nowrap">
+                {{ $item->ClassTypes->name ?? '-' }}
             </td>
-            <td>
+            <td class="align-middle text-left">
                 {{ $item->father_name ?? '-' }}
             </td>
-            <td>
+            <td class="text-center align-middle">
+                {{ $item->mobile ?? '-' }}
+            </td>
+            <td class="align-middle text-left" style="min-width: 180px;">
                 @if(count($feesGroupData) > 0)
                     @foreach($feesGroupData as $fees_group)
-                        <span class="badge-assigned-head">
-                            <i class="fa fa-check text-success mr-1"></i>{{ $fees_group->name ?? '' }}
+                        <span class="badge badge-info mr-1 mb-1 font-weight-normal" style="font-size: 11px; padding: 3px 6px;">
+                            <i class="fa fa-check text-xs mr-1"></i>{{ $fees_group->name ?? '' }}
                         </span>
                     @endforeach
                 @else
-                    <span class="text-muted font-italic" style="font-size: 0.82rem;">None Assigned</span>
+                    <span class="text-muted small font-italic">None Assigned</span>
                 @endif
             </td>
         </tr>
     @endforeach
 @else
     <tr class="text-center">
-        <td colspan="6" class="py-4 text-muted">
+        <td colspan="8" class="py-4 text-muted">
             <i class="fa fa-info-circle text-warning fa-2x mb-2 d-block"></i>
             <span>No students found matching the selected criteria.</span>
         </td>
