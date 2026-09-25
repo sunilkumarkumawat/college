@@ -597,7 +597,7 @@ class FeesController extends Controller
                         $courseCount++;
                     }
 
-                    $msg = 'Fee Head "' . $feesGroup->name . '" successfully assigned to ' . $courseCount . ' Course(s) (1st Sem)!';
+                    $msg = 'Fee Head "' . $feesGroup->name . '" successfully assigned to ' . $courseCount . ' Course(s)!';
                 } else {
                     $class_type_ids = $request->class_type_id ?? [];
                     if (empty($class_type_ids)) {

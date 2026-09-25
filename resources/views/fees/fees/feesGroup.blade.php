@@ -1738,7 +1738,7 @@ foreach ($collectedRows as $cr) {
                     <div id="assign_panel_course" class="assign-mode-panel">
                         <div class="alert alert-info py-2 px-3 mb-2 font-weight-normal" style="font-size: 11.5px; border-left: 4px solid #002c54;">
                             <i class="fa fa-info-circle mr-1 text-primary"></i> 
-                            Selecting a course assigns this fee head to the <strong>course's entry semester (1st Sem)</strong> as a single head. To assign to particular semesters (e.g. 2nd Sem, 3rd Sem, etc.), please switch to the <strong>"Assign to Class / Semester"</strong> tab.
+                            Select courses to assign this fee head course-level. To assign to specific classes/semesters individually, switch to the <strong>"Assign to Class / Semester"</strong> tab.
                         </div>
 
                         <!-- Course Quick Apply Bar -->
@@ -1779,26 +1779,13 @@ foreach ($collectedRows as $cr) {
                                         <tr>
                                             <th class="text-center align-middle" style="width: 45px;">#</th>
                                             <th class="align-middle">Course Name</th>
-                                            <th class="text-center align-middle" style="width: 150px;">Entry Class / Sem</th>
-                                            <th class="align-middle" style="width: 160px;">Amount (₹) <span class="text-danger">*</span></th>
-                                            <th class="align-middle" style="width: 160px;">Due Date</th>
+                                            <th class="align-middle" style="width: 180px;">Amount (₹) <span class="text-danger">*</span></th>
+                                            <th class="align-middle" style="width: 180px;">Due Date</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @if(!empty($courses))
                                             @foreach($courses as $c)
-                                                @php
-                                                    $firstSemName = '';
-                                                    if (!empty($classType)) {
-                                                        foreach ($classType as $cl) {
-                                                            if ($cl->course_id == $c->id) {
-                                                                if (empty($firstSemName)) {
-                                                                    $firstSemName = $cl->name;
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                @endphp
                                                 <tr class="assign-course-row" id="assign_course_row_{{ $c->id }}">
                                                     <td class="text-center align-middle">
                                                         <div class="custom-control custom-checkbox d-inline-block">
@@ -1810,11 +1797,6 @@ foreach ($collectedRows as $cr) {
                                                         <label for="chk_course_{{ $c->id }}" class="mb-0 font-weight-bold text-dark pointer" style="cursor: pointer;">
                                                             {{ $c->name }}
                                                         </label>
-                                                    </td>
-                                                    <td class="text-center align-middle">
-                                                        <span class="badge badge-light border text-primary font-weight-bold" style="font-size: 11px; padding: 3px 8px;">
-                                                            <i class="fa fa-graduation-cap mr-1 text-primary"></i> {{ $firstSemName ?: '1st Sem' }}
-                                                        </span>
                                                     </td>
                                                     <td class="align-middle">
                                                         <div class="input-group input-group-sm">
