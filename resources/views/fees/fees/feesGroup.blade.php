@@ -1207,7 +1207,7 @@ $classType = Helper::classType();
                                                                 ₹{{ number_format($cTotalFee) }} Total Course Fee
                                                             </span>
                                                             <button type="button" class="btn btn-xs btn-setup-course font-weight-bold shadow-sm" onclick="selectCourseForSetup('{{ $c->id }}')" style="font-size:10.5px;">
-                                                                <i class="fa fa-plus-circle"></i> Setup in Form
+                                                                <i class="fa fa-pencil-square-o"></i> Update Fees Structure
                                                             </button>
                                                         </div>
                                                     </div>
@@ -1221,10 +1221,7 @@ $classType = Helper::classType();
                                                                         <tr>
                                                                             <th width="140px"><i class="fa fa-calendar-o"></i> Semester / Class</th>
                                                                             <th>Fee Heads Breakdown (Category | Amount | Due Date)</th>
-                                                                            <th width="110px" class="text-right">Total Semester Fee</th>
-                                                                            @if($getPermission->edit == 1)
-                                                                            <th width="45px" class="text-center">Action</th>
-                                                                            @endif
+                                                                            <th width="130px" class="text-right">Total Semester Fee</th>
                                                                         </tr>
                                                                     </thead>
                                                                     <tbody>
@@ -1272,13 +1269,6 @@ $classType = Helper::classType();
                                                                                     <td class="text-right align-middle font-weight-bold text-success" style="font-size: 12.5px;">
                                                                                         ₹{{ number_format($semTotal) }}
                                                                                     </td>
-                                                                                    @if($getPermission->edit == 1)
-                                                                                    <td class="text-center align-middle">
-                                                                                        <a href="{{ url('feesMasterEdit') }}/{{ $cl->id }}" class="btn btn-primary btn-xs" title="Edit Semester Fees">
-                                                                                            <i class="fa fa-edit"></i>
-                                                                                        </a>
-                                                                                    </td>
-                                                                                    @endif
                                                                                 </tr>
                                                                             @endif
                                                                         @endforeach
@@ -1325,9 +1315,6 @@ $classType = Helper::classType();
                                                         <th>Category</th>
                                                         <th class="text-right">Amount (₹)</th>
                                                         <th>Due Date</th>
-                                                        @if($getPermission->edit == 1)
-                                                        <th width="45px" class="text-center">Action</th>
-                                                        @endif
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -1354,13 +1341,6 @@ $classType = Helper::classType();
                                                                 <td>
                                                                     {{ !empty($row->installment_due_date) ? date('d-M-Y', strtotime($row->installment_due_date)) : 'No Due Date' }}
                                                                 </td>
-                                                                @if($getPermission->edit == 1)
-                                                                <td class="text-center">
-                                                                    <a href="{{ url('feesMasterEdit') }}/{{ $row->class_type_id }}" class="btn btn-primary btn-xs" title="Edit Class Fees">
-                                                                        <i class="fa fa-edit"></i>
-                                                                    </a>
-                                                                </td>
-                                                                @endif
                                                             </tr>
                                                         @endforeach
                                                     @endif
