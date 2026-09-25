@@ -50,6 +50,39 @@ $collectedRows = \App\Models\FeesDetail::where('session_id', $activeSessionId)
 foreach ($collectedRows as $cr) {
     $collectedMap[$cr->fees_group_id] = true;
 }
+
+// Existing assignments mapping by fees_group_id for modal prefill
+$existingHeadAssignments = [];
+if (!empty($allFeesMasterRows)) {
+    foreach ($allFeesMasterRows as $row) {
+        $fgId = (int)$row->fees_group_id;
+        $cTypeId = (int)$row->class_type_id;
+        $courseId = !empty($row->ClassTypes->course_id) ? (int)$row->ClassTypes->course_id : null;
+        $amt = (float)($row->amount ?? 0);
+        $due = !empty($row->installment_due_date) ? date('Y-m-d', strtotime($row->installment_due_date)) : '';
+
+        if (!isset($existingHeadAssignments[$fgId])) {
+            $existingHeadAssignments[$fgId] = [
+                'courses' => [],
+                'classes' => []
+            ];
+        }
+
+        if ($courseId && !isset($existingHeadAssignments[$fgId]['courses'][$courseId])) {
+            $existingHeadAssignments[$fgId]['courses'][$courseId] = [
+                'amount' => $amt,
+                'due_date' => $due,
+                'class_type_id' => $cTypeId
+            ];
+        }
+
+        $existingHeadAssignments[$fgId]['classes'][$cTypeId] = [
+            'amount' => $amt,
+            'due_date' => $due,
+            'course_id' => $courseId
+        ];
+    }
+}
 @endphp
 
 @extends('layout.app') 
@@ -2182,6 +2215,7 @@ window.updateModalAssignSelectionState = updateModalAssignSelectionState;
 
 var currentMode = 'semester';
 var currentCourseClasses = [];
+var existingHeadAssignments = {!! json_encode($existingHeadAssignments ?? []) !!};
 
 var allDefaultClasses = [
     @if(!empty($allClassType))
@@ -3036,37 +3070,57 @@ $(document).ready(function() {
         $('#assign_fees_group_id').val(id);
         $('#assign_fee_head_title').text(name);
 
-        // Reset Course Mode inputs and table
+        var existingData = (existingHeadAssignments && existingHeadAssignments[id]) ? existingHeadAssignments[id] : { courses: {}, classes: {} };
+
+        // Populate Course Mode inputs and table
         $('#assign_course_common_amount').val('');
         $('#assign_course_common_due_date').val('');
-        $('#assign_course_master_check').prop('checked', false).prop('indeterminate', false);
         $('#assign_modal_courses_table tbody tr.assign-course-row').each(function() {
-            $(this).removeClass('table-primary');
             var chk = $(this).find('.assign-course-checkbox');
-            chk.prop('checked', false);
+            var courseId = parseInt(chk.val()) || chk.val();
             var amt = $(this).find('.assign-course-amount-input');
-            amt.val('').prop('disabled', true).css('background', '#e9ecef');
             var due = $(this).find('.assign-course-due-input');
-            due.val('').prop('disabled', true).css('background', '#e9ecef');
+
+            if (existingData.courses && existingData.courses[courseId]) {
+                var cData = existingData.courses[courseId];
+                chk.prop('checked', true);
+                $(this).addClass('table-primary');
+                amt.val(cData.amount != null ? cData.amount : '').prop('disabled', false).css('background', '#ffffff');
+                due.val(cData.due_date || '').prop('disabled', false).css('background', '#ffffff');
+            } else {
+                chk.prop('checked', false);
+                $(this).removeClass('table-primary');
+                amt.val('').prop('disabled', true).css('background', '#e9ecef');
+                due.val('').prop('disabled', true).css('background', '#e9ecef');
+            }
         });
 
-        // Reset Class Mode inputs and table
+        // Populate Class Mode inputs and table
         $('#assign_modal_course_filter').val('');
         $('#assign_modal_common_amount').val('');
         $('#assign_modal_common_due_date').val('');
-        $('#assign_modal_master_check').prop('checked', false).prop('indeterminate', false);
         $('#assign_modal_classes_table tbody tr.assign-class-row').each(function() {
             $(this).show();
-            $(this).removeClass('table-primary');
             var chk = $(this).find('.assign-class-checkbox');
-            chk.prop('checked', false);
+            var classId = parseInt(chk.val()) || chk.val();
             var amt = $(this).find('.assign-amount-input');
-            amt.val('').prop('disabled', true).css('background', '#e9ecef');
             var due = $(this).find('.assign-due-date-input');
-            due.val('').prop('disabled', true).css('background', '#e9ecef');
+
+            if (existingData.classes && existingData.classes[classId]) {
+                var clData = existingData.classes[classId];
+                chk.prop('checked', true);
+                $(this).addClass('table-primary');
+                amt.val(clData.amount != null ? clData.amount : '').prop('disabled', false).css('background', '#ffffff');
+                due.val(clData.due_date || '').prop('disabled', false).css('background', '#ffffff');
+            } else {
+                chk.prop('checked', false);
+                $(this).removeClass('table-primary');
+                amt.val('').prop('disabled', true).css('background', '#e9ecef');
+                due.val('').prop('disabled', true).css('background', '#e9ecef');
+            }
         });
 
-        // Set default mode to Course
+        // Set default mode to Course and update counters
         switchAssignHeadMode('course');
 
         $('#assign_fee_head_modal').modal('show');
