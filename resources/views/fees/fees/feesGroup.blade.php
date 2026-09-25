@@ -57,6 +57,111 @@ $classType = Helper::classType();
     font-weight: 700;
 }
 
+/* Category Badges */
+.fees-unified-page .badge-academic {
+    background-color: #e0f2fe !important;
+    color: #0369a1 !important;
+    border: 1px solid #7dd3fc !important;
+}
+.fees-unified-page .badge-admission {
+    background-color: #dcfce7 !important;
+    color: #15803d !important;
+    border: 1px solid #86efac !important;
+}
+.fees-unified-page .badge-refundable {
+    background-color: #ffe4e6 !important;
+    color: #be123c !important;
+    border: 1px solid #fda4af !important;
+}
+.fees-unified-page .badge-examination {
+    background-color: #ede9fe !important;
+    color: #6d28d9 !important;
+    border: 1px solid #c4b5fd !important;
+}
+.fees-unified-page .badge-practical {
+    background-color: #ccfbf1 !important;
+    color: #0f766e !important;
+    border: 1px solid #5eead4 !important;
+}
+.fees-unified-page .badge-facility {
+    background-color: #fef3c7 !important;
+    color: #b45309 !important;
+    border: 1px solid #fcd34d !important;
+}
+.fees-unified-page .badge-hostel_transport {
+    background-color: #ffedd5 !important;
+    color: #c2410c !important;
+    border: 1px solid #fdba74 !important;
+}
+.fees-unified-page .badge-other {
+    background-color: #f1f5f9 !important;
+    color: #475569 !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+/* Category Filter Pills in Fee Heads Directory */
+.fees-unified-page .category-pill-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 11px;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 20px;
+    border: 1px solid var(--brand-border) !important;
+    background: #ffffff !important;
+    color: #1e293b !important;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+.fees-unified-page .category-pill-btn:hover {
+    background: var(--brand-dark) !important;
+    color: #ffffff !important;
+    border-color: var(--brand-dark) !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+.fees-unified-page .category-pill-btn:hover .badge-counter {
+    background: rgba(255,255,255,0.25) !important;
+    color: #ffffff !important;
+}
+.fees-unified-page .category-pill-btn.active {
+    background: var(--brand-dark) !important;
+    color: #ffffff !important;
+    border-color: var(--brand-dark) !important;
+    box-shadow: 0 2px 5px rgba(0,44,84,0.3) !important;
+}
+.fees-unified-page .category-pill-btn.active .badge-counter {
+    background: rgba(255,255,255,0.25) !important;
+    color: #ffffff !important;
+}
+
+/* Category Section Card in Fee Heads Directory */
+.fees-unified-page .category-head-card {
+    background: #ffffff;
+    border: 1px solid var(--brand-border);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    transition: all 0.2s ease;
+    overflow: hidden;
+}
+.fees-unified-page .category-head-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border-color: #94a3b8;
+}
+.fees-unified-page .category-head-card-header {
+    background: #f8fafc;
+    border-bottom: 1px solid var(--brand-border);
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
 /* Course Selector Container */
 .fees-unified-page .course-selector-box {
     background: #f0f7ff !important;
@@ -849,16 +954,21 @@ $classType = Helper::classType();
                                     </div>
 
                                     <div class="form-group mb-2">
-                                        <label class="font-weight-bold mb-1" style="font-size:11px;">Category</label>
-                                        <select class="form-control form-control-sm" name="head_only_group_type" id="head_only_group_type">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <label class="font-weight-bold mb-0 text-dark" style="font-size:11.5px;">Category*</label>
+                                            <a href="javascript:void(0)" onclick="viewCurrentCategoryHeads()" class="text-primary font-weight-bold" style="font-size: 10.5px;" title="View all heads in this category in the directory on the right">
+                                                <i class="fa fa-eye mr-1"></i> View Heads in Category (<span id="current_cat_head_count">0</span>) &rarr;
+                                            </a>
+                                        </div>
+                                        <select class="form-control form-control-sm font-weight-bold" name="head_only_group_type" id="head_only_group_type" onchange="onHeadCategoryChanged(this.value)">
                                             <option value="admission">Admission & Registration</option>
-                                            <option value="refundable">Refundable Deposit</option>
-                                            <option value="academic">Academic</option>
+                                            <option value="refundable">Refundable Deposit (Caution Money)</option>
+                                            <option value="academic">Academic (Tuition / University)</option>
                                             <option value="examination">Examination</option>
                                             <option value="practical">Laboratory & Practical</option>
                                             <option value="facility">Campus Facility & Library</option>
                                             <option value="hostel_transport">Hostel & Transport</option>
-                                            <option value="other">Other</option>
+                                            <option value="other">Other / Miscellaneous</option>
                                         </select>
                                     </div>
 
@@ -902,11 +1012,26 @@ $classType = Helper::classType();
                     </div>          
                 </div>
                 
-                <!-- Right Side: Class-wise Fees Master Structure -->
+                <!-- Right Side: Unified Fees Master Structure & Fee Heads Directory -->
                 <div class="{{($getPermission->add == 1) ? 'col-md-7 pl-0' : 'col-md-12 pl-0'}}">
                     <div class="card card-outline card-orange ml-1">
-                        <div class="card-header bg-primary py-2">
-                            <h3 class="card-title font-weight-bold mb-0" style="font-size:14px;"><i class="fa fa-table"></i> &nbsp;Class-wise Fees Master</h3>
+                        <div class="card-header bg-primary py-2 d-flex justify-content-between align-items-center flex-wrap" style="gap: 6px;">
+                            <div class="d-flex align-items-center" style="gap: 8px;">
+                                <h3 class="card-title font-weight-bold mb-0" style="font-size:14px;">
+                                    <i class="fa fa-cubes"></i> &nbsp;<span id="right_header_title">Class-wise Fees Master</span>
+                                </h3>
+                            </div>
+
+                            <!-- View Mode Switcher Tabs -->
+                            <div class="btn-group btn-group-sm bg-white p-1 rounded shadow-sm" role="group" id="right_tab_switcher">
+                                <button type="button" class="btn btn-sm btn-primary font-weight-bold active" id="btn_tab_structures" onclick="switchRightTab('structures')" style="font-size: 11px; padding: 3px 10px;">
+                                    <i class="fa fa-th-large mr-1"></i> Class Structures
+                                </button>
+                                <button type="button" class="btn btn-sm btn-light font-weight-bold text-dark" id="btn_tab_heads" onclick="switchRightTab('heads')" style="font-size: 11px; padding: 3px 10px;">
+                                    <i class="fa fa-tags mr-1 text-primary"></i> Fee Heads Directory 
+                                    <span class="badge badge-primary ml-1" id="total_heads_badge">{{ count($dataview ?? []) }}</span>
+                                </button>
+                            </div>
                         </div>  
                         
                         <div class="card-body p-2">
@@ -922,6 +1047,7 @@ $classType = Helper::classType();
                                         $distinctHeads = [];
                                         $coursesWithFees = [];
                                         $configuredClassIds = [];
+                                        $feesGroupUsageMap = [];
 
                                         if (!empty($allFeesMasterRows)) {
                                             foreach ($allFeesMasterRows as $row) {
@@ -933,6 +1059,13 @@ $classType = Helper::classType();
                                                 $totalAmountConfigured += (float)($row->amount ?? 0);
                                                 if (!empty($row->fees_group_id)) {
                                                     $distinctHeads[$row->fees_group_id] = true;
+                                                    if (!isset($feesGroupUsageMap[$row->fees_group_id])) {
+                                                        $feesGroupUsageMap[$row->fees_group_id] = [];
+                                                    }
+                                                    $cName = $row->ClassTypes->name ?? ('Class #'.$row->class_type_id);
+                                                    if (!in_array($cName, $feesGroupUsageMap[$row->fees_group_id])) {
+                                                        $feesGroupUsageMap[$row->fees_group_id][] = $cName;
+                                                    }
                                                 }
                                                 if (!empty($row->ClassTypes->course_id)) {
                                                     $coursesWithFees[$row->ClassTypes->course_id] = true;
@@ -944,247 +1077,527 @@ $classType = Helper::classType();
                                         $totalConfiguredCourses = count($coursesWithFees);
                                         $totalConfiguredClasses = count($configuredClassIds);
                                         $totalDistinctHeads = count($distinctHeads);
+
+                                        // Setup Category Definitions & Group Heads from $dataview
+                                        $categoryDefs = [
+                                            'academic' => ['label' => 'Academic (Tuition / University)', 'icon' => 'fa-graduation-cap', 'badge' => 'badge-academic', 'desc' => 'Tuition and core academic course fee heads'],
+                                            'admission' => ['label' => 'Admission & Registration', 'icon' => 'fa-id-card-o', 'badge' => 'badge-admission', 'desc' => 'One-time admission, registration & enrollment fee heads'],
+                                            'refundable' => ['label' => 'Refundable Deposit (Caution Money)', 'icon' => 'fa-shield', 'badge' => 'badge-refundable', 'desc' => 'Caution money, library & security deposits'],
+                                            'examination' => ['label' => 'Examination', 'icon' => 'fa-file-text-o', 'badge' => 'badge-examination', 'desc' => 'Semester & annual examination, practical & admit card fees'],
+                                            'practical' => ['label' => 'Laboratory & Practical', 'icon' => 'fa-flask', 'badge' => 'badge-practical', 'desc' => 'Lab consumables, workshop & practical training fees'],
+                                            'facility' => ['label' => 'Campus Facility & Library', 'icon' => 'fa-building-o', 'badge' => 'badge-facility', 'desc' => 'Library, sports, gym, development & campus services'],
+                                            'hostel_transport' => ['label' => 'Hostel & Transport', 'icon' => 'fa-bus', 'badge' => 'badge-hostel_transport', 'desc' => 'Hostel boarding, mess & bus/van transportation fees'],
+                                            'other' => ['label' => 'Other / Miscellaneous', 'icon' => 'fa-tags', 'badge' => 'badge-other', 'desc' => 'Miscellaneous, fines, certificates & other charges'],
+                                        ];
+
+                                        $headsByCategory = [];
+                                        foreach($categoryDefs as $cKey => $cMeta) {
+                                            $headsByCategory[$cKey] = [];
+                                        }
+
+                                        $totalFeeHeadsCount = 0;
+                                        $totalRefundableCount = 0;
+                                        $totalStandaloneCount = 0;
+                                        $totalAssignedCount = 0;
+
+                                        if (!empty($dataview)) {
+                                            foreach($dataview as $head) {
+                                                $totalFeeHeadsCount++;
+                                                $gType = strtolower(trim($head->group_type ?? 'other'));
+                                                if ($gType == 'registration') $gType = 'admission';
+                                                if (!isset($headsByCategory[$gType])) {
+                                                    $gType = 'other';
+                                                }
+                                                $headsByCategory[$gType][] = $head;
+
+                                                if (strtolower(trim($head->fees_refund ?? '')) === 'yes') {
+                                                    $totalRefundableCount++;
+                                                }
+
+                                                if (isset($feesGroupUsageMap[$head->id])) {
+                                                    $totalAssignedCount++;
+                                                } else {
+                                                    $totalStandaloneCount++;
+                                                }
+                                            }
+                                        }
+
+                                        $activeCategoriesCount = 0;
+                                        foreach($headsByCategory as $cKey => $hList) {
+                                            if (count($hList) > 0) $activeCategoriesCount++;
+                                        }
                                     @endphp
 
-                                    <!-- Top KPI Summary Cards -->
-                                    <div class="row mb-2">
-                                        <div class="col-6 col-md-3 mb-1">
-                                            <div class="kpi-chip-card">
-                                                <div class="kpi-chip-icon icon-courses">
-                                                    <i class="fa fa-graduation-cap"></i>
+                                    <!-- VIEW 1: CLASS-WISE STRUCTURES -->
+                                    <div id="container_class_structures">
+                                        <!-- Top KPI Summary Cards -->
+                                        <div class="row mb-2">
+                                            <div class="col-6 col-md-3 mb-1">
+                                                <div class="kpi-chip-card">
+                                                    <div class="kpi-chip-icon icon-courses">
+                                                        <i class="fa fa-graduation-cap"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="kpi-chip-val text-primary">{{ $totalConfiguredCourses }} <small class="text-muted" style="font-size:10px;">/ {{ count($courses ?? []) }}</small></div>
+                                                        <div class="kpi-chip-label">Configured Courses</div>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <div class="kpi-chip-val text-primary">{{ $totalConfiguredCourses }} <small class="text-muted" style="font-size:10px;">/ {{ count($courses ?? []) }}</small></div>
-                                                    <div class="kpi-chip-label">Configured Courses</div>
+                                            </div>
+                                            <div class="col-6 col-md-3 mb-1">
+                                                <div class="kpi-chip-card">
+                                                    <div class="kpi-chip-icon icon-classes">
+                                                        <i class="fa fa-book"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="kpi-chip-val text-info">{{ $totalConfiguredClasses }} <small class="text-muted" style="font-size:10px;">Semesters</small></div>
+                                                        <div class="kpi-chip-label">Active Classes</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-6 col-md-3 mb-1">
+                                                <div class="kpi-chip-card">
+                                                    <div class="kpi-chip-icon icon-pool">
+                                                        <i class="fa fa-inr"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="kpi-chip-val text-success">₹{{ number_format($totalAmountConfigured) }}</div>
+                                                        <div class="kpi-chip-label">Total Fee Pool</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-6 col-md-3 mb-1">
+                                                <div class="kpi-chip-card">
+                                                    <div class="kpi-chip-icon icon-heads">
+                                                        <i class="fa fa-tags"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="kpi-chip-val text-warning">{{ $totalDistinctHeads }} <small class="text-muted" style="font-size:10px;">Heads</small></div>
+                                                        <div class="kpi-chip-label">Fee Heads Used</div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-6 col-md-3 mb-1">
-                                            <div class="kpi-chip-card">
-                                                <div class="kpi-chip-icon icon-classes">
-                                                    <i class="fa fa-book"></i>
-                                                </div>
-                                                <div>
-                                                    <div class="kpi-chip-val text-info">{{ $totalConfiguredClasses }} <small class="text-muted" style="font-size:10px;">Semesters</small></div>
-                                                    <div class="kpi-chip-label">Active Classes</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-6 col-md-3 mb-1">
-                                            <div class="kpi-chip-card">
-                                                <div class="kpi-chip-icon icon-pool">
-                                                    <i class="fa fa-inr"></i>
-                                                </div>
-                                                <div>
-                                                    <div class="kpi-chip-val text-success">₹{{ number_format($totalAmountConfigured) }}</div>
-                                                    <div class="kpi-chip-label">Total Fee Pool</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-6 col-md-3 mb-1">
-                                            <div class="kpi-chip-card">
-                                                <div class="kpi-chip-icon icon-heads">
-                                                    <i class="fa fa-tags"></i>
-                                                </div>
-                                                <div>
-                                                    <div class="kpi-chip-val text-warning">{{ $totalDistinctHeads }} <small class="text-muted" style="font-size:10px;">Heads</small></div>
-                                                    <div class="kpi-chip-label">Fee Heads Used</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
 
-                                    <!-- Quick Course Filter Pills Bar -->
-                                    <div class="quick-filters-box">
-                                        <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <label class="font-weight-bold mb-0">
-                                                <i class="fa fa-filter"></i> Quick Course Filters:
-                                            </label>
-                                            <small>Click course to filter instantly</small>
-                                        </div>
-                                        <div class="course-filter-wrapper">
-                                            <button type="button" class="course-scroll-btn" onclick="scrollCourseFilters(-220)" title="Scroll Left">
-                                                <i class="fa fa-chevron-left"></i>
-                                            </button>
-                                            <div class="course-filter-scroll" id="course_pill_list">
-                                                <button type="button" class="course-pill-btn active" data-course-id="all" onclick="filterByCourse('all', this)">
-                                                    <i class="fa fa-globe"></i> All Courses <span class="badge-counter">{{ $totalConfiguredCourses }}</span>
+                                        <!-- Quick Course Filter Pills Bar -->
+                                        <div class="quick-filters-box">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <label class="font-weight-bold mb-0">
+                                                    <i class="fa fa-filter"></i> Quick Course Filters:
+                                                </label>
+                                                <small>Click course to filter instantly</small>
+                                            </div>
+                                            <div class="course-filter-wrapper">
+                                                <button type="button" class="course-scroll-btn" onclick="scrollCourseFilters(-220)" title="Scroll Left">
+                                                    <i class="fa fa-chevron-left"></i>
                                                 </button>
-                                                @if(!empty($courses))
-                                                    @foreach($courses as $c)
-                                                        @php
-                                                            $cClasses = !empty($allClassType) ? $allClassType->where('course_id', $c->id) : collect();
-                                                            $cConfiguredCount = 0;
-                                                            $cTotalFee = 0;
-                                                            foreach($cClasses as $cl) {
-                                                                if (isset($feesMasterByClass[$cl->id])) {
-                                                                    $cConfiguredCount++;
-                                                                    foreach($feesMasterByClass[$cl->id] as $fRow) {
-                                                                        $cTotalFee += (float)($fRow->amount ?? 0);
+                                                <div class="course-filter-scroll" id="course_pill_list">
+                                                    <button type="button" class="course-pill-btn active" data-course-id="all" onclick="filterByCourse('all', this)">
+                                                        <i class="fa fa-globe"></i> All Courses <span class="badge-counter">{{ $totalConfiguredCourses }}</span>
+                                                    </button>
+                                                    @if(!empty($courses))
+                                                        @foreach($courses as $c)
+                                                            @php
+                                                                $cClasses = !empty($allClassType) ? $allClassType->where('course_id', $c->id) : collect();
+                                                                $cConfiguredCount = 0;
+                                                                $cTotalFee = 0;
+                                                                foreach($cClasses as $cl) {
+                                                                    if (isset($feesMasterByClass[$cl->id])) {
+                                                                        $cConfiguredCount++;
+                                                                        foreach($feesMasterByClass[$cl->id] as $fRow) {
+                                                                            $cTotalFee += (float)($fRow->amount ?? 0);
+                                                                        }
                                                                     }
                                                                 }
-                                                            }
-                                                        @endphp
-                                                        <button type="button" class="course-pill-btn" data-course-id="{{ $c->id }}" onclick="filterByCourse('{{ $c->id }}', this)">
-                                                            <i class="fa fa-graduation-cap"></i> {{ $c->name }}
-                                                            <span class="badge-counter">₹{{ number_format($cTotalFee) }}</span>
-                                                        </button>
-                                                    @endforeach
-                                                @endif
+                                                            @endphp
+                                                            <button type="button" class="course-pill-btn" data-course-id="{{ $c->id }}" onclick="filterByCourse('{{ $c->id }}', this)">
+                                                                <i class="fa fa-graduation-cap"></i> {{ $c->name }}
+                                                                <span class="badge-counter">₹{{ number_format($cTotalFee) }}</span>
+                                                            </button>
+                                                        @endforeach
+                                                    @endif
+                                                </div>
+                                                <button type="button" class="course-scroll-btn" onclick="scrollCourseFilters(220)" title="Scroll Right">
+                                                    <i class="fa fa-chevron-right"></i>
+                                                </button>
                                             </div>
-                                            <button type="button" class="course-scroll-btn" onclick="scrollCourseFilters(220)" title="Scroll Right">
-                                                <i class="fa fa-chevron-right"></i>
-                                            </button>
+                                        </div>
+
+                                        <!-- Course-wise Cards Layout -->
+                                        <div id="course_cards_container" class="mt-2">
+                                            @if(!empty($courses))
+                                                @php $renderedCourses = 0; @endphp
+                                                @foreach($courses as $c)
+                                                    @php
+                                                        $cClasses = !empty($allClassType) ? $allClassType->where('course_id', $c->id) : collect();
+                                                        $cConfiguredCount = 0;
+                                                        $cTotalFee = 0;
+                                                        $cClassRows = [];
+
+                                                        foreach($cClasses as $cl) {
+                                                            if (isset($feesMasterByClass[$cl->id])) {
+                                                                $cConfiguredCount++;
+                                                                $cClassRows[$cl->id] = $feesMasterByClass[$cl->id];
+                                                                foreach($feesMasterByClass[$cl->id] as $fRow) {
+                                                                    $cTotalFee += (float)($fRow->amount ?? 0);
+                                                                }
+                                                            }
+                                                        }
+                                                        $dur = !empty($c->duration) ? (int)$c->duration : 3;
+                                                        $totSem = !empty($c->total_semester) && (int)$c->total_semester > 0 ? (int)$c->total_semester : ($dur * 2);
+                                                        $renderedCourses++;
+                                                    @endphp
+
+                                                    <div class="course-card course-group-item" id="course_card_{{ $c->id }}" data-course-id="{{ $c->id }}" data-course-name="{{ strtolower($c->name) }}">
+                                                        <!-- Course Executive Banner -->
+                                                        <div class="course-card-header">
+                                                            <div class="d-flex align-items-center flex-wrap" style="gap: 8px;">
+                                                                <span class="course-card-title">
+                                                                    <i class="fa fa-graduation-cap"></i> {{ $c->name }}
+                                                                </span>
+                                                                <span class="badge badge-light text-dark font-weight-bold" style="font-size:10px;">
+                                                                    {{ ($c->course_type == 'Yearly') ? ($dur . ' Year(s) - Yearly') : ($totSem . ' Semesters') }}
+                                                                </span>
+                                                                @if($cConfiguredCount > 0)
+                                                                    <span class="badge badge-warning text-dark font-weight-bold" style="font-size:10px;">
+                                                                        {{ $cConfiguredCount }} / {{ $cClasses->count() }} Semesters Configured
+                                                                    </span>
+                                                                @else
+                                                                    <span class="badge badge-secondary" style="font-size:10px;">Not Configured</span>
+                                                                @endif
+                                                            </div>
+                                                            <div class="d-flex align-items-center flex-wrap" style="gap: 6px;">
+                                                                <span class="badge badge-success px-2 py-1 font-weight-bold" style="font-size:11.5px;">
+                                                                    ₹{{ number_format($cTotalFee) }} Total Course Fee
+                                                                </span>
+                                                                <button type="button" class="btn btn-xs btn-setup-course font-weight-bold shadow-sm" onclick="selectCourseForSetup('{{ $c->id }}')" style="font-size:10.5px;">
+                                                                    <i class="fa fa-pencil-square-o"></i> Update Fees Structure
+                                                                </button>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Course Body: Semester Breakdown Table -->
+                                                        <div class="p-2">
+                                                            @if($cConfiguredCount > 0)
+                                                                <div class="table-responsive">
+                                                                    <table class="table table-bordered table-striped table-hover mb-0 padding_table" style="font-size: 11.5px;">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th width="140px"><i class="fa fa-calendar-o"></i> Semester / Class</th>
+                                                                                <th>Fee Heads Breakdown (Category | Amount | Due Date)</th>
+                                                                                <th width="130px" class="text-right">Total Semester Fee</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            @foreach($cClasses as $cl)
+                                                                                @if(isset($cClassRows[$cl->id]))
+                                                                                    @php
+                                                                                        $semRows = $cClassRows[$cl->id];
+                                                                                        $semTotal = 0;
+                                                                                    @endphp
+                                                                                    <tr class="course-class-row" data-class-name="{{ strtolower($cl->name) }}">
+                                                                                        <td class="font-weight-bold text-primary align-middle">
+                                                                                            <i class="fa fa-book text-muted mr-1"></i> {{ $cl->name }}
+                                                                                        </td>
+                                                                                        <td style="padding: 3px 6px;">
+                                                                                            <div class="d-flex flex-wrap" style="gap: 4px;">
+                                                                                                @foreach($semRows as $sRow)
+                                                                                                    @php
+                                                                                                        $amt = (float)($sRow->amount ?? 0);
+                                                                                                        $semTotal += $amt;
+                                                                                                        $fgName = $sRow->feesGroup->name ?? 'Fee Head';
+                                                                                                        $fgType = $sRow->feesGroup->group_type ?? 'academic';
+                                                                                                        $badgeClass = 'badge-academic';
+                                                                                                        if ($fgType === 'examination') $badgeClass = 'badge-examination';
+                                                                                                        elseif ($fgType === 'practical') $badgeClass = 'badge-practical';
+                                                                                                        elseif ($fgType === 'admission') $badgeClass = 'badge-admission';
+                                                                                                        elseif ($fgType === 'facility') $badgeClass = 'badge-facility';
+                                                                                                        elseif ($fgType === 'refundable') $badgeClass = 'badge-refundable';
+                                                                                                        elseif ($fgType === 'hostel_transport') $badgeClass = 'badge-hostel_transport';
+
+                                                                                                        $dueDateStr = !empty($sRow->installment_due_date) ? date('d-M-y', strtotime($sRow->installment_due_date)) : null;
+                                                                                                    @endphp
+                                                                                                    <div class="d-inline-flex align-items-center border rounded px-2 py-1 bg-white shadow-sm" style="font-size: 11px; gap: 5px;">
+                                                                                                        <span class="badge {{ $badgeClass }}" style="font-size: 9px; padding: 2px 4px;">{{ ucfirst($fgType) }}</span>
+                                                                                                        <span class="font-weight-bold text-dark">{{ $fgName }}:</span>
+                                                                                                        <span class="font-weight-bold text-success">₹{{ number_format($amt) }}</span>
+                                                                                                        @if($dueDateStr)
+                                                                                                            <span class="badge badge-light border text-muted" style="font-size: 9px;" title="Due Date">
+                                                                                                                <i class="fa fa-calendar-check-o text-info"></i> {{ $dueDateStr }}
+                                                                                                            </span>
+                                                                                                        @endif
+                                                                                                    </div>
+                                                                                                @endforeach
+                                                                                            </div>
+                                                                                        </td>
+                                                                                        <td class="text-right align-middle font-weight-bold text-success" style="font-size: 12.5px;">
+                                                                                            ₹{{ number_format($semTotal) }}
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                @endif
+                                                                            @endforeach
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            @else
+                                                                <div class="empty-course-box">
+                                                                    <div class="empty-msg">
+                                                                        <i class="fa fa-info-circle"></i> No fee structure configured for <strong>{{ $c->name }}</strong> in this session.
+                                                                    </div>
+                                                                    <button type="button" class="btn btn-configure-course shadow-sm" onclick="selectCourseForSetup('{{ $c->id }}')">
+                                                                        <i class="fa fa-plus-circle"></i> Click Here to Configure {{ $c->name }}
+                                                                    </button>
+                                                                </div>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            @else
+                                                <div class="alert alert-light text-center border">
+                                                    No courses available to display.
+                                                </div>
+                                            @endif
+
+                                            <div id="no_course_search_results" class="p-4 text-center border rounded bg-white mt-2" style="display:none; border: 1.5px dashed #cbd5e1 !important;">
+                                                <i class="fa fa-graduation-cap text-muted mb-2" style="font-size:24px;"></i>
+                                                <h6 class="font-weight-bold text-dark mb-1" style="font-size:13px;">No Fee Structures Found</h6>
+                                                <p class="text-muted mb-2" style="font-size:11px;">Try selecting "All Courses" from the filter bar above.</p>
+                                                <button type="button" class="btn btn-xs btn-primary font-weight-bold" onclick="$('.course-pill-btn[data-course-id=\'all\']').click()">Show All Courses</button>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-12 mt-2">
+                                            <p class="text-muted mb-0" style="font-size:11px;">
+                                                <i class="fa fa-info-circle text-info"></i> <b>Tip:</b> Creating fee heads here with Amount & Due Date automatically configures Fees Master for student admissions & collection.
+                                            </p>
                                         </div>
                                     </div>
 
-                                    <!-- Course-wise Cards Layout -->
-                                    <div id="course_cards_container" class="mt-2">
-                                        @if(!empty($courses))
-                                            @php $renderedCourses = 0; @endphp
-                                            @foreach($courses as $c)
-                                                @php
-                                                    $cClasses = !empty($allClassType) ? $allClassType->where('course_id', $c->id) : collect();
-                                                    $cConfiguredCount = 0;
-                                                    $cTotalFee = 0;
-                                                    $cClassRows = [];
+                                    <!-- VIEW 2: FEE HEADS DIRECTORY & CATEGORIES -->
+                                    <div id="container_category_heads" style="display: none;">
+                                        <!-- Top KPI Summary for Fee Heads -->
+                                        <div class="row mb-2">
+                                            <div class="col-6 col-md-3 mb-1">
+                                                <div class="kpi-chip-card">
+                                                    <div class="kpi-chip-icon icon-heads">
+                                                        <i class="fa fa-tags"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="kpi-chip-val text-primary">{{ $totalFeeHeadsCount }} <small class="text-muted" style="font-size:10px;">Total</small></div>
+                                                        <div class="kpi-chip-label">Fee Heads Created</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-6 col-md-3 mb-1">
+                                                <div class="kpi-chip-card">
+                                                    <div class="kpi-chip-icon icon-courses">
+                                                        <i class="fa fa-th-list"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="kpi-chip-val text-info">{{ $activeCategoriesCount }} <small class="text-muted" style="font-size:10px;">/ {{ count($categoryDefs) }}</small></div>
+                                                        <div class="kpi-chip-label">Active Categories</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-6 col-md-3 mb-1">
+                                                <div class="kpi-chip-card">
+                                                    <div class="kpi-chip-icon icon-pool">
+                                                        <i class="fa fa-cubes"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="kpi-chip-val text-success">{{ $totalAssignedCount }} <small class="text-muted" style="font-size:10px;">Heads</small></div>
+                                                        <div class="kpi-chip-label">Used In Classes</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-6 col-md-3 mb-1">
+                                                <div class="kpi-chip-card">
+                                                    <div class="kpi-chip-icon" style="background: #fee2e2; color: #dc2626;">
+                                                        <i class="fa fa-shield"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="kpi-chip-val text-danger">{{ $totalRefundableCount }} <small class="text-muted" style="font-size:10px;">Heads</small></div>
+                                                        <div class="kpi-chip-label">Refundable Deposits</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
 
-                                                    foreach($cClasses as $cl) {
-                                                        if (isset($feesMasterByClass[$cl->id])) {
-                                                            $cConfiguredCount++;
-                                                            $cClassRows[$cl->id] = $feesMasterByClass[$cl->id];
-                                                            foreach($feesMasterByClass[$cl->id] as $fRow) {
-                                                                $cTotalFee += (float)($fRow->amount ?? 0);
-                                                            }
-                                                        }
-                                                    }
-                                                    $dur = !empty($c->duration) ? (int)$c->duration : 3;
-                                                    $totSem = !empty($c->total_semester) && (int)$c->total_semester > 0 ? (int)$c->total_semester : ($dur * 2);
-                                                    $renderedCourses++;
+                                        <!-- Quick Category Filter Pills & Search Bar -->
+                                        <div class="quick-filters-box">
+                                            <div class="d-flex justify-content-between align-items-center mb-1 flex-wrap" style="gap: 4px;">
+                                                <label class="font-weight-bold mb-0 text-dark" style="font-size: 11.5px;">
+                                                    <i class="fa fa-filter text-primary mr-1"></i> Filter Fee Heads by Category:
+                                                </label>
+                                                <div class="input-group input-group-sm" style="max-width: 220px;">
+                                                    <input type="text" class="form-control form-control-sm" id="search_category_heads" placeholder="Search head name..." oninput="filterFeeHeadsSearch(this.value)">
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text bg-white"><i class="fa fa-search text-muted"></i></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="course-filter-wrapper">
+                                                <button type="button" class="course-scroll-btn" onclick="scrollCategoryFilters(-220)" title="Scroll Left">
+                                                    <i class="fa fa-chevron-left"></i>
+                                                </button>
+                                                <div class="course-filter-scroll" id="category_pill_list">
+                                                    <button type="button" class="category-pill-btn active" data-category-key="all" onclick="filterByCategory('all', this)">
+                                                        <i class="fa fa-globe"></i> All Categories <span class="badge-counter">{{ $totalFeeHeadsCount }}</span>
+                                                    </button>
+                                                    @foreach($categoryDefs as $cKey => $cMeta)
+                                                        @php $hCount = count($headsByCategory[$cKey] ?? []); @endphp
+                                                        <button type="button" class="category-pill-btn" data-category-key="{{ $cKey }}" onclick="filterByCategory('{{ $cKey }}', this)">
+                                                            <i class="fa {{ $cMeta['icon'] }}"></i> {{ $cMeta['label'] }}
+                                                            <span class="badge-counter">{{ $hCount }}</span>
+                                                        </button>
+                                                    @endforeach
+                                                </div>
+                                                <button type="button" class="course-scroll-btn" onclick="scrollCategoryFilters(220)" title="Scroll Right">
+                                                    <i class="fa fa-chevron-right"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Category Groups & Fee Heads Cards List -->
+                                        <div id="category_cards_container" class="mt-2">
+                                            @foreach($categoryDefs as $cKey => $cMeta)
+                                                @php 
+                                                    $headsList = $headsByCategory[$cKey] ?? [];
+                                                    $hCount = count($headsList);
                                                 @endphp
-
-                                                <div class="course-card course-group-item" id="course_card_{{ $c->id }}" data-course-id="{{ $c->id }}" data-course-name="{{ strtolower($c->name) }}">
-                                                    <!-- Course Executive Banner -->
-                                                    <div class="course-card-header">
-                                                        <div class="d-flex align-items-center flex-wrap" style="gap: 8px;">
-                                                            <span class="course-card-title">
-                                                                <i class="fa fa-graduation-cap"></i> {{ $c->name }}
-                                                            </span>
-                                                            <span class="badge badge-light text-dark font-weight-bold" style="font-size:10px;">
-                                                                {{ ($c->course_type == 'Yearly') ? ($dur . ' Year(s) - Yearly') : ($totSem . ' Semesters') }}
-                                                            </span>
-                                                            @if($cConfiguredCount > 0)
-                                                                <span class="badge badge-warning text-dark font-weight-bold" style="font-size:10px;">
-                                                                    {{ $cConfiguredCount }} / {{ $cClasses->count() }} Semesters Configured
-                                                                </span>
-                                                            @else
-                                                                <span class="badge badge-secondary" style="font-size:10px;">Not Configured</span>
-                                                            @endif
-                                                        </div>
+                                                <div class="category-head-card category-group-item" id="category_card_{{ $cKey }}" data-category-key="{{ $cKey }}">
+                                                    <!-- Category Card Header -->
+                                                    <div class="category-head-card-header">
                                                         <div class="d-flex align-items-center flex-wrap" style="gap: 6px;">
-                                                            <span class="badge badge-success px-2 py-1 font-weight-bold" style="font-size:11.5px;">
-                                                                ₹{{ number_format($cTotalFee) }} Total Course Fee
+                                                            <span class="badge {{ $cMeta['badge'] }} px-2 py-1 font-weight-bold" style="font-size: 11px;">
+                                                                <i class="fa {{ $cMeta['icon'] }} mr-1"></i> {{ $cMeta['label'] }}
                                                             </span>
-                                                            <button type="button" class="btn btn-xs btn-setup-course font-weight-bold shadow-sm" onclick="selectCourseForSetup('{{ $c->id }}')" style="font-size:10.5px;">
-                                                                <i class="fa fa-pencil-square-o"></i> Update Fees Structure
+                                                            <span class="badge badge-light border text-dark font-weight-bold" style="font-size: 10px;">
+                                                                {{ $hCount }} Head(s)
+                                                            </span>
+                                                            <small class="text-muted d-none d-md-inline">{{ $cMeta['desc'] }}</small>
+                                                        </div>
+                                                        <div>
+                                                            <button type="button" class="btn btn-xs btn-outline-primary font-weight-bold" onclick="addHeadInSpecificCategory('{{ $cKey }}')" style="font-size: 10.5px;">
+                                                                <i class="fa fa-plus-circle"></i> + Add Head in this Category
                                                             </button>
                                                         </div>
                                                     </div>
 
-                                                    <!-- Course Body: Semester Breakdown Table -->
+                                                    <!-- Category Card Body -->
                                                     <div class="p-2">
-                                                        @if($cConfiguredCount > 0)
+                                                        @if($hCount > 0)
                                                             <div class="table-responsive">
                                                                 <table class="table table-bordered table-striped table-hover mb-0 padding_table" style="font-size: 11.5px;">
                                                                     <thead>
                                                                         <tr>
-                                                                            <th width="140px"><i class="fa fa-calendar-o"></i> Semester / Class</th>
-                                                                            <th>Fee Heads Breakdown (Category | Amount | Due Date)</th>
-                                                                            <th width="130px" class="text-right">Total Semester Fee</th>
+                                                                            <th width="40px" class="text-center">#</th>
+                                                                            <th>Fee Head Name</th>
+                                                                            <th width="140px" class="text-center">Properties</th>
+                                                                            <th>Assigned Structure / Status</th>
+                                                                            <th width="85px" class="text-center">Action</th>
                                                                         </tr>
                                                                     </thead>
                                                                     <tbody>
-                                                                        @foreach($cClasses as $cl)
-                                                                            @if(isset($cClassRows[$cl->id]))
-                                                                                @php
-                                                                                    $semRows = $cClassRows[$cl->id];
-                                                                                    $semTotal = 0;
-                                                                                @endphp
-                                                                                <tr class="course-class-row" data-class-name="{{ strtolower($cl->name) }}">
-                                                                                    <td class="font-weight-bold text-primary align-middle">
-                                                                                        <i class="fa fa-book text-muted mr-1"></i> {{ $cl->name }}
-                                                                                    </td>
-                                                                                    <td style="padding: 3px 6px;">
-                                                                                        <div class="d-flex flex-wrap" style="gap: 4px;">
-                                                                                            @foreach($semRows as $sRow)
-                                                                                                @php
-                                                                                                    $amt = (float)($sRow->amount ?? 0);
-                                                                                                    $semTotal += $amt;
-                                                                                                    $fgName = $sRow->feesGroup->name ?? 'Fee Head';
-                                                                                                    $fgType = $sRow->feesGroup->group_type ?? 'academic';
-                                                                                                    $badgeClass = 'badge-academic';
-                                                                                                    if ($fgType === 'examination') $badgeClass = 'badge-examination';
-                                                                                                    elseif ($fgType === 'practical') $badgeClass = 'badge-practical';
-                                                                                                    elseif ($fgType === 'admission') $badgeClass = 'badge-admission';
-                                                                                                    elseif ($fgType === 'facility') $badgeClass = 'badge-facility';
-                                                                                                    elseif ($fgType === 'refundable') $badgeClass = 'badge-refundable';
-                                                                                                    elseif ($fgType === 'hostel_transport') $badgeClass = 'badge-hostel_transport';
-
-                                                                                                    $dueDateStr = !empty($sRow->installment_due_date) ? date('d-M-y', strtotime($sRow->installment_due_date)) : null;
-                                                                                                @endphp
-                                                                                                <div class="d-inline-flex align-items-center border rounded px-2 py-1 bg-white shadow-sm" style="font-size: 11px; gap: 5px;">
-                                                                                                    <span class="badge {{ $badgeClass }}" style="font-size: 9px; padding: 2px 4px;">{{ ucfirst($fgType) }}</span>
-                                                                                                    <span class="font-weight-bold text-dark">{{ $fgName }}:</span>
-                                                                                                    <span class="font-weight-bold text-success">₹{{ number_format($amt) }}</span>
-                                                                                                    @if($dueDateStr)
-                                                                                                        <span class="badge badge-light border text-muted" style="font-size: 9px;" title="Due Date">
-                                                                                                            <i class="fa fa-calendar-check-o text-info"></i> {{ $dueDateStr }}
-                                                                                                        </span>
-                                                                                                    @endif
-                                                                                                </div>
+                                                                        @foreach($headsList as $hIdx => $hItem)
+                                                                            @php
+                                                                                $isRef = strtolower(trim($hItem->fees_refund ?? '')) === 'yes';
+                                                                                $isPart = ($hItem->fees_partial ?? 0) == 1;
+                                                                                $assignedClasses = $feesGroupUsageMap[$hItem->id] ?? [];
+                                                                            @endphp
+                                                                            <tr class="head-item-row" data-head-name="{{ strtolower($hItem->name) }}" data-category-key="{{ $cKey }}">
+                                                                                <td class="text-center align-middle font-weight-bold text-muted">{{ $hIdx + 1 }}</td>
+                                                                                <td class="align-middle font-weight-bold text-dark">
+                                                                                    <span class="head-name-text">{{ $hItem->name }}</span>
+                                                                                    @if($isRef)
+                                                                                        <span class="badge badge-refundable ml-1" style="font-size: 9.5px; padding: 2px 5px;" title="Refundable Deposit">
+                                                                                            <i class="fa fa-shield"></i> Refundable
+                                                                                        </span>
+                                                                                    @endif
+                                                                                    @if($isPart)
+                                                                                        <span class="badge badge-info ml-1" style="font-size: 9.5px; padding: 2px 5px;" title="Partial Payment (50%) Allowed">
+                                                                                            50% Partial
+                                                                                        </span>
+                                                                                    @endif
+                                                                                </td>
+                                                                                <td class="text-center align-middle">
+                                                                                    @if($isRef)
+                                                                                        <span class="badge badge-success px-1" style="font-size: 10px;">Refundable</span>
+                                                                                    @elseif($isPart)
+                                                                                        <span class="badge badge-info px-1" style="font-size: 10px;">Partial (50%)</span>
+                                                                                    @else
+                                                                                        <span class="badge badge-light border text-muted" style="font-size: 10px;">Standard</span>
+                                                                                    @endif
+                                                                                </td>
+                                                                                <td class="align-middle">
+                                                                                    @if(count($assignedClasses) > 0)
+                                                                                        <div class="d-flex align-items-center flex-wrap" style="gap: 3px;">
+                                                                                            <span class="badge badge-primary px-1" style="font-size: 10px;">
+                                                                                                <i class="fa fa-check-circle"></i> Used in {{ count($assignedClasses) }} Classes:
+                                                                                            </span>
+                                                                                            @foreach(array_slice($assignedClasses, 0, 3) as $cName)
+                                                                                                <span class="badge badge-light border text-dark font-weight-bold" style="font-size: 9.5px;">{{ $cName }}</span>
                                                                                             @endforeach
+                                                                                            @if(count($assignedClasses) > 3)
+                                                                                                <span class="badge badge-light border text-muted" style="font-size: 9px;" title="{{ implode(', ', array_slice($assignedClasses, 3)) }}">+{{ count($assignedClasses) - 3 }} more</span>
+                                                                                            @endif
                                                                                         </div>
-                                                                                    </td>
-                                                                                    <td class="text-right align-middle font-weight-bold text-success" style="font-size: 12.5px;">
-                                                                                        ₹{{ number_format($semTotal) }}
-                                                                                    </td>
-                                                                                </tr>
-                                                                            @endif
+                                                                                    @else
+                                                                                        <span class="badge badge-warning text-dark font-weight-bold px-1" style="font-size: 10px;">
+                                                                                            <i class="fa fa-tag"></i> Standalone Head (No Class Attached)
+                                                                                        </span>
+                                                                                    @endif
+                                                                                </td>
+                                                                                <td class="text-center align-middle text-nowrap">
+                                                                                    <button type="button" 
+                                                                                            class="btn btn-xs btn-outline-primary btn-edit-fee-head" 
+                                                                                            data-id="{{ $hItem->id }}" 
+                                                                                            data-name="{{ $hItem->name }}" 
+                                                                                            data-category="{{ $cKey }}" 
+                                                                                            data-refund="{{ $hItem->fees_refund ?? 'no' }}" 
+                                                                                            data-partial="{{ $hItem->fees_partial ?? 0 }}"
+                                                                                            title="Edit Fee Head" 
+                                                                                            style="font-size: 11px; padding: 1px 6px;">
+                                                                                        <i class="fa fa-pencil"></i>
+                                                                                    </button>
+                                                                                    <a href="javascript:void(0)" 
+                                                                                       class="btn btn-xs btn-outline-danger deleteData" 
+                                                                                       data-id="{{ $hItem->id }}" 
+                                                                                       data-toggle="modal" 
+                                                                                       data-target="#Modal_id" 
+                                                                                       data-bs-toggle="modal" 
+                                                                                       data-bs-target="#Modal_id" 
+                                                                                       title="Delete Fee Head" 
+                                                                                       style="font-size: 11px; padding: 1px 6px;">
+                                                                                        <i class="fa fa-trash"></i>
+                                                                                    </a>
+                                                                                </td>
+                                                                            </tr>
                                                                         @endforeach
                                                                     </tbody>
                                                                 </table>
+                              
                                                             </div>
                                                         @else
-                                                            <div class="empty-course-box">
-                                                                <div class="empty-msg">
-                                                                    <i class="fa fa-info-circle"></i> No fee structure configured for <strong>{{ $c->name }}</strong> in this session.
-                                                                </div>
-                                                                <button type="button" class="btn btn-configure-course shadow-sm" onclick="selectCourseForSetup('{{ $c->id }}')">
-                                                                    <i class="fa fa-plus-circle"></i> Click Here to Configure {{ $c->name }}
+                                                            <div class="text-center py-3 text-muted" style="background: #fafbfc; border-radius: 4px; border: 1px dashed #cbd5e1;">
+                                                                <i class="fa {{ $cMeta['icon'] }} fa-2x text-muted mb-1 d-block" style="opacity: 0.5;"></i>
+                                                                <span style="font-size: 11.5px;">No fee heads configured in <strong>{{ $cMeta['label'] }}</strong> yet.</span><br>
+                                                                <button type="button" class="btn btn-xs btn-primary font-weight-bold mt-1" onclick="addHeadInSpecificCategory('{{ $cKey }}')">
+                                                                    <i class="fa fa-plus"></i> Create {{ $cMeta['label'] }} Head
                                                                 </button>
                                                             </div>
                                                         @endif
                                                     </div>
                                                 </div>
                                             @endforeach
-                                        @else
-                                            <div class="alert alert-light text-center border">
-                                                No courses available to display.
+
+                                            <div id="no_category_head_results" class="p-4 text-center border rounded bg-white mt-2" style="display:none; border: 1.5px dashed #cbd5e1 !important;">
+                                                <i class="fa fa-tags text-muted mb-2" style="font-size:24px;"></i>
+                                                <h6 class="font-weight-bold text-dark mb-1" style="font-size:13px;">No Matching Fee Heads Found</h6>
+                                                <p class="text-muted mb-2" style="font-size:11px;">Try clearing search or clicking "All Categories" above.</p>
+                                                <button type="button" class="btn btn-xs btn-primary font-weight-bold" onclick="$('.category-pill-btn[data-category-key=\'all\']').click()">Show All Categories</button>
                                             </div>
-                                        @endif
-
-                                        <div id="no_course_search_results" class="p-4 text-center border rounded bg-white mt-2" style="display:none; border: 1.5px dashed #cbd5e1 !important;">
-                                            <i class="fa fa-graduation-cap text-muted mb-2" style="font-size:24px;"></i>
-                                            <h6 class="font-weight-bold text-dark mb-1" style="font-size:13px;">No Fee Structures Found</h6>
-                                            <p class="text-muted mb-2" style="font-size:11px;">Try selecting "All Courses" from the filter bar above.</p>
-                                            <button type="button" class="btn btn-xs btn-primary font-weight-bold" onclick="$('.course-pill-btn[data-course-id=\'all\']').click()">Show All Courses</button>
                                         </div>
-                                    </div>
-
-                                    <div class="col-md-12 mt-2">
-                                        <p class="text-muted mb-0" style="font-size:11px;">
-                                            <i class="fa fa-info-circle text-info"></i> <b>Tip:</b> Creating fee heads here with Amount & Due Date automatically configures Fees Master for student admissions & collection.
-                                        </p>
                                     </div>
                                 </div> 
                             </div>          
@@ -1252,7 +1665,79 @@ $classType = Helper::classType();
     </div>
 </div>
 
+<!-- 1. Quick In-Place Edit Fee Head Modal -->
+<div class="modal fade fees-unified-page" id="edit_fee_head_modal" tabindex="-1" aria-labelledby="editHeadModalLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-primary text-white py-2">
+                <h5 class="modal-title font-weight-bold" style="font-size: 13.5px;" id="editHeadModalLabel">
+                    <i class="fa fa-pencil-square-o"></i> Edit Fee Head Details
+                </h5>
+                <button type="button" class="close text-white" data-bs-dismiss="modal" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="edit_fee_head_form" action="" method="post">
+                @csrf
+                <div class="modal-body p-3">
+                    <div class="form-group mb-2">
+                        <label class="font-weight-bold text-dark mb-1" style="font-size: 11.5px;">Fee Head Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control form-control-sm font-weight-bold" name="name" id="modal_edit_head_name" placeholder="Enter Fee Head Name" required>
+                    </div>
+                    
+                    <div class="form-group mb-2">
+                        <label class="font-weight-bold text-dark mb-1" style="font-size: 11.5px;">Category / Fee Type</label>
+                        <select class="form-control form-control-sm font-weight-bold" name="group_type" id="modal_edit_head_group_type">
+                            <option value="academic">Academic (Tuition / University)</option>
+                            <option value="admission">Admission & Registration</option>
+                            <option value="refundable">Refundable Deposit (Caution Money)</option>
+                            <option value="examination">Examination</option>
+                            <option value="practical">Laboratory & Practical</option>
+                            <option value="facility">Campus Facility & Library</option>
+                            <option value="hostel_transport">Hostel & Transport</option>
+                            <option value="other">Other / Miscellaneous</option>
+                        </select>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group mb-2 p-2 border rounded bg-white">
+                                <input type="checkbox" id="modal_edit_head_refund" onchange="document.getElementById('modal_edit_fees_refund').value = this.checked ? 'yes' : 'no'">
+                                <label for="modal_edit_head_refund" class="font-weight-normal mb-0 pointer" style="font-size:11px;">Refundable Deposit</label>
+                                <input type="hidden" id="modal_edit_fees_refund" name="fees_refund" value="no">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group mb-2 p-2 border rounded bg-white">
+                                <input type="checkbox" id="modal_edit_head_partial" onchange="document.getElementById('modal_edit_fees_partial').value = this.checked ? '1' : '0'">
+                                <label for="modal_edit_head_partial" class="font-weight-normal mb-0 pointer" style="font-size:11px;">Partial (50%)</label>
+                                <input type="hidden" id="modal_edit_fees_partial" name="fees_partial" value="0">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer py-2 bg-light d-flex justify-content-between">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-dismiss="modal" style="font-size: 11.5px;">
+                        <i class="fa fa-times"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary btn-sm font-weight-bold" style="font-size: 11.5px;">
+                        <i class="fa fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
+// Category Counts Cache for Instant Sync
+var categoryHeadCounts = {
+    @foreach($categoryDefs as $cKey => $cMeta)
+        "{{ $cKey }}": {{ count($headsByCategory[$cKey] ?? []) }},
+    @endforeach
+    "all": {{ $totalFeeHeadsCount }}
+};
+
 function scrollCourseFilters(offset) {
     var container = document.getElementById('course_pill_list');
     if (container) {
@@ -1261,6 +1746,132 @@ function scrollCourseFilters(offset) {
             behavior: 'smooth'
         });
     }
+}
+
+function scrollCategoryFilters(offset) {
+    var container = document.getElementById('category_pill_list');
+    if (container) {
+        container.scrollBy({
+            left: offset,
+            behavior: 'smooth'
+        });
+    }
+}
+
+// Right Panel Tab Switcher (Class Structures vs Fee Heads Directory)
+function switchRightTab(tab) {
+    if (tab === 'heads') {
+        $('#btn_tab_heads').removeClass('btn-light text-dark').addClass('btn-primary active');
+        $('#btn_tab_structures').removeClass('btn-primary active').addClass('btn-light text-dark');
+        $('#container_class_structures').hide();
+        $('#container_category_heads').fadeIn(150);
+        $('#right_header_title').text('Fee Heads Directory & Categories');
+    } else {
+        $('#btn_tab_structures').removeClass('btn-light text-dark').addClass('btn-primary active');
+        $('#btn_tab_heads').removeClass('btn-primary active').addClass('btn-light text-dark');
+        $('#container_category_heads').hide();
+        $('#container_class_structures').fadeIn(150);
+        $('#right_header_title').text('Class-wise Fees Master');
+    }
+}
+
+// Filter Fee Heads Directory by Category Pill
+function filterByCategory(catKey, btnElement) {
+    $('.category-pill-btn').removeClass('active');
+    if (btnElement) {
+        $(btnElement).addClass('active');
+    } else {
+        $('.category-pill-btn[data-category-key="' + catKey + '"]').addClass('active');
+    }
+
+    if (catKey === 'all') {
+        $('.category-group-item').show();
+        $('.head-item-row').show();
+    } else {
+        $('.category-group-item').hide();
+        $('#category_card_' + catKey).show();
+    }
+    checkVisibleCategoryCards();
+}
+
+function filterFeeHeadsSearch(query) {
+    var q = (query || '').toLowerCase().trim();
+    if (q === '') {
+        var activeCat = $('.category-pill-btn.active').data('category-key') || 'all';
+        filterByCategory(activeCat);
+        return;
+    }
+
+    $('.category-group-item').show();
+    var anyMatch = false;
+
+    $('.category-group-item').each(function() {
+        var $card = $(this);
+        var cardHasMatch = false;
+        $card.find('.head-item-row').each(function() {
+            var headName = $(this).data('head-name') || '';
+            if (headName.indexOf(q) > -1) {
+                $(this).show();
+                cardHasMatch = true;
+                anyMatch = true;
+            } else {
+                $(this).hide();
+            }
+        });
+
+        if (cardHasMatch) {
+            $card.show();
+        } else {
+            $card.hide();
+        }
+    });
+
+    if (!anyMatch) {
+        $('#no_category_head_results').show();
+    } else {
+        $('#no_category_head_results').hide();
+    }
+}
+
+function checkVisibleCategoryCards() {
+    var visible = $('.category-group-item:visible').length;
+    if (visible === 0) {
+        $('#no_category_head_results').show();
+    } else {
+        $('#no_category_head_results').hide();
+    }
+}
+
+// Pre-fill left form for specific category from right directory
+function addHeadInSpecificCategory(catKey) {
+    switchMode('single_head');
+    $('#head_only_group_type').val(catKey).trigger('change');
+    
+    $('html, body').animate({
+        scrollTop: $('#quickForm').offset().top - 70
+    }, 350);
+    
+    $('#head_only_name').focus();
+}
+
+// Triggered from Left "View Heads in Category" link
+function viewCurrentCategoryHeads() {
+    var selectedCat = $('#head_only_group_type').val() || 'all';
+    switchRightTab('heads');
+    filterByCategory(selectedCat);
+    
+    if ($('#category_card_' + selectedCat).length > 0) {
+        $('html, body').animate({
+            scrollTop: $('#category_card_' + selectedCat).offset().top - 70
+        }, 350);
+    }
+}
+
+function onHeadCategoryChanged(catKey) {
+    var count = categoryHeadCounts[catKey] || 0;
+    $('#current_cat_head_count').text(count);
+    updateHeadOnlyPreview();
+    checkFormHasData();
 }
 
 var currentMode = 'semester';
@@ -1410,6 +2021,7 @@ function switchMode(mode) {
             submitBtn.className = 'btn btn-secondary btn-sm btn-block font-weight-bold py-2 disabled';
             submitBtn.innerHTML = '<i class="fa fa-hand-o-up"></i> Please Select a Course to Continue';
         }
+        switchRightTab('structures');
     } else if (mode === 'single_class') {
         document.getElementById('btn_mode_single_class').classList.add('active');
         document.getElementById('section_single_class').style.display = 'block';
@@ -1421,6 +2033,7 @@ function switchMode(mode) {
         submitBtn.disabled = false;
         submitBtn.className = 'btn btn-primary btn-sm btn-block font-weight-bold py-2 shadow-sm';
         updateSingleClassPreview();
+        switchRightTab('structures');
     } else {
         document.getElementById('btn_mode_single_head').classList.add('active');
         document.getElementById('section_single_head').style.display = 'block';
@@ -1429,6 +2042,11 @@ function switchMode(mode) {
         submitBtn.disabled = false;
         submitBtn.className = 'btn btn-primary btn-sm btn-block font-weight-bold py-2 shadow-sm';
         updateHeadOnlyPreview();
+        
+        // Auto-switch right side to Fee Heads Directory & Categories
+        switchRightTab('heads');
+        var selectedCat = $('#head_only_group_type').val() || 'admission';
+        onHeadCategoryChanged(selectedCat);
     }
     checkFormHasData();
 }
@@ -1794,6 +2412,9 @@ $(document).ready(function() {
     }
     checkFormHasData();
 
+    // Initialize category count for current selection
+    onHeadCategoryChanged($('#head_only_group_type').val() || 'admission');
+
     // Listen to course selection & form inputs to toggle Reset Form button
     $(document).on('change', '#course_selector', function() {
         checkFormHasData();
@@ -1805,6 +2426,30 @@ $(document).ready(function() {
     $(document).on('click', '.deleteData', function() {
         var delete_id = $(this).data('id');
         $('#delete_id').val(delete_id);
+    });
+
+    // In-place Edit Fee Head Modal Handler
+    $(document).on('click', '.btn-edit-fee-head', function() {
+        var headId = $(this).data('id');
+        var headName = $(this).data('name');
+        var category = $(this).data('category');
+        var isRefund = String($(this).data('refund')).toLowerCase() === 'yes';
+        var isPartial = parseInt($(this).data('partial')) === 1;
+
+        $('#modal_edit_head_name').val(headName);
+        $('#modal_edit_head_group_type').val(category);
+        $('#modal_edit_head_refund').prop('checked', isRefund);
+        $('#modal_edit_fees_refund').val(isRefund ? 'yes' : 'no');
+        $('#modal_edit_head_partial').prop('checked', isPartial);
+        $('#modal_edit_fees_partial').val(isPartial ? '1' : '0');
+
+        $('#edit_fee_head_form').attr('action', "{{ url('feesGroupEdit') }}/" + headId);
+        $('#edit_fee_head_modal').modal('show');
+    });
+
+    // Close handlers for modal
+    $(document).on('click', '[data-dismiss="modal"], [data-bs-dismiss="modal"]', function() {
+        $(this).closest('.modal').modal('hide');
     });
 });
 </script>
