@@ -41,11 +41,10 @@ $collectedRows = \App\Models\FeesDetail::where('session_id', $activeSessionId)
     ->where('branch_id', $activeBranchId)
     ->whereNull('deleted_at')
     ->where('paid_amount', '>', 0)
-    ->select('fees_group_id', 'class_type_id')
+    ->select('fees_group_id')
     ->get();
 foreach ($collectedRows as $cr) {
     $collectedMap[$cr->fees_group_id] = true;
-    $collectedMap[$cr->fees_group_id . '_' . $cr->class_type_id] = true;
 }
 @endphp
 
@@ -1233,7 +1232,7 @@ foreach ($collectedRows as $cr) {
 
                                                                                                         $dueDateStr = !empty($sRow->installment_due_date) ? date('d-M-y', strtotime($sRow->installment_due_date)) : null;
                                                                                                         $isFmAssigned = !empty($assignedMap[$sRow->fees_group_id . '_' . $sRow->class_type_id]);
-                                                                                                        $isFmCollected = !empty($collectedMap[$sRow->fees_group_id . '_' . $sRow->class_type_id]);
+                                                                                                        $isFmCollected = !empty($collectedMap[$sRow->fees_group_id]);
                                                                                                     @endphp
                                                                                                     <div class="d-inline-flex align-items-center border rounded px-2 py-1 bg-white shadow-sm" style="font-size: 11px; gap: 5px;">
                                                                                                         <span class="badge {{ $badgeClass }}" style="font-size: 9px; padding: 2px 4px;">{{ ucfirst($fgType) }}</span>
